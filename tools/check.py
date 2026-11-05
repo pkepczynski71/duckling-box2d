@@ -9,7 +9,11 @@ def main():
   start=time.monotonic()
   try:
    r=subprocess.run([sys.executable,'-B',str(path)],cwd=ROOT,capture_output=True,timeout=180);code=r.returncode;log=(r.stdout+r.stderr).decode('utf8',errors='replace');n=re.search(r'Ran ([0-9]+) tests?',log);count=int(n[1]) if n else 0
-  except subprocess.TimeoutExpired:code=124;count=0
+  except subprocess.TimeoutExpired as exc:
+   code=124;count=0;log=((exc.stdout or b'')+(exc.stderr or b'')).decode('utf8',errors='replace')
+   print(f'[{path.relative_to(ROOT)}] TIMEOUT po {exc.timeout} s',file=sys.stderr,flush=True)
+  if code:
+   print(f'[{path.relative_to(ROOT)}] EXIT {code}; ostatnie 60 linii:\n'+'\n'.join(log.splitlines()[-60:]),file=sys.stderr,flush=True)
   results.append([i,code,count,round(time.monotonic()-start,3)]);print(json.dumps(results[-1]),flush=True)
  a.out.write_text(json.dumps(results)+'\n',encoding='utf8');return int(any(x[1] for x in results))
 if __name__=='__main__':raise SystemExit(main())
