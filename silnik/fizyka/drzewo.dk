@@ -1,0 +1,943 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import fizyka.kola.*;
+import fizyka.wielokaty as geometry;
+import fizyka.ruch as motion;
+
+extern("C") { fundecl abort() -> (); }
+
+# Box2D 8c661469, src/dynamic_tree.                                           
+const B2_TREE_STACK_SIZE: i32 = 1024i32;
+const B2_NULL_INDEX: i32 = -1i32;
+const b2_allocatedNode: u16 = 1u16;
+const b2_enlargedNode: u16 = 2u16;
+const b2_leafNode: u16 = 4u16;
+
+# Box2D 8c661469, include/box2d/math_functions.h:58.
+class AABB {
+    lowerBound: Vec2 = Vec2();
+    upperBound: Vec2 = Vec2();
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:19-50.
+                                                                              
+                                                               
+                                                                       
+class TreeNode {
+    aabb: AABB = AABB();
+    categoryBits: i64 = 0i64;
+    child1: i32 = 0i32;
+    child2: i32 = 0i32;
+    userData: i64 = 0i64;
+    parent: i32 = 0i32;
+    height: u16 = 0u16;
+    flags: u16 = 0u16;
+}
+
+                                                                        
+                                                                       
+fun emptyNodes() -> List[TreeNode] = {
+    var values: List[TreeNode];
+    return values;
+}
+
+                                                                        
+fun emptyIndices() -> List[i32] = {
+    var values: List[i32];
+    return values;
+}
+
+                                                                        
+fun emptyCenters() -> List[Vec2] = {
+    var values: List[Vec2];
+    return values;
+}
+
+# Box2D 8c661469, include/box2d/collision.h:621-655.
+                                                                            
+                                                                                
+class DynamicTree {
+    nodes: List[TreeNode] = emptyNodes();
+    root: i32 = 0i32;
+    nodeCount: i32 = 0i32;
+    nodeCapacity: i32 = 0i32;
+    freeList: i32 = 0i32;
+    proxyCount: i32 = 0i32;
+    leafIndices: List[i32] = emptyIndices();
+    leafCenters: List[Vec2] = emptyCenters();
+    rebuildCapacity: i32 = 0i32;
+}
+
+# Box2D 8c661469, include/box2d/collision.                           
+class TreeHit {
+    proxyId: i32 = 0i32;
+    userData: i64 = 0i64;
+}
+
+                                                                  
+fun emptyHits() -> List[TreeHit] = {
+    var values: List[TreeHit];
+    return values;
+}
+
+# Box2D 8c661469, include/box2d/collision.                           
+                                                                       
+class TreeQueryResult {
+    nodeVisits: i32 = 0i32;
+    leafVisits: i32 = 0i32;
+    hits: List[TreeHit] = emptyHits();
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:132.
+fun b2MaxFloat(a: f32, b: f32) -> f32 = {
+    if (a > b) return a;
+    return b;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:254.
+fun b2Min(a: Vec2, b: Vec2) -> Vec2 = {
+    return Vec2(geometry.b2MinFloat(a.x, b.x), geometry.b2MinFloat(a.y, b.y));
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:263.
+fun b2Max(a: Vec2, b: Vec2) -> Vec2 = {
+    return Vec2(b2MaxFloat(a.x, b.x), b2MaxFloat(a.y, b.y));
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:582.
+fun b2AABB_Contains(a: AABB, b: AABB) -> bool = {
+    var s: bool = true;
+    s = s and a.lowerBound.x <= b.lowerBound.x;
+    s = s and a.lowerBound.y <= b.lowerBound.y;
+    s = s and b.upperBound.x <= a.upperBound.x;
+    s = s and b.upperBound.y <= a.upperBound.y;
+    return s;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:593.
+fun b2AABB_Center(a: AABB) -> Vec2 = {
+    return Vec2(0.5f32 * (a.lowerBound.x + a.upperBound.x),
+        0.5f32 * (a.lowerBound.y + a.upperBound.y));
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:607.
+fun b2AABB_Union(a: AABB, b: AABB) -> AABB = {
+    var c = AABB();
+    c.lowerBound.x = geometry.b2MinFloat(a.lowerBound.x, b.lowerBound.x);
+    c.lowerBound.y = geometry.b2MinFloat(a.lowerBound.y, b.lowerBound.y);
+    c.upperBound.x = b2MaxFloat(a.upperBound.x, b.upperBound.x);
+    c.upperBound.y = b2MaxFloat(a.upperBound.y, b.upperBound.y);
+    return c;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:618.
+fun b2AABB_Overlaps(a: AABB, b: AABB) -> bool = {
+    return not (b.lowerBound.x > a.upperBound.x or b.lowerBound.y > a.upperBound.y
+        or a.lowerBound.x > b.upperBound.x or a.lowerBound.y > b.upperBound.y);
+}
+
+# Box2D 8c661469, src/aabb.h:12.
+fun b2Perimeter(a: AABB) -> f32 = {
+    let wx: f32 = a.upperBound.x - a.lowerBound.x;
+    let wy: f32 = a.upperBound.y - a.lowerBound.y;
+    return 2.0f32 * (wx + wy);
+}
+
+# Box2D 8c661469, src/aabb.h:21.
+fun b2EnlargeAABB(a: ref AABB, b: AABB) -> bool = {
+    var changed: bool = false;
+    if (b.lowerBound.x < a.lowerBound.x) {
+        a.lowerBound.x = b.lowerBound.x;
+        changed = true;
+    }
+    if (b.lowerBound.y < a.lowerBound.y) {
+        a.lowerBound.y = b.lowerBound.y;
+        changed = true;
+    }
+    if (a.upperBound.x < b.upperBound.x) {
+        a.upperBound.x = b.upperBound.x;
+        changed = true;
+    }
+    if (a.upperBound.y < b.upperBound.y) {
+        a.upperBound.y = b.upperBound.y;
+        changed = true;
+    }
+    return changed;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:65.
+fun b2IsLeaf(node: ref TreeNode) -> bool = {
+    return (node.flags & b2_leafNode) != 0u16;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:70.
+fun b2IsAllocated(node: ref TreeNode) -> bool = {
+    return (node.flags & b2_allocatedNode) != 0u16;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:75.
+fun b2MaxUInt16(a: u16, b: u16) -> u16 = {
+    if (a > b) return a;
+    return b;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:80.
+fun b2DynamicTree_Create() -> DynamicTree = {
+    var tree = DynamicTree();
+    tree.root = B2_NULL_INDEX;
+    tree.nodeCapacity = 16i32;
+    var i: i32 = 0i32;
+    while (i < tree.nodeCapacity) {
+        var node = TreeNode();
+        node.parent = if i < tree.nodeCapacity - 1i32 then i + 1i32 else B2_NULL_INDEX;
+        tree.nodes.push(move node);
+        i = i + 1i32;
+    }
+    return tree;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:110.
+                                                                            
+fun b2DynamicTree_Destroy(tree: ref DynamicTree) -> () = {
+    tree = DynamicTree();
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:122.
+fun b2AllocateNode(tree: ref DynamicTree) -> i32 = {
+    if (tree.freeList == B2_NULL_INDEX) {
+        let oldCapacity: i32 = tree.nodeCapacity;
+        tree.nodeCapacity = tree.nodeCapacity + (oldCapacity >> 1i32);
+        var i: i32 = tree.nodeCount;
+        while (i < tree.nodeCapacity) {
+            var freeNode = TreeNode();
+            freeNode.parent = if i < tree.nodeCapacity - 1i32 then i + 1i32 else B2_NULL_INDEX;
+            tree.nodes.push(move freeNode);
+            i = i + 1i32;
+        }
+        tree.freeList = tree.nodeCount;
+    }
+    let nodeIndex: i32 = tree.freeList;
+    tree.freeList = tree.nodes.at(nodeIndex as i64).parent;
+                                                                     
+    var allocatedNode = TreeNode();
+    allocatedNode.categoryBits = 1i64;
+    allocatedNode.child1 = B2_NULL_INDEX;
+    allocatedNode.child2 = B2_NULL_INDEX;
+    allocatedNode.parent = B2_NULL_INDEX;
+    allocatedNode.flags = b2_allocatedNode;
+    tree.nodes.at(nodeIndex as i64) = allocatedNode;
+    tree.nodeCount = tree.nodeCount + 1i32;
+    return nodeIndex;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:160.
+fun b2FreeNode(tree: ref DynamicTree, nodeId: i32) -> () = {
+    tree.nodes.at(nodeId as i64).parent = tree.freeList;
+    tree.nodes.at(nodeId as i64).flags = 0u16;
+    tree.freeList = nodeId;
+    tree.nodeCount = tree.nodeCount - 1i32;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:187.
+fun b2FindBestSibling(tree: ref DynamicTree, boxD: AABB) -> i32 = {
+    let centerD: Vec2 = b2AABB_Center(boxD);
+    let areaD: f32 = b2Perimeter(boxD);
+    let rootIndex: i32 = tree.root;
+    let rootBox: AABB = tree.nodes.at(rootIndex as i64).aabb;
+    var areaBase: f32 = b2Perimeter(rootBox);
+    var directCost: f32 = b2Perimeter(b2AABB_Union(rootBox, boxD));
+    var inheritedCost: f32 = 0.0f32;
+    var bestSibling: i32 = rootIndex;
+    var bestCost: f32 = directCost;
+    var index: i32 = rootIndex;
+    var descend: bool = true;
+    while (descend and tree.nodes.at(index as i64).height > 0u16) {
+        let child1: i32 = tree.nodes.at(index as i64).child1;
+        let child2: i32 = tree.nodes.at(index as i64).child2;
+        let cost: f32 = directCost + inheritedCost;
+        if (cost < bestCost) {
+            bestSibling = index;
+            bestCost = cost;
+        }
+        inheritedCost = inheritedCost + (directCost - areaBase);
+        let leaf1: bool = tree.nodes.at(child1 as i64).height == 0u16;
+        let leaf2: bool = tree.nodes.at(child2 as i64).height == 0u16;
+        var lowerCost1: f32 = geometry.FLT_MAX;
+        let box1: AABB = tree.nodes.at(child1 as i64).aabb;
+        let directCost1: f32 = b2Perimeter(b2AABB_Union(box1, boxD));
+        var area1: f32 = 0.0f32;
+        if (leaf1) {
+            let cost1: f32 = directCost1 + inheritedCost;
+            if (cost1 < bestCost) {
+                bestSibling = child1;
+                bestCost = cost1;
+            }
+        } else {
+            area1 = b2Perimeter(box1);
+            lowerCost1 = (inheritedCost + directCost1) + geometry.b2MinFloat(areaD - area1, 0.0f32);
+        }
+        var lowerCost2: f32 = geometry.FLT_MAX;
+        let box2: AABB = tree.nodes.at(child2 as i64).aabb;
+        let directCost2: f32 = b2Perimeter(b2AABB_Union(box2, boxD));
+        var area2: f32 = 0.0f32;
+        if (leaf2) {
+            let cost2: f32 = directCost2 + inheritedCost;
+            if (cost2 < bestCost) {
+                bestSibling = child2;
+                bestCost = cost2;
+            }
+        } else {
+            area2 = b2Perimeter(box2);
+            lowerCost2 = (inheritedCost + directCost2) + geometry.b2MinFloat(areaD - area2, 0.0f32);
+        }
+        if ((leaf1 and leaf2) or (bestCost <= lowerCost1 and bestCost <= lowerCost2)) {
+            descend = false;
+        } else {
+            if (lowerCost1 == lowerCost2 and not leaf1) {
+                let d1: Vec2 = b2Sub(b2AABB_Center(box1), centerD);
+                let d2: Vec2 = b2Sub(b2AABB_Center(box2), centerD);
+                lowerCost1 = motion.b2LengthSquared(d1);
+                lowerCost2 = motion.b2LengthSquared(d2);
+            }
+            if (lowerCost1 < lowerCost2 and not leaf1) {
+                index = child1;
+                areaBase = area1;
+                directCost = directCost1;
+            } else {
+                index = child2;
+                areaBase = area2;
+                directCost = directCost2;
+            }
+        }
+    }
+    return bestSibling;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:338.
+                                                                              
+                                                                         
+fun b2RotateNodes(tree: ref DynamicTree, iA: i32) -> () = {
+    var A: ref TreeNode = tree.nodes.at(iA as i64);
+    if (A.height < 2u16) return;
+    let iB: i32 = A.child1;
+    let iC: i32 = A.child2;
+    var B: ref TreeNode = tree.nodes.at(iB as i64);
+    var C: ref TreeNode = tree.nodes.at(iC as i64);
+    if (B.height == 0u16) {
+        let iF1: i32 = C.child1;
+        let iG1: i32 = C.child2;
+        var F1: ref TreeNode = tree.nodes.at(iF1 as i64);
+        var G1: ref TreeNode = tree.nodes.at(iG1 as i64);
+        let costBase1: f32 = b2Perimeter(C.aabb);
+        let aabbBG1: AABB = b2AABB_Union(B.aabb, G1.aabb);
+        let costBF1: f32 = b2Perimeter(aabbBG1);
+        let aabbBF1: AABB = b2AABB_Union(B.aabb, F1.aabb);
+        let costBG1: f32 = b2Perimeter(aabbBF1);
+        if (costBase1 < costBF1 and costBase1 < costBG1) return;
+        if (costBF1 < costBG1) {
+            A.child1 = iF1;
+            C.child1 = iB;
+            B.parent = iC;
+            F1.parent = iA;
+            C.aabb = aabbBG1;
+            C.height = 1u16 + b2MaxUInt16(B.height, G1.height);
+            A.height = 1u16 + b2MaxUInt16(C.height, F1.height);
+            C.categoryBits = B.categoryBits | G1.categoryBits;
+            A.categoryBits = C.categoryBits | F1.categoryBits;
+            C.flags = C.flags | ((B.flags | G1.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((C.flags | F1.flags) & b2_enlargedNode);
+        } else {
+            A.child1 = iG1;
+            C.child2 = iB;
+            B.parent = iC;
+            G1.parent = iA;
+            C.aabb = aabbBF1;
+            C.height = 1u16 + b2MaxUInt16(B.height, F1.height);
+            A.height = 1u16 + b2MaxUInt16(C.height, G1.height);
+            C.categoryBits = B.categoryBits | F1.categoryBits;
+            A.categoryBits = C.categoryBits | G1.categoryBits;
+            C.flags = C.flags | ((B.flags | F1.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((C.flags | G1.flags) & b2_enlargedNode);
+        }
+    } else if (C.height == 0u16) {
+        let iD2: i32 = B.child1;
+        let iE2: i32 = B.child2;
+        var D2: ref TreeNode = tree.nodes.at(iD2 as i64);
+        var E2: ref TreeNode = tree.nodes.at(iE2 as i64);
+        let costBase2: f32 = b2Perimeter(B.aabb);
+        let aabbCE2: AABB = b2AABB_Union(C.aabb, E2.aabb);
+        let costCD2: f32 = b2Perimeter(aabbCE2);
+        let aabbCD2: AABB = b2AABB_Union(C.aabb, D2.aabb);
+        let costCE2: f32 = b2Perimeter(aabbCD2);
+        if (costBase2 < costCD2 and costBase2 < costCE2) return;
+        if (costCD2 < costCE2) {
+            A.child2 = iD2;
+            B.child1 = iC;
+            C.parent = iB;
+            D2.parent = iA;
+            B.aabb = aabbCE2;
+            B.height = 1u16 + b2MaxUInt16(C.height, E2.height);
+            A.height = 1u16 + b2MaxUInt16(B.height, D2.height);
+            B.categoryBits = C.categoryBits | E2.categoryBits;
+            A.categoryBits = B.categoryBits | D2.categoryBits;
+            B.flags = B.flags | ((C.flags | E2.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((B.flags | D2.flags) & b2_enlargedNode);
+        } else {
+            A.child2 = iE2;
+            B.child2 = iC;
+            C.parent = iB;
+            E2.parent = iA;
+            B.aabb = aabbCD2;
+            B.height = 1u16 + b2MaxUInt16(C.height, D2.height);
+            A.height = 1u16 + b2MaxUInt16(B.height, E2.height);
+            B.categoryBits = C.categoryBits | D2.categoryBits;
+            A.categoryBits = B.categoryBits | E2.categoryBits;
+            B.flags = B.flags | ((C.flags | D2.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((B.flags | E2.flags) & b2_enlargedNode);
+        }
+    } else {
+        let iD3: i32 = B.child1;
+        let iE3: i32 = B.child2;
+        let iF3: i32 = C.child1;
+        let iG3: i32 = C.child2;
+        var D3: ref TreeNode = tree.nodes.at(iD3 as i64);
+        var E3: ref TreeNode = tree.nodes.at(iE3 as i64);
+        var F3: ref TreeNode = tree.nodes.at(iF3 as i64);
+        var G3: ref TreeNode = tree.nodes.at(iG3 as i64);
+        let areaB: f32 = b2Perimeter(B.aabb);
+        let areaC: f32 = b2Perimeter(C.aabb);
+        let costBase3: f32 = areaB + areaC;
+                                                                     
+        var bestRotation: i32 = 0i32;
+        var bestCost: f32 = costBase3;
+        let aabbBG3: AABB = b2AABB_Union(B.aabb, G3.aabb);
+        let costBF3: f32 = areaB + b2Perimeter(aabbBG3);
+        if (costBF3 < bestCost) {
+            bestRotation = 1i32;
+            bestCost = costBF3;
+        }
+        let aabbBF3: AABB = b2AABB_Union(B.aabb, F3.aabb);
+        let costBG3: f32 = areaB + b2Perimeter(aabbBF3);
+        if (costBG3 < bestCost) {
+            bestRotation = 2i32;
+            bestCost = costBG3;
+        }
+        let aabbCE3: AABB = b2AABB_Union(C.aabb, E3.aabb);
+        let costCD3: f32 = areaC + b2Perimeter(aabbCE3);
+        if (costCD3 < bestCost) {
+            bestRotation = 3i32;
+            bestCost = costCD3;
+        }
+        let aabbCD3: AABB = b2AABB_Union(C.aabb, D3.aabb);
+        let costCE3: f32 = areaC + b2Perimeter(aabbCD3);
+        if (costCE3 < bestCost) bestRotation = 4i32;
+        if (bestRotation == 1i32) {
+            A.child1 = iF3;
+            C.child1 = iB;
+            B.parent = iC;
+            F3.parent = iA;
+            C.aabb = aabbBG3;
+            C.height = 1u16 + b2MaxUInt16(B.height, G3.height);
+            A.height = 1u16 + b2MaxUInt16(C.height, F3.height);
+            C.categoryBits = B.categoryBits | G3.categoryBits;
+            A.categoryBits = C.categoryBits | F3.categoryBits;
+            C.flags = C.flags | ((B.flags | G3.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((C.flags | F3.flags) & b2_enlargedNode);
+        } else if (bestRotation == 2i32) {
+            A.child1 = iG3;
+            C.child2 = iB;
+            B.parent = iC;
+            G3.parent = iA;
+            C.aabb = aabbBF3;
+            C.height = 1u16 + b2MaxUInt16(B.height, F3.height);
+            A.height = 1u16 + b2MaxUInt16(C.height, G3.height);
+            C.categoryBits = B.categoryBits | F3.categoryBits;
+            A.categoryBits = C.categoryBits | G3.categoryBits;
+            C.flags = C.flags | ((B.flags | F3.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((C.flags | G3.flags) & b2_enlargedNode);
+        } else if (bestRotation == 3i32) {
+            A.child2 = iD3;
+            B.child1 = iC;
+            C.parent = iB;
+            D3.parent = iA;
+            B.aabb = aabbCE3;
+            B.height = 1u16 + b2MaxUInt16(C.height, E3.height);
+            A.height = 1u16 + b2MaxUInt16(B.height, D3.height);
+            B.categoryBits = C.categoryBits | E3.categoryBits;
+            A.categoryBits = B.categoryBits | D3.categoryBits;
+            B.flags = B.flags | ((C.flags | E3.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((B.flags | D3.flags) & b2_enlargedNode);
+        } else if (bestRotation == 4i32) {
+            A.child2 = iE3;
+            B.child2 = iC;
+            C.parent = iB;
+            E3.parent = iA;
+            B.aabb = aabbCD3;
+            B.height = 1u16 + b2MaxUInt16(C.height, D3.height);
+            A.height = 1u16 + b2MaxUInt16(B.height, E3.height);
+            B.categoryBits = C.categoryBits | D3.categoryBits;
+            A.categoryBits = B.categoryBits | E3.categoryBits;
+            B.flags = B.flags | ((C.flags | D3.flags) & b2_enlargedNode);
+            A.flags = A.flags | ((B.flags | E3.flags) & b2_enlargedNode);
+        }
+    }
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:625.
+fun b2InsertLeaf(tree: ref DynamicTree, leaf: i32, shouldRotate: bool) -> () = {
+    if (tree.root == B2_NULL_INDEX) {
+        tree.root = leaf;
+        tree.nodes.at(tree.root as i64).parent = B2_NULL_INDEX;
+        return;
+    }
+    let leafAABB: AABB = tree.nodes.at(leaf as i64).aabb;
+    let sibling: i32 = b2FindBestSibling(tree, leafAABB);
+    let oldParent: i32 = tree.nodes.at(sibling as i64).parent;
+    let newParent: i32 = b2AllocateNode(tree);
+                                                                                
+    tree.nodes.at(newParent as i64).parent = oldParent;
+    tree.nodes.at(newParent as i64).userData = -1i64;
+    tree.nodes.at(newParent as i64).aabb = b2AABB_Union(leafAABB, tree.nodes.at(sibling as i64).aabb);
+    tree.nodes.at(newParent as i64).categoryBits = tree.nodes.at(leaf as i64).categoryBits
+        | tree.nodes.at(sibling as i64).categoryBits;
+    tree.nodes.at(newParent as i64).height = tree.nodes.at(sibling as i64).height + 1u16;
+    if (oldParent != B2_NULL_INDEX) {
+        if (tree.nodes.at(oldParent as i64).child1 == sibling) {
+            tree.nodes.at(oldParent as i64).child1 = newParent;
+        } else {
+            tree.nodes.at(oldParent as i64).child2 = newParent;
+        }
+        tree.nodes.at(newParent as i64).child1 = sibling;
+        tree.nodes.at(newParent as i64).child2 = leaf;
+        tree.nodes.at(sibling as i64).parent = newParent;
+        tree.nodes.at(leaf as i64).parent = newParent;
+    } else {
+        tree.nodes.at(newParent as i64).child1 = sibling;
+        tree.nodes.at(newParent as i64).child2 = leaf;
+        tree.nodes.at(sibling as i64).parent = newParent;
+        tree.nodes.at(leaf as i64).parent = newParent;
+        tree.root = newParent;
+    }
+    var index: i32 = tree.nodes.at(leaf as i64).parent;
+    while (index != B2_NULL_INDEX) {
+        let child1: i32 = tree.nodes.at(index as i64).child1;
+        let child2: i32 = tree.nodes.at(index as i64).child2;
+        tree.nodes.at(index as i64).aabb = b2AABB_Union(tree.nodes.at(child1 as i64).aabb,
+            tree.nodes.at(child2 as i64).aabb);
+        tree.nodes.at(index as i64).categoryBits = tree.nodes.at(child1 as i64).categoryBits
+            | tree.nodes.at(child2 as i64).categoryBits;
+        tree.nodes.at(index as i64).height = 1u16 + b2MaxUInt16(tree.nodes.at(child1 as i64).height,
+            tree.nodes.at(child2 as i64).height);
+        tree.nodes.at(index as i64).flags = tree.nodes.at(index as i64).flags
+            | ((tree.nodes.at(child1 as i64).flags | tree.nodes.at(child2 as i64).flags) & b2_enlargedNode);
+        if (shouldRotate) b2RotateNodes(tree, index);
+        index = tree.nodes.at(index as i64).parent;
+    }
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:701.
+fun b2RemoveLeaf(tree: ref DynamicTree, leaf: i32) -> () = {
+    if (leaf == tree.root) {
+        tree.root = B2_NULL_INDEX;
+        return;
+    }
+    let parent: i32 = tree.nodes.at(leaf as i64).parent;
+    let grandParent: i32 = tree.nodes.at(parent as i64).parent;
+    var sibling: i32 = 0i32;
+    if (tree.nodes.at(parent as i64).child1 == leaf) {
+        sibling = tree.nodes.at(parent as i64).child2;
+    } else {
+        sibling = tree.nodes.at(parent as i64).child1;
+    }
+    if (grandParent != B2_NULL_INDEX) {
+        if (tree.nodes.at(grandParent as i64).child1 == parent) {
+            tree.nodes.at(grandParent as i64).child1 = sibling;
+        } else {
+            tree.nodes.at(grandParent as i64).child2 = sibling;
+        }
+        tree.nodes.at(sibling as i64).parent = grandParent;
+        b2FreeNode(tree, parent);
+        var index: i32 = grandParent;
+        while (index != B2_NULL_INDEX) {
+            let child1: i32 = tree.nodes.at(index as i64).child1;
+            let child2: i32 = tree.nodes.at(index as i64).child2;
+            tree.nodes.at(index as i64).aabb = b2AABB_Union(tree.nodes.at(child1 as i64).aabb,
+                tree.nodes.at(child2 as i64).aabb);
+            tree.nodes.at(index as i64).categoryBits = tree.nodes.at(child1 as i64).categoryBits
+                | tree.nodes.at(child2 as i64).categoryBits;
+            tree.nodes.at(index as i64).height = 1u16 + b2MaxUInt16(tree.nodes.at(child1 as i64).height,
+                tree.nodes.at(child2 as i64).height);
+            index = tree.nodes.at(index as i64).parent;
+        }
+    } else {
+        tree.root = sibling;
+        tree.nodes.at(sibling as i64).parent = B2_NULL_INDEX;
+        b2FreeNode(tree, parent);
+    }
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:770.
+fun b2DynamicTree_CreateProxy(tree: ref DynamicTree, aabb: AABB, categoryBits: i64, userData: i64) -> i32 = {
+    let proxyId: i32 = b2AllocateNode(tree);
+    tree.nodes.at(proxyId as i64).aabb = aabb;
+    tree.nodes.at(proxyId as i64).userData = userData;
+    tree.nodes.at(proxyId as i64).categoryBits = categoryBits;
+    tree.nodes.at(proxyId as i64).height = 0u16;
+    tree.nodes.at(proxyId as i64).flags = b2_allocatedNode | b2_leafNode;
+    b2InsertLeaf(tree, proxyId, true);
+    tree.proxyCount = tree.proxyCount + 1i32;
+    return proxyId;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:794.
+fun b2DynamicTree_DestroyProxy(tree: ref DynamicTree, proxyId: i32) -> () = {
+    b2RemoveLeaf(tree, proxyId);
+    b2FreeNode(tree, proxyId);
+    tree.proxyCount = tree.proxyCount - 1i32;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:806.
+fun b2DynamicTree_GetProxyCount(tree: ref DynamicTree) -> i32 = {
+    return tree.proxyCount;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:811.
+fun b2DynamicTree_MoveProxy(tree: ref DynamicTree, proxyId: i32, aabb: AABB) -> () = {
+    b2RemoveLeaf(tree, proxyId);
+    tree.nodes.at(proxyId as i64).aabb = aabb;
+    b2InsertLeaf(tree, proxyId, false);
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:827.
+fun b2DynamicTree_EnlargeProxy(tree: ref DynamicTree, proxyId: i32, aabb: AABB) -> () = {
+    tree.nodes.at(proxyId as i64).aabb = aabb;
+    var parentIndex: i32 = tree.nodes.at(proxyId as i64).parent;
+    var enlarge: bool = true;
+    while (parentIndex != B2_NULL_INDEX and enlarge) {
+        let changed: bool = b2EnlargeAABB(&tree.nodes.at(parentIndex as i64).aabb, aabb);
+        tree.nodes.at(parentIndex as i64).flags = tree.nodes.at(parentIndex as i64).flags | b2_enlargedNode;
+        parentIndex = tree.nodes.at(parentIndex as i64).parent;
+        if (not changed) enlarge = false;
+    }
+    var mark: bool = true;
+    while (parentIndex != B2_NULL_INDEX and mark) {
+        if ((tree.nodes.at(parentIndex as i64).flags & b2_enlargedNode) != 0u16) {
+            mark = false;
+        } else {
+            tree.nodes.at(parentIndex as i64).flags = tree.nodes.at(parentIndex as i64).flags | b2_enlargedNode;
+            parentIndex = tree.nodes.at(parentIndex as i64).parent;
+        }
+    }
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:868.
+fun b2DynamicTree_SetCategoryBits(tree: ref DynamicTree, proxyId: i32, categoryBits: i64) -> () = {
+    tree.nodes.at(proxyId as i64).categoryBits = categoryBits;
+    var nodeIndex: i32 = tree.nodes.at(proxyId as i64).parent;
+    while (nodeIndex != B2_NULL_INDEX) {
+        let child1: i32 = tree.nodes.at(nodeIndex as i64).child1;
+        let child2: i32 = tree.nodes.at(nodeIndex as i64).child2;
+        tree.nodes.at(nodeIndex as i64).categoryBits = tree.nodes.at(child1 as i64).categoryBits
+            | tree.nodes.at(child2 as i64).categoryBits;
+        nodeIndex = tree.nodes.at(nodeIndex as i64).parent;
+    }
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:893.
+fun b2DynamicTree_GetCategoryBits(tree: ref DynamicTree, proxyId: i32) -> i64 = {
+    return tree.nodes.at(proxyId as i64).categoryBits;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:899.
+fun b2DynamicTree_GetHeight(tree: ref DynamicTree) -> i32 = {
+    if (tree.root == B2_NULL_INDEX) return 0i32;
+    return tree.nodes.at(tree.root as i64).height as i32;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:909.
+fun b2DynamicTree_GetAreaRatio(tree: ref DynamicTree) -> f32 = {
+    if (tree.root == B2_NULL_INDEX) return 0.0f32;
+    let rootArea: f32 = b2Perimeter(tree.nodes.at(tree.root as i64).aabb);
+    if (rootArea <= 0.0f32) return 0.0f32;
+    var totalArea: f32 = 0.0f32;
+    var i: i32 = 0i32;
+    while (i < tree.nodeCapacity) {
+        if (b2IsAllocated(tree.nodes.at(i as i64)) and not b2IsLeaf(tree.nodes.at(i as i64)) and i != tree.root) {
+            totalArea = totalArea + b2Perimeter(tree.nodes.at(i as i64).aabb);
+        }
+        i = i + 1i32;
+    }
+    return totalArea / rootArea;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:934.
+fun b2DynamicTree_GetRootBounds(tree: ref DynamicTree) -> AABB = {
+    if (tree.root != B2_NULL_INDEX) return tree.nodes.at(tree.root as i64).aabb;
+    return AABB();
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1102.
+fun b2DynamicTree_GetUserData(tree: ref DynamicTree, proxyId: i32) -> i64 = {
+    return tree.nodes.at(proxyId as i64).userData;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1108.
+fun b2DynamicTree_GetAABB(tree: ref DynamicTree, proxyId: i32) -> AABB = {
+    return tree.nodes.at(proxyId as i64).aabb;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1114.
+fun b2DynamicTree_Query(tree: ref DynamicTree, aabb: AABB, maskBits: i64) -> TreeQueryResult = {
+    var result = TreeQueryResult();
+    if (tree.nodeCount == 0i32) return result;
+    var stack: i32[1024];
+    var stackCount: i32 = 0i32;
+    stack[stackCount] = tree.root;
+    stackCount = stackCount + 1i32;
+    while (stackCount > 0i32) {
+        stackCount = stackCount - 1i32;
+        let nodeId: i32 = stack[stackCount];
+        if (nodeId != B2_NULL_INDEX) {
+                                                                                  
+            var node: ref TreeNode = tree.nodes.at(nodeId as i64);
+            result.nodeVisits = result.nodeVisits + 1i32;
+            if (b2AABB_Overlaps(node.aabb, aabb) and (node.categoryBits & maskBits) != 0i64) {
+                if (b2IsLeaf(node)) {
+                    result.hits.push(TreeHit(nodeId, node.userData));
+                    result.leafVisits = result.leafVisits + 1i32;
+                } else {
+                    if (stackCount < B2_TREE_STACK_SIZE - 1i32) {
+                        stack[stackCount] = node.child1;
+                        stackCount = stackCount + 1i32;
+                        stack[stackCount] = node.child2;
+                        stackCount = stackCount + 1i32;
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
+
+# Box2D 8c661469, src/dynamic_tree.                                
+                                                                                
+fun b2PartitionMid(indices: ref List[i32], centers: ref List[Vec2], start: i32, count: i32) -> i32 = {
+    if (count <= 2i32) return count / 2i32;
+    var lowerBound: Vec2 = centers.at(start as i64);
+    var upperBound: Vec2 = centers.at(start as i64);
+    var i: i32 = 1i32;
+    while (i < count) {
+        let center: Vec2 = centers.at((start + i) as i64);
+        lowerBound = b2Min(lowerBound, center);
+        upperBound = b2Max(upperBound, center);
+        i = i + 1i32;
+    }
+    let d: Vec2 = b2Sub(upperBound, lowerBound);
+    let c: Vec2 = Vec2(0.5f32 * (lowerBound.x + upperBound.x),
+        0.5f32 * (lowerBound.y + upperBound.y));
+    var i1: i32 = 0i32;
+    var i2: i32 = count;
+    if (d.x > d.y) {
+        let pivotX: f32 = c.x;
+        while (i1 < i2) {
+            while (i1 < i2 and centers.at((start + i1) as i64).x < pivotX) i1 = i1 + 1i32;
+            while (i1 < i2 and centers.at((start + i2 - 1i32) as i64).x >= pivotX) i2 = i2 - 1i32;
+            if (i1 < i2) {
+                let tempIndexX: i32 = indices.at((start + i1) as i64);
+                indices.at((start + i1) as i64) = indices.at((start + i2 - 1i32) as i64);
+                indices.at((start + i2 - 1i32) as i64) = tempIndexX;
+                let tempCenterX: Vec2 = centers.at((start + i1) as i64);
+                centers.at((start + i1) as i64) = centers.at((start + i2 - 1i32) as i64);
+                centers.at((start + i2 - 1i32) as i64) = tempCenterX;
+                i1 = i1 + 1i32;
+                i2 = i2 - 1i32;
+            }
+        }
+    } else {
+        let pivotY: f32 = c.y;
+        while (i1 < i2) {
+            while (i1 < i2 and centers.at((start + i1) as i64).y < pivotY) i1 = i1 + 1i32;
+            while (i1 < i2 and centers.at((start + i2 - 1i32) as i64).y >= pivotY) i2 = i2 - 1i32;
+            if (i1 < i2) {
+                let tempIndexY: i32 = indices.at((start + i1) as i64);
+                indices.at((start + i1) as i64) = indices.at((start + i2 - 1i32) as i64);
+                indices.at((start + i2 - 1i32) as i64) = tempIndexY;
+                let tempCenterY: Vec2 = centers.at((start + i1) as i64);
+                centers.at((start + i1) as i64) = centers.at((start + i2 - 1i32) as i64);
+                centers.at((start + i2 - 1i32) as i64) = tempCenterY;
+                i1 = i1 + 1i32;
+                i2 = i2 - 1i32;
+            }
+        }
+    }
+    if (i1 > 0i32 and i1 < count) return i1;
+    return count / 2i32;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1704.
+class RebuildItem {
+    nodeIndex: i32 = 0i32;
+    childCount: i32 = 0i32;
+    startIndex: i32 = 0i32;
+    splitIndex: i32 = 0i32;
+    endIndex: i32 = 0i32;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1716.
+fun b2BuildTree(tree: ref DynamicTree, leafCount: i32) -> i32 = {
+    if (leafCount == 1i32) {
+        let singleIndex: i32 = tree.leafIndices.at(0i64);
+        tree.nodes.at(singleIndex as i64).parent = B2_NULL_INDEX;
+        return singleIndex;
+    }
+    var stack: RebuildItem[1024];
+    var top: i32 = 0i32;
+    stack[0].nodeIndex = b2AllocateNode(tree);
+    stack[0].childCount = -1i32;
+    stack[0].startIndex = 0i32;
+    stack[0].endIndex = leafCount;
+    stack[0].splitIndex = b2PartitionMid(&tree.leafIndices, &tree.leafCenters, 0i32, leafCount);
+    var building: bool = true;
+    while (building) {
+                                                                              
+        var item: ref RebuildItem = &stack[top];
+        item.childCount = item.childCount + 1i32;
+        if (item.childCount == 2i32) {
+            if (top == 0i32) {
+                building = false;
+            } else {
+                let parentIndex: i32 = stack[top - 1i32].nodeIndex;
+                if (stack[top - 1i32].childCount == 0i32) {
+                    tree.nodes.at(parentIndex as i64).child1 = item.nodeIndex;
+                } else {
+                    tree.nodes.at(parentIndex as i64).child2 = item.nodeIndex;
+                }
+                tree.nodes.at(item.nodeIndex as i64).parent = parentIndex;
+                let child1: i32 = tree.nodes.at(item.nodeIndex as i64).child1;
+                let child2: i32 = tree.nodes.at(item.nodeIndex as i64).child2;
+                tree.nodes.at(item.nodeIndex as i64).aabb = b2AABB_Union(tree.nodes.at(child1 as i64).aabb,
+                    tree.nodes.at(child2 as i64).aabb);
+                tree.nodes.at(item.nodeIndex as i64).height = 1u16 + b2MaxUInt16(tree.nodes.at(child1 as i64).height,
+                    tree.nodes.at(child2 as i64).height);
+                tree.nodes.at(item.nodeIndex as i64).categoryBits = tree.nodes.at(child1 as i64).categoryBits
+                    | tree.nodes.at(child2 as i64).categoryBits;
+                top = top - 1i32;
+            }
+        } else {
+            var startIndex: i32 = 0i32;
+            var endIndex: i32 = 0i32;
+            if (item.childCount == 0i32) {
+                startIndex = item.startIndex;
+                endIndex = item.splitIndex;
+            } else {
+                startIndex = item.splitIndex;
+                endIndex = item.endIndex;
+            }
+            let count: i32 = endIndex - startIndex;
+            if (count == 1i32) {
+                let childIndex: i32 = tree.leafIndices.at(startIndex as i64);
+                if (item.childCount == 0i32) {
+                    tree.nodes.at(item.nodeIndex as i64).child1 = childIndex;
+                } else {
+                    tree.nodes.at(item.nodeIndex as i64).child2 = childIndex;
+                }
+                tree.nodes.at(childIndex as i64).parent = item.nodeIndex;
+            } else {
+                                                                                
+                if (top >= B2_TREE_STACK_SIZE - 1i32) abort();
+                top = top + 1i32;
+                stack[top].nodeIndex = b2AllocateNode(tree);
+                stack[top].childCount = -1i32;
+                stack[top].startIndex = startIndex;
+                stack[top].endIndex = endIndex;
+                stack[top].splitIndex = b2PartitionMid(&tree.leafIndices, &tree.leafCenters, startIndex, count);
+                stack[top].splitIndex = stack[top].splitIndex + startIndex;
+            }
+        }
+    }
+    let rootIndex: i32 = stack[0].nodeIndex;
+    let rootChild1: i32 = tree.nodes.at(rootIndex as i64).child1;
+    let rootChild2: i32 = tree.nodes.at(rootIndex as i64).child2;
+    tree.nodes.at(rootIndex as i64).aabb = b2AABB_Union(tree.nodes.at(rootChild1 as i64).aabb,
+        tree.nodes.at(rootChild2 as i64).aabb);
+    tree.nodes.at(rootIndex as i64).height = 1u16 + b2MaxUInt16(tree.nodes.at(rootChild1 as i64).height,
+        tree.nodes.at(rootChild2 as i64).height);
+    tree.nodes.at(rootIndex as i64).categoryBits = tree.nodes.at(rootChild1 as i64).categoryBits
+        | tree.nodes.at(rootChild2 as i64).categoryBits;
+    return rootIndex;
+}
+
+# Box2D 8c661469, src/dynamic_tree.c:1872.
+fun b2DynamicTree_Rebuild(tree: ref DynamicTree, fullBuild: bool) -> i32 = {
+    let proxyCount: i32 = tree.proxyCount;
+    if (proxyCount == 0i32) return 0i32;
+    if (proxyCount > tree.rebuildCapacity) {
+        let newCapacity: i32 = proxyCount + proxyCount / 2i32;
+        tree.leafIndices = emptyIndices();
+        tree.leafCenters = emptyCenters();
+        var reserveIndex: i32 = 0i32;
+        while (reserveIndex < newCapacity) {
+            tree.leafIndices.push(0i32);
+            tree.leafCenters.push(Vec2());
+            reserveIndex = reserveIndex + 1i32;
+        }
+        tree.rebuildCapacity = newCapacity;
+    }
+    var leafCount: i32 = 0i32;
+    var stack: i32[1024];
+    var stackCount: i32 = 0i32;
+    var nodeIndex: i32 = tree.root;
+    var gathering: bool = true;
+    while (gathering) {
+        if (tree.nodes.at(nodeIndex as i64).height == 0u16
+            or ((tree.nodes.at(nodeIndex as i64).flags & b2_enlargedNode) == 0u16 and not fullBuild)) {
+            tree.leafIndices.at(leafCount as i64) = nodeIndex;
+            tree.leafCenters.at(leafCount as i64) = b2AABB_Center(tree.nodes.at(nodeIndex as i64).aabb);
+            leafCount = leafCount + 1i32;
+            tree.nodes.at(nodeIndex as i64).parent = B2_NULL_INDEX;
+            if (stackCount == 0i32) {
+                gathering = false;
+            } else {
+                stackCount = stackCount - 1i32;
+                nodeIndex = stack[stackCount];
+            }
+        } else {
+            let doomedNodeIndex: i32 = nodeIndex;
+                                                                                 
+            let nextChild: i32 = tree.nodes.at(nodeIndex as i64).child1;
+            if (stackCount < B2_TREE_STACK_SIZE) {
+                stack[stackCount] = tree.nodes.at(nodeIndex as i64).child2;
+                stackCount = stackCount + 1i32;
+            }
+            nodeIndex = nextChild;
+            b2FreeNode(tree, doomedNodeIndex);
+        }
+    }
+    tree.root = b2BuildTree(tree, leafCount);
+    return leafCount;
+}

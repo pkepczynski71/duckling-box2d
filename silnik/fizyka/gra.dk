@@ -1,0 +1,2787 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+
+import fizyka.swiat as raw;
+import fizyka.kola.*;
+import fizyka.zbior.*;
+import fizyka.szeroka as broad;
+import fizyka.wielokaty as poly;
+import fizyka.ruch as mass2;
+import fizyka.drzewo as tree;
+import fizyka.odleglosc as distance;
+
+                                                                                           
+class ExplosionDescription {
+    maskBits: Key64 = Key64(4294967295u32,4294967295u32);
+    position: Vec2 = Vec2(); radius: f32 = 0.0f32; falloff: f32 = 0.0f32; impulsePerLength: f32 = 0.0f32;
+}
+const EXPLOSION_DOMAIN: i32 = 25i32;
+fun defaultExplosionDescription() -> ExplosionDescription = {
+    let value: raw.ExplosionDef = raw.b2DefaultExplosionDef();
+    return ExplosionDescription(value.maskBits,value.position,value.radius,value.falloff,value.impulsePerLength);
+}
+                                                                                            
+fun explosionPreflight(owner: WorldNumber, description: ExplosionDescription) -> ChainValidation = {
+    let status: i32 = worldMutationStatus(owner);
+    if (status != OK) return ChainValidation(status,if status == LOCKED then 1i32 else 0i32);
+    if (not finiteVector(description.position) or not finite(description.radius) or not finite(description.falloff)
+        or not finite(description.impulsePerLength) or description.radius < 0.0f32 or description.falloff < 0.0f32) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    let extent: f32 = description.radius + description.falloff;
+    if (not finite(extent)) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    if (not finite(description.position.x-extent)) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    if (not finite(description.position.y-extent)) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    if (not finite(description.position.x+extent)) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    if (not finite(description.position.y+extent)) return ChainValidation(PARAM,EXPLOSION_DOMAIN);
+    return ChainValidation();
+}
+fun explode(owner: WorldNumber, description: ExplosionDescription) -> ChainValidation = {
+    let check: ChainValidation = explosionPreflight(owner,description); if (check.status != OK) return check;
+    var definition = raw.ExplosionDef(description.maskBits,description.position,description.radius,description.falloff,description.impulsePerLength);
+    raw.b2World_Explode(raw.WorldId((owner.slot+1i32) as u16,raw.worlds.at(owner.slot as i64).generation),&definition);
+    return check;
+}
+
+                                                                            
+const SENSOR_FILTER17: i32 = 20i32;
+const NOT_SENSOR17: i32 = 21i32;
+fun pairRulesPreflight17(owner: WorldNumber, flag: bool) -> SensorAction = {
+    let status: i32 = worldMutationStatus(owner);
+    if (status != OK) return SensorAction(status,if status == LOCKED then 1i32 else 0i32);
+    return SensorAction();
+}
+                                                                               
+fun sensorDescription(geometry: raw.ShapeRecord) -> raw.ShapeRecord = {
+    var result: raw.ShapeRecord = geometry; result.density = 0.0f32; result.isSensor = true; result.enableSensorEvents = true;
+    return result;
+}
+class SensorAction { status: i32 = OK; reason: i32 = 0i32; }
+class SensorMeta { status: i32 = STALE; reason: i32 = 0i32; value: i32 = 0i32; }
+class SensorOverlap { id: broad.ShapeId = broad.ShapeId(); number: ShapeNumber = ShapeNumber(); }
+fun emptySensorOverlaps17() -> List[SensorOverlap] = { var values: List[SensorOverlap]; return values; }
+class SensorOverlaps { status: i32 = STALE; reason: i32 = 0i32; values: List[SensorOverlap] = emptySensorOverlaps17(); }
+class SensorTouch {
+    sensorId: broad.ShapeId = broad.ShapeId(); visitorId: broad.ShapeId = broad.ShapeId();
+    sensor: ShapeNumber = ShapeNumber(); visitor: ShapeNumber = ShapeNumber();
+}
+fun emptySensorTouches17() -> List[SensorTouch] = { var values: List[SensorTouch]; return values; }
+class SensorEventCopy {
+    status: i32 = STALE; reason: i32 = 0i32;
+    beginEvents: List[SensorTouch] = emptySensorTouches17(); endEvents: List[SensorTouch] = emptySensorTouches17();
+}
+                                                                                    
+fun sensorReadPreflight17(owner: WorldNumber, number: ShapeNumber) -> SensorAction = {
+    let status: i32 = shapeMutationStatus(owner,number);
+    if (status != OK) return SensorAction(status,if status == LOCKED then 1i32 else 0i32);
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (world.shapes.at(number.slot as i64).sensorIndex == -1i32) return SensorAction(PARAM,NOT_SENSOR17);
+    return SensorAction();
+}
+fun enableSensorEvents(owner: WorldNumber, number: ShapeNumber, flag: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner,number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_EnableSensorEvents(raw.b2MakeShapeId(world,number.slot),flag); return OK;
+}
+                                                                                
+fun isSensor(owner: WorldNumber, number: ShapeNumber) -> SensorMeta = {
+    let status: i32 = shapeStatus(owner,number); if (status != OK) return SensorMeta(status,0i32,0i32);
+    let value: i32 = if raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).sensorIndex != -1i32 then 1i32 else 0i32;
+    return SensorMeta(OK,0i32,value);
+}
+fun areSensorEventsEnabled(owner: WorldNumber, number: ShapeNumber) -> SensorMeta = {
+    let status: i32 = shapeStatus(owner,number); if (status != OK) return SensorMeta(status,0i32,0i32);
+    let value: i32 = if raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).enableSensorEvents then 1i32 else 0i32;
+    return SensorMeta(OK,0i32,value);
+}
+fun sensorCapacity(owner: WorldNumber, number: ShapeNumber) -> SensorMeta = {
+    let check: SensorAction = sensorReadPreflight17(owner,number);
+    if (check.status != OK) return SensorMeta(check.status,check.reason,0i32);
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    return SensorMeta(OK,0i32,raw.b2Shape_GetSensorCapacity(raw.b2MakeShapeId(world,number.slot)));
+}
+fun sensorOverlaps(owner: WorldNumber, number: ShapeNumber) -> SensorOverlaps = {
+    var result = SensorOverlaps(); let check: SensorAction = sensorReadPreflight17(owner,number);
+    result.status = check.status; result.reason = check.reason; if (check.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let index: i32 = world.shapes.at(number.slot as i64).sensorIndex; var i: i64 = 0i64;
+    while (i < world.sensors.at(index as i64).overlaps2.length()) {
+        let r: raw.ShapeRef = world.sensors.at(index as i64).overlaps2.at(i);
+        result.values.push(SensorOverlap(broad.ShapeId(r.shapeId+1i32,world.worldId,r.generation),ShapeNumber(r.shapeId,r.birthTicket,owner.birthTicket)));
+        i = i+1i64;
+    }
+    return result;
+}
+fun sensorTouch17(event: raw.SensorEvent) -> SensorTouch = {
+    return SensorTouch(event.sensorShapeId,event.visitorShapeId,
+        ShapeNumber(event.sensorShapeId.index1-1i32,event.sensorBirth,event.ownerBirth),
+        ShapeNumber(event.visitorShapeId.index1-1i32,event.visitorBirth,event.ownerBirth));
+}
+fun copySensorEvents(owner: WorldNumber) -> SensorEventCopy = {
+    var result = SensorEventCopy(); result.status = worldMutationStatus(owner);
+    if (result.status != OK) { if (result.status == LOCKED) result.reason = 1i32; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var events: raw.SensorEvents = raw.b2World_GetSensorEvents(raw.WorldId((owner.slot+1i32) as u16,world.generation));
+    var i: i64 = 0i64;
+    while (i < events.beginEvents.length()) { result.beginEvents.push(sensorTouch17(events.beginEvents.at(i))); i = i+1i64; }
+    var j: i64 = 0i64;
+    while (j < events.endEvents.length()) { result.endEvents.push(sensorTouch17(events.endEvents.at(j))); j = j+1i64; }
+    return result;
+}
+
+# Box2D 8c661469, src/manifold.                                                           
+class ChainPairResult { status: i32 = 0i32; reason: i32 = 0i32; value: Manifold = Manifold(); }
+# Box2D 8c661469, src/manifold.                                                           
+                                                                                
+fun validateChainPair(kind: i32, segment: ref raw.ChainSegment, xfA: Transform, xfB: Transform, count: i32, radius: f32, points: ref Vec2[8], cache: ref distance.SimplexCache) -> ChainValidation = {
+    let countOk: bool = (kind == 0i32 and count == 1i32) or (kind == 1i32 and count == 2i32) or (kind == 2i32 and count >= 3i32 and count <= 8i32);
+    if (not distance.validRadius(radius) or not distance.validTransform(xfA) or not distance.validTransform(xfB)) return ChainValidation(PARAM,0i32);
+    if (cache.count < 0i32 or cache.count > 3i32) return ChainValidation(PARAM,82i32);
+    var ci: i32 = 0i32;
+    while (ci < 3i32) {
+        if (cache.indexA[ci] < 0i32 or cache.indexA[ci] > 255i32 or cache.indexB[ci] < 0i32 or cache.indexB[ci] > 255i32) return ChainValidation(PARAM,82i32);
+        if (kind != 0i32 and countOk and ci < cache.count) {
+            if (cache.indexA[ci] >= 2i32 or cache.indexB[ci] >= count) return ChainValidation(PARAM,82i32);
+        }
+        ci = ci+1i32;
+    }
+    if (not countOk) return ChainValidation(GEOMETRY,84i32);
+    var chainPoints: List[Vec2]; chainPoints.push(segment.ghost1); chainPoints.push(segment.segment.point1); chainPoints.push(segment.segment.point2); chainPoints.push(segment.ghost2);
+    let chainReason: i32 = validateChainGeometry(&chainPoints,false);
+    if (chainReason != 0i32) return ChainValidation(GEOMETRY,chainReason);
+    var pi: i32 = 0i32;
+    while (pi < count) { if (not finiteVector(points[pi])) return ChainValidation(GEOMETRY,84i32); pi = pi+1i32; }
+    if (kind == 1i32) {
+        let delta: Vec2 = b2Sub(points[1],points[0]); let lengthSquared: f32 = mass2.b2LengthSquared(delta);
+        if (not finite(lengthSquared) or lengthSquared <= FLT_EPSILON) return ChainValidation(GEOMETRY,84i32);
+    }
+    if (kind == 2i32) {
+        var shape = poly.Polygon(); shape.count = count; shape.radius = radius; shape.vertices = points;
+        if (not raw.b2ValidateHull(&shape)) return ChainValidation(GEOMETRY,84i32);
+    }
+    return ChainValidation();
+}
+# Box2D 8c661469, src/manifold.                                            
+fun chainPairCached(kind: i32, segment: ref raw.ChainSegment, xfA: Transform, xfB: Transform, count: i32, radius: f32, points: ref Vec2[8], cache: ref distance.SimplexCache) -> ChainPairResult = {
+    let check: ChainValidation = validateChainPair(kind,segment,xfA,xfB,count,radius,points,cache);
+    if (check.status != OK) return ChainPairResult(check.status,check.reason,Manifold());
+    if (kind == 0i32) return ChainPairResult(OK,0i32,raw.b2CollideChainSegmentAndCircle(segment,xfA,Circle(points[0],radius),xfB));
+    if (kind == 1i32) { var capsule = raw.Capsule(points[0],points[1],radius); return ChainPairResult(OK,0i32,raw.b2CollideChainSegmentAndCapsule(segment,xfA,&capsule,xfB,cache)); }
+    var polygon = poly.Polygon(); polygon.count = count; polygon.radius = radius; polygon.vertices = points; raw.b2MakePolygon(&polygon);
+    return ChainPairResult(OK,0i32,raw.b2CollideChainSegmentAndPolygon(segment,xfA,&polygon,xfB,cache));
+}
+
+# Box2D 8c661469, include/box2d/id.h:36,44. Game-only types, PLAN-6 points 2-5.
+class WorldNumber { slot: i32 = -1i32; birthTicket: Key64 = Key64(); }
+class BodyNumber {
+    slot: i32 = -1i32;
+    birthTicket: Key64 = Key64();
+    ownerTicket: Key64 = Key64();
+}
+const OK: i32 = 0i32;
+const STALE: i32 = 1i32;
+const FOREIGN: i32 = 2i32;
+const LIMIT: i32 = 3i32;
+const GEOMETRY: i32 = 4i32;
+const PARAM: i32 = 5i32;
+const UNSUPPORTED_PAIR: i32 = 6i32;
+const LOCKED: i32 = 7i32;
+# Box2D 8c661469, src/solver.h:53-60. Reason within LIMIT, not an additional status.
+const BLOCK_WIDTH: i32 = 1i32;
+
+# Box2D 8c661469, src/shape.                                                   
+class ChainNumber { slot: i32 = -1i32; birthTicket: Key64 = Key64(); ownerTicket: Key64 = Key64(); }
+class ChainResult { status: i32 = STALE; reason: i32 = 0i32; number: ChainNumber = ChainNumber(); id: raw.ChainId = raw.ChainId(); }
+class ChainDescription {
+    points: List[Vec2] = raw.emptyChainPoints(); isLoop: bool = false;
+    materials: List[raw.SurfaceMaterial] = raw.defaultChainMaterials();
+    filter: broad.ShapeFilter = broad.ShapeFilter(); hasObjectId: bool = false; objectId: Key64 = Key64(); enableSensorEvents: bool = false;
+}
+class ChainView { number: ChainNumber = ChainNumber(); body: BodyNumber = BodyNumber(); segments: List[ShapeNumber] = emptyShapeNumbers(); }
+class ChainLookup { status: i32 = STALE; value: ChainView = ChainView(); }
+class ParentChainResult { status: i32 = STALE; hasParent: bool = false; number: ChainNumber = ChainNumber(); }
+class ChainValidation { status: i32 = OK; reason: i32 = 0i32; }
+
+# Box2D 8c661469, src/world.                                                  
+fun chainStatus(owner: WorldNumber, number: ChainNumber) -> i32 = {
+    if (worldStatus(owner) != OK) return STALE;
+    if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if ((number.slot as u32) >= (world.chainIdPool.nextIndex as u32)) return STALE;
+    if (world.chainShapes.at(number.slot as i64).id != number.slot) return STALE;
+    if (not equalKey(world.chainShapes.at(number.slot as i64).birthTicket, number.birthTicket)) return STALE;
+    if (not raw.b2Chain_IsValid(raw.b2MakeChainId(world, number.slot))) return STALE;
+    return OK;
+}
+fun chainMutationStatus(owner: WorldNumber, number: ChainNumber) -> i32 = {
+    let status: i32 = chainStatus(owner, number); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).locked) return LOCKED; return OK;
+}
+# Box2D 8c661469, src/shape.                                                                           
+fun chainChildStatus(owner: WorldNumber, number: ShapeNumber) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).shapeType == 4i32) return PARAM;
+    return OK;
+}
+fun chainBodyTypeStatus(owner: WorldNumber, number: BodyNumber, bodyType: i32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (bodyType != 0i32 and raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64).headChainId != -1i32) return PARAM;
+    return OK;
+}
+# Box2D 8c661469, src/world.                                                                         
+fun chainTicketReservation(last: Key64, segments: i32) -> bool = {
+    var value: Key64 = last; var i: i32 = 0i32;
+    while (i < 1i32 + segments) { if (ticketLimit(value)) return false; value = nextTicket(value); i = i+1i32; }
+    return true;
+}
+# Box2D 8c661469, src/math_functions.                                                            
+fun chainOrientation(a: Vec2, b: Vec2, c: Vec2, result: ref f32) -> bool = {
+    let dx: f32 = b.x-a.x; let dy: f32 = b.y-a.y; let cx: f32 = c.x-a.x; let cy: f32 = c.y-a.y;
+    if (not finite(dx) or not finite(dy) or not finite(cx) or not finite(cy)) return false;
+    let first: f32 = dx*cy; let second: f32 = dy*cx;
+    if (not finite(first) or not finite(second)) return false;
+    result = first-second; return finite(result);
+}
+                                                                                       
+fun chainOnSegment(a: Vec2, b: Vec2, p: Vec2, orientation: f32) -> bool = {
+    return orientation == 0.0f32 and p.x >= poly.b2MinFloat(a.x,b.x) and p.x <= tree.b2MaxFloat(a.x,b.x)
+        and p.y >= poly.b2MinFloat(a.y,b.y) and p.y <= tree.b2MaxFloat(a.y,b.y);
+}
+fun chainOpposite(a: f32, b: f32) -> bool = { return (a < 0.0f32 and b > 0.0f32) or (a > 0.0f32 and b < 0.0f32); }
+# Box2D 8c661469, types.                                                                           
+                                                                                              
+fun validateChainGeometry(points: ref List[Vec2], closed: bool) -> i32 = {
+    let n: i64 = points.length(); if (n < 4i64) return 84i32;
+    var i: i64 = 0i64;
+    while (i < n) { if (not finiteVector(points.at(i))) return 84i32; i = i+1i64; }
+    var pi: i64 = 0i64;
+    while (pi < n) {
+        var pj: i64 = pi+1i64;
+        while (pj < n) {
+            let a: Vec2 = points.at(pi); let b: Vec2 = points.at(pj);
+            let dx: f32 = b.x-a.x; let dy: f32 = b.y-a.y;
+            let xx: f32 = dx*dx; let yy: f32 = dy*dy; let d2: f32 = xx+yy;
+            if (not finite(dx) or not finite(dy) or not finite(xx) or not finite(yy) or not finite(d2)) return 84i32;
+            if (d2 <= B2_LINEAR_SLOP*B2_LINEAR_SLOP) return 84i32;
+            pj = pj+1i64;
+        }
+        pi = pi+1i64;
+    }
+    let edgeCount: i64 = if closed then n else n-1i64;
+    var ei: i64 = 0i64;
+    while (ei < edgeCount) {
+        let a1: Vec2 = points.at(ei); let a2: Vec2 = points.at((ei+1i64)%n);
+        var ej: i64 = ei+1i64;
+        while (ej < edgeCount) {
+            let b1: Vec2 = points.at(ej); let b2: Vec2 = points.at((ej+1i64)%n);
+            var o1: f32 = 0.0f32; var o2: f32 = 0.0f32; var o3: f32 = 0.0f32; var o4: f32 = 0.0f32;
+            if (not chainOrientation(a1,a2,b1,&o1) or not chainOrientation(a1,a2,b2,&o2)
+                or not chainOrientation(b1,b2,a1,&o3) or not chainOrientation(b1,b2,a2,&o4)) return 84i32;
+            let adjacent: bool = ej == ei+1i64 or (closed and ei == 0i64 and ej == edgeCount-1i64);
+            if (adjacent) {
+                if (o1 == 0.0f32 and o2 == 0.0f32) {
+                    var loA: f32 = poly.b2MinFloat(a1.x,a2.x); var hiA: f32 = tree.b2MaxFloat(a1.x,a2.x);
+                    var loB: f32 = poly.b2MinFloat(b1.x,b2.x); var hiB: f32 = tree.b2MaxFloat(b1.x,b2.x);
+                    if (mass2.b2AbsFloat(a2.y-a1.y) > mass2.b2AbsFloat(a2.x-a1.x)) {
+                        loA = poly.b2MinFloat(a1.y,a2.y); hiA = tree.b2MaxFloat(a1.y,a2.y);
+                        loB = poly.b2MinFloat(b1.y,b2.y); hiB = tree.b2MaxFloat(b1.y,b2.y);
+                    }
+                    if (poly.b2MinFloat(hiA,hiB) > tree.b2MaxFloat(loA,loB)) return 85i32;
+                }
+            } else {
+                if ((chainOpposite(o1,o2) and chainOpposite(o3,o4))
+                    or chainOnSegment(a1,a2,b1,o1) or chainOnSegment(a1,a2,b2,o2)
+                    or chainOnSegment(b1,b2,a1,o3) or chainOnSegment(b1,b2,a2,o4)) return 85i32;
+            }
+            ej = ej+1i64;
+        }
+        ei = ei+1i64;
+    }
+    return 0i32;
+}
+fun validateChainDescription(description: ref ChainDescription) -> ChainValidation = {
+    let n: i64 = description.points.length(); let count: i64 = description.materials.length();
+    if (count != 1i64 and count != n) return ChainValidation(PARAM,83i32);
+    var i: i64 = 0i64; while (i < count) { if (not validSurfaceMaterial(description.materials.at(i))) return ChainValidation(PARAM,0i32); i = i+1i64; }
+    let reason: i32 = validateChainGeometry(&description.points,description.isLoop);
+    if (reason != 0i32) return ChainValidation(GEOMETRY,reason); return ChainValidation();
+}
+fun chainCreatePreflight(owner: WorldNumber, parent: BodyNumber, description: ref ChainDescription) -> ChainValidation = {
+    let status: i32 = bodyMutationStatus(owner,parent); if (status != OK) return ChainValidation(status,if status == LOCKED then 1i32 else 0i32);
+    if (raw.worlds.at(owner.slot as i64).bodies.at(parent.slot as i64).bodyType != 0i32) return ChainValidation(PARAM,80i32);
+    let validation: ChainValidation = validateChainDescription(description); if (validation.status != OK) return validation;
+    let count: i32 = if description.isLoop then description.points.length() as i32 else description.points.length() as i32-3i32;
+    if (not chainTicketReservation(lastIssued,count)) return ChainValidation(LIMIT,0i32);
+    return ChainValidation();
+}
+fun addChain(owner: WorldNumber, parent: BodyNumber, description: ref ChainDescription) -> ChainResult = {
+    var result = ChainResult(); let validation: ChainValidation = chainCreatePreflight(owner,parent,description);
+    result.status = validation.status; result.reason = validation.reason; if (result.status != OK) return result;
+    var def = raw.ChainDef(); def.points = copy description.points; def.count = description.points.length() as i32; def.isLoop = description.isLoop;
+    def.materials = copy description.materials; def.materialCount = description.materials.length() as i32;
+    def.filter = description.filter; def.hasObjectId = description.hasObjectId; def.objectId = description.objectId; def.enableSensorEvents = description.enableSensorEvents;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let id: raw.ChainId = raw.b2CreateChain(raw.b2MakeBodyId(world,parent.slot),&def);
+    stampChainTickets(owner,id);
+    result.id = id; result.number = ChainNumber(id.index1-1i32,world.chainShapes.at((id.index1-1i32) as i64).birthTicket,owner.birthTicket); return result;
+}
+                                                                                                  
+fun stampChainTickets(owner: WorldNumber, id: raw.ChainId) -> () = {
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); let slot: i64 = (id.index1-1i32) as i64;
+    lastIssued = nextTicket(lastIssued); world.chainShapes.at(slot).birthTicket = lastIssued; world.chainShapes.at(slot).ownerTicket = owner.birthTicket;
+    var i: i32 = 0i32;
+    while (i < world.chainShapes.at(slot).count) {
+        lastIssued = nextTicket(lastIssued); let child: i32 = world.chainShapes.at(slot).shapeIndices.at(i as i64);
+        world.shapes.at(child as i64).birthTicket = lastIssued; i = i+1i32;
+    }
+}
+fun destroyChain(owner: WorldNumber, number: ChainNumber) -> i32 = {
+    let status: i32 = chainMutationStatus(owner,number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); raw.b2DestroyChain(raw.b2MakeChainId(world,number.slot)); return OK;
+}
+fun chainSegments(owner: WorldNumber, number: ChainNumber) -> ShapeList = {
+    var result = ShapeList(); result.status = chainStatus(owner,number); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var i: i32 = 0i32;
+    while (i < world.chainShapes.at(number.slot as i64).count) {
+        let slot: i32 = world.chainShapes.at(number.slot as i64).shapeIndices.at(i as i64);
+        result.values.push(ShapeNumber(slot,world.shapes.at(slot as i64).birthTicket,owner.birthTicket)); i = i+1i32;
+    }
+    return result;
+}
+fun lookupChain(owner: WorldNumber, number: ChainNumber) -> ChainLookup = {
+    var result = ChainLookup(); result.status = chainStatus(owner,number); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); let body: i32 = world.chainShapes.at(number.slot as i64).bodyId;
+    result.value.number = number; result.value.body = BodyNumber(body,world.bodies.at(body as i64).birthTicket,owner.birthTicket);
+    var segments: ShapeList = chainSegments(owner,number); result.value.segments = copy segments.values; return result;
+}
+fun cloneChainView(source: ref ChainView) -> ChainView = { var result = ChainView(); result.number = source.number; result.body = source.body; result.segments = copy source.segments; return result; }
+fun parentChain(owner: WorldNumber, number: ShapeNumber) -> ParentChainResult = {
+    var result = ParentChainResult(); result.status = shapeStatus(owner,number); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); let id: raw.ChainId = raw.b2Shape_GetParentChain(raw.b2MakeShapeId(world,number.slot));
+    if (id.index1 != 0i32) { result.hasParent = true; let slot: i32 = id.index1-1i32; result.number = ChainNumber(slot,world.chainShapes.at(slot as i64).birthTicket,owner.birthTicket); }
+    return result;
+}
+fun chainSetPreflight(owner: WorldNumber, number: ChainNumber, kind: i32, value: f32) -> i32 = {
+    let status: i32 = chainMutationStatus(owner,number); if (status != OK) return status;
+    if (kind < 0i32 or kind > 2i32) return PARAM;
+    if (kind != 2i32 and not validNonnegative(value)) return PARAM; return OK;
+}
+fun setChainFriction(owner: WorldNumber, number: ChainNumber, value: f32) -> i32 = {
+    let status: i32 = chainSetPreflight(owner,number,0i32,value); if (status != OK) return status;
+    raw.b2Chain_SetFriction(raw.b2MakeChainId(raw.worlds.at(owner.slot as i64),number.slot),value); return OK;
+}
+fun setChainRestitution(owner: WorldNumber, number: ChainNumber, value: f32) -> i32 = {
+    let status: i32 = chainSetPreflight(owner,number,1i32,value); if (status != OK) return status;
+    raw.b2Chain_SetRestitution(raw.b2MakeChainId(raw.worlds.at(owner.slot as i64),number.slot),value); return OK;
+}
+fun setChainMaterial(owner: WorldNumber, number: ChainNumber, value: i32) -> i32 = {
+    let status: i32 = chainSetPreflight(owner,number,2i32,0.0f32); if (status != OK) return status;
+    raw.b2Chain_SetMaterial(raw.b2MakeChainId(raw.worlds.at(owner.slot as i64),number.slot),value); return OK;
+}
+
+# Box2D 8c661469, src/world.                                                   
+                                                                              
+var lastIssued: Key64 = Key64();
+
+# Box2D 8c661469, src/world.                                                
+fun ticketLimit(last: Key64) -> bool = {
+    return last.low == 4294967295u32 and last.high == 4294967295u32;
+}
+
+# Box2D 8c661469, src/world.                                      
+                                                                                  
+fun nextTicket(last: Key64) -> Key64 = {
+    if (ticketLimit(last)) return last;
+    if (last.low == 4294967295u32) return Key64(0u32, last.high + 1u32);
+    return Key64(last.low + 1u32, last.high);
+}
+
+# Box2D 8c661469, src/world.c:1557. Stronger game lifetime test before raw access.
+                                                                       
+fun worldSlotValid17(slot: i32) -> bool = { return slot >= 0i32 and slot < 128i32; }
+fun worldMetadataValid17(number: WorldNumber, inUse: bool, birth: Key64) -> bool = { return inUse and equalKey(birth,number.birthTicket); }
+fun targetOwnerValid17(owner: Key64, target: Key64) -> bool = { return equalKey(owner,target); }
+fun targetSlotValid17(slot: i32, capacity: i64) -> bool = { return slot >= 0i32 and slot as i64 < capacity; }
+fun bodyMetadataValid17(id: i32, setIndex: i32, actual: Key64, expected: Key64) -> bool = { return id != -1i32 and setIndex != -1i32 and equalKey(actual,expected); }
+fun shapeMetadataValid17(id: i32, actual: Key64, expected: Key64) -> bool = { return id != -1i32 and equalKey(actual,expected); }
+fun worldStatus(number: WorldNumber) -> i32 = {
+    if (not worldSlotValid17(number.slot)) return STALE;
+    var world: ref raw.World = raw.worlds.at(number.slot as i64);
+    if (not worldMetadataValid17(number,world.inUse,world.birthTicket)) return STALE;
+    let id: raw.WorldId = raw.WorldId((number.slot + 1i32) as u16, world.generation);
+    if (not raw.b2World_IsValid(id)) return STALE;
+    return OK;
+}
+
+# Box2D 8c661469, src/world.c:1576. Buffered contact order is part of the API.
+fun bodyStatus(owner: WorldNumber, number: BodyNumber) -> i32 = {
+    if (worldStatus(owner) != OK) return STALE;
+    if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (not targetSlotValid17(number.slot,world.bodies.length())) return STALE;
+    let body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+    if (not bodyMetadataValid17(body.id,body.setIndex,body.birthTicket,number.birthTicket)) return STALE;
+    if (not raw.b2Body_IsValid(raw.b2MakeBodyId(world, number.slot))) return STALE;
+    return OK;
+}
+
+# Box2D 8c661469, src/world.c:100. Explicit failed creation has no object.
+class WorldResult {
+    status: i32 = STALE;
+    number: WorldNumber = WorldNumber();
+    id: raw.WorldId = raw.WorldId();
+}
+# Box2D 8c661469, src/body.c:177.
+class BodyResult {
+    status: i32 = STALE;
+    number: BodyNumber = BodyNumber();
+    id: raw.BodyId = raw.BodyId();
+}
+
+# Box2D 8c661469, src/world.c:100. LIMIT before touching the physics registry.
+fun createWorld(gravity: Vec2, maximumLinearSpeed: f32) -> WorldResult = {
+    var result = WorldResult();
+    if (ticketLimit(lastIssued)) { result.status = LIMIT; return result; }
+    let reserved: Key64 = nextTicket(lastIssued);
+    let id: raw.WorldId = raw.b2CreateWorld(gravity, maximumLinearSpeed);
+    if (id.index1 == 0u16) { result.status = LIMIT; return result; }
+    let slot: i32 = (id.index1 - 1u16) as i32;
+    raw.worlds.at(slot as i64).birthTicket = reserved;
+    lastIssued = reserved;
+    result.status = OK;
+    result.number = WorldNumber(slot, reserved);
+    result.id = id;
+    return result;
+}
+
+# Box2D 8c661469, src/types.                                                                                
+class SolverWorldParameters {
+    gravity: Vec2 = Vec2(0.0f32, -10.0f32); maximumLinearSpeed: f32 = 400.0f32;
+    contactHertz: f32 = 30.0f32; contactDampingRatio: f32 = 10.0f32; maxContactPushSpeed: f32 = 3.0f32;
+    restitutionThreshold: f32 = 1.0f32; hitEventThreshold: f32 = 1.0f32; enableWarmStarting: bool = true;
+}
+# Box2D 8c661469, src/world.                                                               
+fun validSolverWorldParameters(parameters: SolverWorldParameters) -> bool = {
+    return finiteVector(parameters.gravity) and finite(parameters.maximumLinearSpeed) and parameters.maximumLinearSpeed > 0.0f32
+        and finite(parameters.contactHertz) and parameters.contactHertz >= 0.0f32
+        and finite(parameters.contactDampingRatio) and parameters.contactDampingRatio >= 0.0f32
+        and finite(parameters.maxContactPushSpeed) and parameters.maxContactPushSpeed >= 0.0f32
+        and finite(parameters.restitutionThreshold) and parameters.restitutionThreshold >= 0.0f32
+        and finite(parameters.hitEventThreshold) and parameters.hitEventThreshold >= 0.0f32;
+}
+# Box2D 8c661469, src/world.c:190-220,1746-1761.
+fun createSolverWorld(parameters: SolverWorldParameters) -> WorldResult = {
+    var result = WorldResult();
+    if (not validSolverWorldParameters(parameters)) { result.status = PARAM; return result; }
+    result = createWorld(parameters.gravity, parameters.maximumLinearSpeed);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(result.number.slot as i64);
+    world.contactHertz = parameters.contactHertz; world.contactDampingRatio = parameters.contactDampingRatio;
+    world.maxContactPushSpeed = parameters.maxContactPushSpeed; world.restitutionThreshold = parameters.restitutionThreshold;
+    world.hitEventThreshold = parameters.hitEventThreshold;
+    raw.b2World_EnableWarmStarting(result.id, parameters.enableWarmStarting);
+    return result;
+}
+
+# Box2D 8c661469, src/world.                                                      
+fun createSleepWorld(gravity: Vec2, maximumLinearSpeed: f32, solverParameters: SolverWorldParameters, enableSleeping: bool = true) -> WorldResult = {
+    var parameters: SolverWorldParameters = solverParameters;
+    parameters.gravity = gravity; parameters.maximumLinearSpeed = maximumLinearSpeed;
+    var result: WorldResult = createSolverWorld(parameters);
+    if (result.status != OK) return result;
+    raw.worlds.at(result.number.slot as i64).enableSleep = enableSleeping;
+    return result;
+}
+# Box2D 8c661469, src/body.c:1483-1507. Lifetime validation precedes raw transfer.
+fun setAwake(owner: WorldNumber, number: BodyNumber, awake: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetAwake(raw.b2MakeBodyId(world, number.slot), awake);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1538-1553.
+fun setSleepEnabled(owner: WorldNumber, number: BodyNumber, enableSleep: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_EnableSleep(raw.b2MakeBodyId(world, number.slot), enableSleep);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1524-1529. Threshold alone does not wake or reset the timer.
+fun setSleepThreshold(owner: WorldNumber, number: BodyNumber, threshold: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validSleepThreshold(threshold)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetSleepThreshold(raw.b2MakeBodyId(world, number.slot), threshold);
+    return OK;
+}
+# Box2D 8c661469, src/world.c:1710-1738.
+fun setSleepingEnabled(owner: WorldNumber, flag: bool) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_EnableSleeping(raw.WorldId((owner.slot + 1i32) as u16, world.generation), flag);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1476-1481,1517-1536. Game owns this value.
+class SleepState {
+    status: i32 = STALE;
+    number: BodyNumber = BodyNumber();
+    isAwake: bool = false;
+    isSleeping: bool = false;
+    sleepEnabled: bool = false;
+    sleepThreshold: f32 = 0.0f32;
+}
+# Box2D 8c661469, src/body.c:1476-1481,1517-1536.
+fun getSleepState(owner: WorldNumber, number: BodyNumber) -> SleepState = {
+    var result = SleepState(); result.number = number; result.status = bodyStatus(owner, number);
+    if (result.status != OK) return result;
+    let body: raw.BodyRecord = raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64);
+    result.isAwake = body.setIndex == 2i32;
+    result.isSleeping = body.setIndex != 1i32 and body.bodyType != 0i32 and not result.isAwake;
+    result.sleepEnabled = body.enableSleep; result.sleepThreshold = body.sleepThreshold;
+    return result;
+}
+
+# Box2D 8c661469, src/world.c:263. Destruction never issues/recycles a ticket.
+fun destroyWorld(number: WorldNumber) -> i32 = {
+    let status: i32 = worldMutationStatus(number);
+    if (status != OK) return status;
+    let id: raw.WorldId = raw.WorldId((number.slot + 1i32) as u16,
+        raw.worlds.at(number.slot as i64).generation);
+    raw.b2DestroyWorld(id);
+    return OK;
+}
+
+# Box2D 8c661469, src/body.c:177. Validate owner, then reserve, then commit on success.
+fun createBody(owner: WorldNumber, def: raw.BodyDef) -> BodyResult = {
+    var result = BodyResult();
+    result.status = worldMutationStatus(owner);
+    if (result.status != OK) return result;
+    if (not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }
+    if (ticketLimit(lastIssued)) { result.status = LIMIT; return result; }
+    let reserved: Key64 = nextTicket(lastIssued);
+    let worldId: raw.WorldId = raw.WorldId((owner.slot + 1i32) as u16,
+        raw.worlds.at(owner.slot as i64).generation);
+    let id: raw.BodyId = raw.b2CreateBody(worldId, def);
+    if (id.index1 == 0i32) { result.status = LIMIT; return result; }
+    let slot: i32 = id.index1 - 1i32;
+    raw.worlds.at(owner.slot as i64).bodies.at(slot as i64).birthTicket = reserved;
+    lastIssued = reserved;
+    result.status = OK;
+    result.number = BodyNumber(slot, reserved, owner.birthTicket);
+    result.id = id;
+    return result;
+}
+
+# Box2D 8c661469, src/body.c:343. No raw mutation before full guard succeeds.
+fun destroyBody(owner: WorldNumber, number: BodyNumber) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number);
+    if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let id: raw.BodyId = raw.b2MakeBodyId(world, number.slot);
+    raw.b2DestroyBody(id);
+    return OK;
+}
+
+# Box2D 8c661469, src/body.c:688.
+fun setTransform(owner: WorldNumber, number: BodyNumber, position: Vec2, rotation: Rot) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number);
+    if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let id: raw.BodyId = raw.b2MakeBodyId(world, number.slot);
+    raw.b2Body_SetTransform(id, position, rotation);
+    return OK;
+}
+
+# Box2D 8c661469, src/body.c:633-655.                                                     
+class BodyLookup { status: i32 = STALE; value: raw.BodyView = raw.BodyView(); }
+# Box2D 8c661469, src/body.c:38,633-655.
+fun lookupBody(owner: WorldNumber, number: BodyNumber) -> BodyLookup = {
+    var result = BodyLookup();
+    result.status = bodyStatus(owner, number);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetView(raw.b2MakeBodyId(world, number.slot));
+    return result;
+}
+
+# Box2D 8c661469, src/world.c:1865,2625. Same checked value-only access for a world.
+class WorldLookup { status: i32 = STALE; value: raw.WorldView = raw.WorldView(); }
+# Box2D 8c661469, src/world.c:45,1865,2625.
+fun lookupWorld(number: WorldNumber) -> WorldLookup = {
+    var result = WorldLookup();
+    result.status = worldStatus(number);
+    if (result.status != OK) return result;
+    result.value = raw.b2World_GetView(raw.WorldId((number.slot + 1i32) as u16,
+        raw.worlds.at(number.slot as i64).generation));
+    return result;
+}
+
+# Box2D 8c661469, include/box2d/id.h:52. Same lifetime guard as BodyNumber.
+class ShapeNumber {
+    slot: i32 = -1i32;
+    birthTicket: Key64 = Key64();
+    ownerTicket: Key64 = Key64();
+}
+class ShapeResult { status: i32 = STALE; number: ShapeNumber = ShapeNumber(); id: broad.ShapeId = broad.ShapeId(); sensorReason17: i32 = 0i32; }
+class PairResult { status: i32 = STALE; body: BodyResult = BodyResult(); shape: ShapeResult = ShapeResult(); sensorReason17: i32 = 0i32; }
+class ShapeLookup { status: i32 = STALE; value: raw.ShapeRecord = raw.ShapeRecord(); }
+
+# Box2D 8c661469, src/array.h:49-115. Values returned to the game, never storage references.
+fun emptyShapeNumbers() -> List[ShapeNumber] = { var values: List[ShapeNumber]; return values; }
+class ShapeList { status: i32 = STALE; values: List[ShapeNumber] = emptyShapeNumbers(); }
+
+# Box2D 8c661469, src/world.c:1614-1644. World, owner, slot, ticket, raw validity in that order.
+fun shapeStatus(owner: WorldNumber, number: ShapeNumber) -> i32 = {
+    if (worldStatus(owner) != OK) return STALE;
+    if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (not targetSlotValid17(number.slot,world.shapes.length())) return STALE;
+    let shape: raw.ShapeRecord = world.shapes.at(number.slot as i64);
+    if (not shapeMetadataValid17(shape.id,shape.birthTicket,number.birthTicket)) return STALE;
+    if (not raw.b2Shape_IsValid(raw.b2MakeShapeId(world, number.slot))) return STALE;
+    return OK;
+}
+
+# Box2D 8c661469, src/math_functions.c:14-27. Finite guards also accept signed zero.
+fun finite(value: f32) -> bool = { return value >= -poly.FLT_MAX and value <= poly.FLT_MAX; }
+# Box2D 8c661469, src/math_functions.c:29-33.
+fun finiteVector(value: Vec2) -> bool = { return finite(value.x) and finite(value.y); }
+# Box2D 8c661469, src/body.                                                           
+fun validSleepThreshold(threshold: f32) -> bool = { return finite(threshold) and threshold >= 0.0f32; }
+# Box2D 8c661469, include/box2d/math_functions.                          
+fun validBodyDef(def: raw.BodyDef) -> bool = {
+    if (not validSleepThreshold(def.sleepThreshold)) return false;
+    let lengthSquared: f32 = def.rotation.s * def.rotation.s + def.rotation.c * def.rotation.c;
+    return def.bodyType >= 0i32 and def.bodyType <= 2i32 and finiteVector(def.position)
+        and finiteVector(def.linearVelocity) and finite(def.angularVelocity)
+        and finite(def.linearDamping) and def.linearDamping >= 0.0f32
+        and finite(def.angularDamping) and def.angularDamping >= 0.0f32 and finite(def.gravityScale)
+        and finite(def.rotation.c) and finite(def.rotation.s)
+        and 1.0f32 - 0.0006f32 < lengthSquared and lengthSquared < 1.0f32 + 0.0006f32;
+}
+
+# Box2D 8c661469, src/hull.                                                                    
+fun validPolygonPoints(shape: ref poly.Polygon) -> bool = {
+    if (shape.count < 3i32 or shape.count > 8i32 or not finite(shape.radius) or shape.radius < 0.0f32) return false;
+    var i: i32 = 0i32;
+    while (i < shape.count) {
+        if (not finiteVector(shape.vertices[i])) return false;
+        let next: i32 = if i + 1i32 < shape.count then i + 1i32 else 0i32;
+        let edgeSqr: f32 = mass2.b2LengthSquared(b2Sub(shape.vertices[next], shape.vertices[i]));
+        if (not finite(edgeSqr) or edgeSqr <= FLT_EPSILON * FLT_EPSILON) return false;
+        i = i + 1i32;
+    }
+    if (not raw.b2ValidateHull(shape)) return false;
+    var area: f32 = 0.0f32;
+    let origin: Vec2 = shape.vertices[0];
+    var triangle: i32 = 1i32;
+    while (triangle < shape.count - 1i32) {
+        let e1: Vec2 = b2Sub(shape.vertices[triangle], origin);
+        let e2: Vec2 = b2Sub(shape.vertices[triangle + 1i32], origin);
+        area = area + 0.5f32 * mass2.b2Cross(e1, e2);
+        triangle = triangle + 1i32;
+    }
+    return finite(area) and area > FLT_EPSILON;
+}
+
+# Box2D 8c661469, src/geometry.c:56-89. No replacement hull on rejection.
+fun preparePolygon(shape: ref poly.Polygon) -> bool = {
+    if (not validPolygonPoints(shape)) return false;
+    raw.b2MakePolygon(shape);
+    if (not finiteVector(shape.centroid)) return false;
+    var i: i32 = 0i32;
+    while (i < shape.count) {
+        if (not finiteVector(shape.normals[i])) return false;
+        i = i + 1i32;
+    }
+    return true;
+}
+
+# Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.
+fun validShapeGeometry(shape: ref raw.ShapeRecord) -> bool = {
+    if (not finite(shape.density) or shape.density < 0.0f32) return false;
+    if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and finite(shape.circle.radius) and shape.circle.radius > 0.0f32;
+    if (shape.shapeType == 1i32) {
+        let capsuleLength: f32 = mass2.b2LengthSquared(b2Sub(shape.capsule.center1, shape.capsule.center2));
+        return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)
+            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and finite(capsuleLength);
+    }
+    if (shape.shapeType == 2i32) {
+        let segmentLength: f32 = mass2.b2LengthSquared(b2Sub(shape.segment.point1, shape.segment.point2));
+        return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)
+            and finite(segmentLength) and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;
+    }
+                                                                               
+                                                                                 
+    if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32
+        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;
+    var i: i32 = 0i32;
+    while (i < shape.polygon.count) {
+        if (not finiteVector(shape.polygon.vertices[i]) or not finiteVector(shape.polygon.normals[i])) return false;
+        i = i + 1i32;
+    }
+    return true;
+}
+
+# Box2D 8c661469, src/body.c:528-631.                                                              
+fun safeMass(body: raw.BodyRecord, sim: raw.BodySim, state: raw.BodyState, shapes: ref List[raw.ShapeRecord]) -> bool = {
+    var i: i64 = 0i64;
+    while (i < shapes.length()) {
+        var shape: raw.ShapeRecord = shapes.at(i);
+        if (shape.shapeType == 4i32) {
+            let segment: raw.Segment = shape.chainSegment.segment;
+            let lengthSquared: f32 = mass2.b2LengthSquared(b2Sub(segment.point2,segment.point1));
+            if (not finiteVector(segment.point1) or not finiteVector(segment.point2) or not finite(lengthSquared) or lengthSquared <= B2_LINEAR_SLOP*B2_LINEAR_SLOP) return false;
+        } else if (not validShapeGeometry(&shape)) return false;
+        let bounds: tree.AABB = raw.b2ComputeShapeAABB(&shape, sim.transform);
+        if (not finiteVector(bounds.lowerBound) or not finiteVector(bounds.upperBound)) return false;
+                                                                
+        let extent: raw.ShapeExtent = raw.b2ComputeShapeExtent(&shape, Vec2());
+        if (not finite(extent.minExtent) or not finite(extent.maxExtent)) return false;
+        i = i + 1i64;
+    }
+    let computed: raw.BodyMassResult = raw.computeBodyMass(body, sim, state, shapes);
+    if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)
+        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)
+        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)
+        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)
+        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;
+    if (body.bodyType == 2i32 and computed.mass > 0.0f32 and not body.fixedRotation and computed.inertia <= 0.0f32) return false;
+    return true;
+}
+
+# Box2D 8c661469, src/body.c:568-630. Proposed add/remove/density in the exact future head order.
+                                                                                      
+fun preflight(owner: WorldNumber, bodySlot: i32, mode: i32, shapeSlot: i32, proposed: raw.ShapeRecord, density: f32) -> bool = {
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let body: raw.BodyRecord = world.bodies.at(bodySlot as i64);
+    var set: ref raw.SolverSet = raw.b2GetSolverSet(world, body.setIndex);
+    let sim: raw.BodySim = set.bodySims.at(body.localIndex as i64);
+    var state = raw.BodyState();
+    if (body.setIndex == 2i32) state = set.bodyStates.at(body.localIndex as i64);
+    var values: List[raw.ShapeRecord];
+    if (mode == 0i32) values.push(raw.resolveShape(proposed));
+    var slot: i32 = body.headShapeId;
+    while (slot != -1i32) {
+        var shape: raw.ShapeRecord = world.shapes.at(slot as i64);
+        if (mode == 2i32 and slot == shapeSlot) shape.density = density;
+        if (mode == 3i32 and slot == shapeSlot) shape = proposed;
+        if (mode != 1i32 or slot != shapeSlot) values.push(shape);
+        slot = shape.nextShapeId;
+    }
+    return safeMass(body, sim, state, &values);
+}
+
+# Box2D 8c661469, src/shape.c:163-227. Checked raw semantics, including optional mass update.
+fun createShapeRaw(owner: WorldNumber, parent: BodyNumber, source: raw.ShapeRecord, updateMass: bool, invoke: bool) -> ShapeResult = {
+    var result = ShapeResult();
+    result.status = bodyMutationStatus(owner, parent);
+    if (result.status != OK) return result;
+    if (source.shapeType == 2i32 and mass2.b2LengthSquared(b2Sub(source.segment.point1, source.segment.point2)) <= B2_LINEAR_SLOP * B2_LINEAR_SLOP) {
+        result.status = GEOMETRY; return result;
+    }
+    if (ticketLimit(lastIssued)) { result.status = LIMIT; return result; }
+    let reserved: Key64 = nextTicket(lastIssued);
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let id: broad.ShapeId = raw.b2CreateShape(raw.b2MakeBodyId(world, parent.slot), source, updateMass, invoke);
+    if (id.index1 == 0i32) { result.status = GEOMETRY; return result; }
+    let slot: i32 = id.index1 - 1i32;
+    world.shapes.at(slot as i64).birthTicket = reserved;
+    lastIssued = reserved;
+    result.status = OK; result.id = id;
+    result.number = ShapeNumber(slot, reserved, owner.birthTicket);
+    return result;
+}
+
+# Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.
+fun validContactMaterial(shape: ref raw.ShapeRecord) -> bool = {
+    return finite(shape.friction) and shape.friction >= 0.0f32
+        and finite(shape.restitution) and shape.restitution >= 0.0f32
+        and finite(shape.rollingResistance) and shape.rollingResistance >= 0.0f32
+        and finite(shape.tangentSpeed);
+}
+
+# Box2D 8c661469, src/shape.c:183-185. Game path always applies mass after preflight.
+fun addPreparedShape(owner: WorldNumber, parent: BodyNumber, source: raw.ShapeRecord, invoke: bool) -> ShapeResult = { return addPreparedShapeFlags12(owner, parent, source, invoke, false); }
+# Box2D 8c661469, src/shape.c:59-141,163-227.                                                                                                            
+                                                                                            
+class CreationCheck17 { status: i32 = OK; reason: i32 = 0i32; shape: raw.ShapeRecord = raw.ShapeRecord(); }
+fun creationPreflight17(owner: WorldNumber, parent: BodyNumber, def: raw.BodyDef, source: raw.ShapeRecord,
+    geometry: BoxGeometry, kind: i32, pair: bool, preservePreSolve: bool) -> CreationCheck17 = {
+    var result = CreationCheck17(); result.status = if pair then worldMutationStatus(owner) else bodyMutationStatus(owner,parent);
+    if (result.status != OK) { if (result.status == LOCKED) result.reason = 1i32; return result; }
+    if (pair and not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }
+    var shape: raw.ShapeRecord = source;
+    if (not validContactMaterial(&shape)) { result.status = PARAM; return result; }
+    if (kind == 0i32 and shape.shapeType == 3i32 and not preparePolygon(&shape.polygon)) { result.status = GEOMETRY; return result; }
+    if (kind == 2i32) {
+        if (not validBox(geometry)) { result.status = GEOMETRY; return result; }
+        shape.shapeType = 3i32; shape.polygon = mass2.b2MakeOffsetRoundedBox(geometry.halfWidth,geometry.halfHeight,geometry.center,geometry.rotation,geometry.radius);
+    }
+    if (pair and not validBodyDef(def)) { result.status = GEOMETRY; return result; }
+    if (not preservePreSolve or pair) shape.enablePreSolveEvents = false;
+    if (not validShapeGeometry(&shape)) { result.status = GEOMETRY; return result; }
+    if (pair) {
+        var body = raw.BodyRecord(); body.bodyType = def.bodyType; body.fixedRotation = def.fixedRotation;
+        var sim = raw.BodySim(); sim.transform = Transform(def.position,def.rotation); sim.center = def.position;
+        var state = raw.BodyState();
+        if (def.bodyType != 0i32 and def.isEnabled and (def.isAwake or not def.enableSleep)) { state.linearVelocity = def.linearVelocity; state.angularVelocity = def.angularVelocity; }
+        var values: List[raw.ShapeRecord]; values.push(raw.resolveShape(shape));
+        if (not safeMass(body,sim,state,&values)) { result.status = GEOMETRY; return result; }
+    } else if (not preflight(owner,parent.slot,0i32,-1i32,shape,0.0f32)) { result.status = GEOMETRY; return result; }
+    if (ticketLimit(lastIssued) or (pair and ticketLimit(nextTicket(lastIssued)))) { result.status = LIMIT; return result; }
+    result.shape = shape; return result;
+}
+fun addPreparedShapeFlags12(owner: WorldNumber, parent: BodyNumber, source: raw.ShapeRecord, invoke: bool, preservePreSolve12: bool) -> ShapeResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,parent,raw.BodyDef(),source,BoxGeometry(),1i32,false,preservePreSolve12);
+    var result = ShapeResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createShapeRaw(owner,parent,check.shape,true,invoke);
+}
+
+# Box2D 8c661469, src/shape.c:318-336. Historical handle checked before destruction.
+fun destroyShapeRaw(owner: WorldNumber, number: ShapeNumber, updateMass: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number);
+    if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2DestroyShape(raw.b2MakeShapeId(world, number.slot), updateMass);
+    return OK;
+}
+# Box2D 8c661469, src/shape.                                                                  
+fun destroyShape(owner: WorldNumber, number: ShapeNumber) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number);
+    if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    let parent: i32 = raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).bodyId;
+    if (not preflight(owner, parent, 1i32, number.slot, raw.ShapeRecord(), 0.0f32)) return GEOMETRY;
+    return destroyShapeRaw(owner, number, true);
+}
+# Box2D 8c661469, src/shape.c:1055-1078.
+fun setDensityRaw(owner: WorldNumber, number: ShapeNumber, density: f32, updateMass: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number);
+    if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetDensity(raw.b2MakeShapeId(world, number.slot), density, updateMass);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1393-1403.
+fun applyMassRaw(owner: WorldNumber, number: BodyNumber) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number);
+    if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2UpdateBodyMassData(world, number.slot);
+    return OK;
+}
+# Box2D 8c661469, src/shape.                                                                             
+fun setDensity(owner: WorldNumber, number: ShapeNumber, density: f32) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number);
+    if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    if (not finite(density) or density < 0.0f32) return GEOMETRY;
+    let parent: i32 = raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).bodyId;
+    if (not preflight(owner, parent, 2i32, number.slot, raw.ShapeRecord(), density)) return GEOMETRY;
+    setDensityRaw(owner, number, density, false);
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2UpdateBodyMassData(world, parent);
+    return OK;
+}
+
+# Box2D 8c661469, src/body.                                                                            
+fun createBodyWithPreparedShape(owner: WorldNumber, def: raw.BodyDef, source: raw.ShapeRecord, invoke: bool,
+    hasObjectId: bool, objectId: Key64) -> PairResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,BodyNumber(),def,source,BoxGeometry(),1i32,true,false);
+    var result = PairResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createPairAfterPreflight17(owner,def,check.shape,invoke,hasObjectId,objectId);
+}
+
+# Box2D 8c661469, src/shape.c:945-977,1339-1384. Value snapshot after lifetime check.
+fun lookupShape(owner: WorldNumber, number: ShapeNumber) -> ShapeLookup = {
+    var result = ShapeLookup(); result.status = shapeStatus(owner, number);
+    if (result.status == OK) result.value = raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64);
+    return result;
+}
+# Box2D 8c661469, src/shape.c:945-955.                                                          
+fun shapeBody(owner: WorldNumber, number: ShapeNumber) -> BodyResult = {
+    var result = BodyResult(); result.status = shapeStatus(owner, number);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let slot: i32 = world.shapes.at(number.slot as i64).bodyId;
+    result.number = BodyNumber(slot, world.bodies.at(slot as i64).birthTicket, owner.birthTicket);
+    result.id = raw.b2MakeBodyId(world, slot);
+    return result;
+}
+# Box2D 8c661469, src/body.c:1811-1828. Typed copied list in the original order.
+fun getShapes(owner: WorldNumber, number: BodyNumber) -> ShapeList = {
+    var result = ShapeList(); result.status = bodyStatus(owner, number);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var slot: i32 = world.bodies.at(number.slot as i64).headShapeId;
+    while (slot != -1i32) {
+        let shape: raw.ShapeRecord = world.shapes.at(slot as i64);
+        result.values.push(ShapeNumber(slot, shape.birthTicket, owner.birthTicket));
+        slot = shape.nextShapeId;
+    }
+    return result;
+}
+# Box2D 8c661469, src/body.c:1313-1325.
+fun setBodyObjectId(owner: WorldNumber, number: BodyNumber, present: bool, value: Key64) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64).hasObjectId = present;
+    raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64).objectId = if present then value else Key64();
+    return OK;
+}
+# Box2D 8c661469, src/shape.c:958-970.
+fun setShapeObjectId(owner: WorldNumber, number: ShapeNumber, present: bool, value: Key64) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).hasObjectId = present;
+    raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).objectId = if present then value else Key64();
+    return OK;
+}
+
+# Box2D 8c661469, include/box2d/collision.                                                
+fun circleShape(radius: f32, density: f32) -> raw.ShapeRecord = {
+    var shape = raw.ShapeRecord(); shape.circle = Circle(Vec2(), radius); shape.density = density; return shape;
+}
+# Box2D 8c661469, src/shape.                                                                      
+fun capsuleShape(halfLength: f32, radius: f32, density: f32) -> raw.ShapeRecord = {
+    var shape = raw.ShapeRecord(); shape.shapeType = 1i32; shape.density = density;
+    shape.capsule = raw.Capsule(Vec2(-halfLength, 0.0f32), Vec2(halfLength, 0.0f32), radius);
+    return shape;
+}
+
+# Box2D 8c661469, src/geometry.c:185-203. A box recipe is distinct from an ordered hull.
+class BoxGeometry {
+    halfWidth: f32 = 0.5f32;
+    halfHeight: f32 = 0.5f32;
+    center: Vec2 = Vec2();
+    rotation: Rot = Rot(1.0f32, 0.0f32);
+    radius: f32 = 0.0f32;
+}
+# Box2D 8c661469, src/geometry.                                              
+fun validBox(geometry: BoxGeometry) -> bool = {
+    let norm: f32 = geometry.rotation.s * geometry.rotation.s + geometry.rotation.c * geometry.rotation.c;
+    return finite(geometry.halfWidth) and geometry.halfWidth > 0.0f32
+        and finite(geometry.halfHeight) and geometry.halfHeight > 0.0f32 and finiteVector(geometry.center)
+        and finite(geometry.radius) and geometry.radius >= 0.0f32 and finite(geometry.rotation.c) and finite(geometry.rotation.s)
+        and 1.0f32 - 0.0006f32 < norm and norm < 1.0f32 + 0.0006f32;
+}
+# Box2D 8c661469, src/geometry.                                                                            
+fun addShape(owner: WorldNumber, parent: BodyNumber, source: raw.ShapeRecord, invoke: bool) -> ShapeResult = { return addShapeFlags12(owner, parent, source, invoke, false); }
+# Box2D 8c661469, src/shape.c:59-141,163-227.                                                                                                            
+fun addShapeFlags12(owner: WorldNumber, parent: BodyNumber, source: raw.ShapeRecord, invoke: bool, preservePreSolve12: bool) -> ShapeResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,parent,raw.BodyDef(),source,BoxGeometry(),0i32,false,preservePreSolve12);
+    var result = ShapeResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createShapeRaw(owner,parent,check.shape,true,invoke);
+}
+# Box2D 8c661469, src/geometry.                                                                                     
+fun addBox(owner: WorldNumber, parent: BodyNumber, geometry: BoxGeometry, properties: raw.ShapeRecord, invoke: bool) -> ShapeResult = { return addBoxFlags12(owner, parent, geometry, properties, invoke, false); }
+# Box2D 8c661469, src/shape.c:59-141,163-227.                                                                                                            
+fun addBoxFlags12(owner: WorldNumber, parent: BodyNumber, geometry: BoxGeometry, properties: raw.ShapeRecord, invoke: bool, preservePreSolve12: bool) -> ShapeResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,parent,raw.BodyDef(),properties,geometry,2i32,false,preservePreSolve12);
+    var result = ShapeResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createShapeRaw(owner,parent,check.shape,true,invoke);
+}
+# Box2D 8c661469, src/body.                                                                                
+fun createBodyWithShape(owner: WorldNumber, def: raw.BodyDef, source: raw.ShapeRecord, invoke: bool,
+    hasObjectId: bool, objectId: Key64) -> PairResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,BodyNumber(),def,source,BoxGeometry(),0i32,true,false);
+    var result = PairResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createPairAfterPreflight17(owner,def,check.shape,invoke,hasObjectId,objectId);
+}
+# Box2D 8c661469, src/body.                                                                             
+fun createBodyWithBox(owner: WorldNumber, def: raw.BodyDef, geometry: BoxGeometry, properties: raw.ShapeRecord, invoke: bool,
+    hasObjectId: bool, objectId: Key64) -> PairResult = {
+    let check: CreationCheck17 = creationPreflight17(owner,BodyNumber(),def,properties,geometry,2i32,true,false);
+    var result = PairResult(); result.status = check.status; result.sensorReason17 = if check.reason == SENSOR_FILTER17 then check.reason else 0i32;
+    if (result.status != OK) return result;
+    return createPairAfterPreflight17(owner,def,check.shape,invoke,hasObjectId,objectId);
+}
+
+# Box2D 8c661469, src/body.c:177-184,245-247,250. Validate before ticket reservation.
+fun createBody8(owner: WorldNumber, def: raw.BodyDef) -> BodyResult = {
+    var result = BodyResult(); result.status = worldMutationStatus(owner);
+    if (result.status != OK) return result;
+    if (not validBodyDef(def)) { result.status = PARAM; return result; }
+    if (not validName(def.name)) { result.status = PARAM; return result; }
+    var prepared: raw.BodyDef = def; prepared.name = canonicalName(def.name);
+    return createBody(owner, prepared);
+}
+
+# Box2D 8c661469, src/world.c:695-758. Game input, not an implicit game clock.
+class StepParameters { dt: f32 = 1.0f32 / 60.0f32; subStepCount: i32 = 4i32; }
+# Box2D 8c661469, src/world.c:747-758. Include underflow/overflow of derived step values.
+fun validStepParameters(parameters: StepParameters) -> bool = {
+    if (not finite(parameters.dt) or parameters.dt < 0.0f32 or parameters.subStepCount <= 0i32) return false;
+    if (parameters.dt == 0.0f32) return true;
+    let inv_dt: f32 = 1.0f32 / parameters.dt;
+    let h: f32 = parameters.dt / (parameters.subStepCount as f32);
+    let inv_h: f32 = (parameters.subStepCount as f32) * inv_dt;
+    return h > 0.0f32 and finite(inv_dt) and finite(h) and finite(inv_h);
+}
+
+# Box2D 8c661469, src/solver.                                          
+                                                                                           
+fun bodyBlocksFit(count: i32) -> bool = {
+    return raw.b2BlocksFit(count as i64, 0i32);
+}
+# Box2D 8c661469, src/solver.                                                          
+fun sleepBodyUpperBlocksFit(count: i64) -> bool = {
+    if (count < 0i64) return false;
+    if (count <= 128i64) return true;
+    return count / 4i64 + 3i64 <= 32767i64;
+}
+# Box2D 8c661469, src/world.                                                          
+fun checkedSleepBodySum(count: i64, added: i64, value: ref i64) -> bool = {
+    value = 0i64;
+    if (count < 0i64 or added < 0i64 or count > 9223372036854775807i64 - added) return false;
+    value = count + added;
+    return true;
+}
+# Box2D 8c661469, src/world.                                                       
+fun sleepBodyUpperFit(world: ref raw.World) -> bool = {
+    var total: i64 = 0i64;
+    var setIndex: i32 = 2i32;
+    while (setIndex < world.solverSetIdPool.nextIndex) {
+        let count: i64 = raw.b2GetSolverSet(world, setIndex).bodyCount as i64;
+        var sum: i64 = 0i64;
+        if (not checkedSleepBodySum(total, count, &sum)) return false;
+        total = sum; setIndex = setIndex + 1i32;
+    }
+    return sleepBodyUpperBlocksFit(total);
+}
+
+# Box2D 8c661469, include/box2d/types.h:1126-1154. Own values with event-time object ID.
+class BodyMove {
+    number: BodyNumber = BodyNumber();
+    transform: Transform = Transform();
+    hasObjectId: bool = false;
+    objectId: Key64 = Key64();
+    fellAsleep: bool = false;
+}
+# Box2D 8c661469, src/array.h:49-115.
+fun emptyBodyMoves() -> List[BodyMove] = { var values: List[BodyMove]; return values; }
+# Box2D 8c661469, src/world.c:695-812,1491-1503. Game-owned copy and explicit profile failure.
+class StepResult {
+    status: i32 = STALE;
+    values: List[BodyMove] = emptyBodyMoves();
+    shapeA: ShapeNumber = ShapeNumber();
+    shapeB: ShapeNumber = ShapeNumber();
+    effectiveSubSteps: i32 = 0i32;
+    didSolve: bool = false;
+    reason: i32 = 0i32;
+    sensorReason17: i32 = 0i32;
+}
+# Box2D 8c661469, src/world.c:695-812,1491-1503. Guards precede any world mutation.
+fun step(owner: WorldNumber, parameters: StepParameters) -> StepResult = {
+    var result = StepResult(); result.status = worldMutationStatus(owner);
+    if (result.status != OK) return result;
+    if (not validStepParameters(parameters)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (parameters.dt > 0.0f32 and not bodyBlocksFit(raw.b2GetSolverSet(world, 2i32).bodyCount)) {
+        result.status = LIMIT; result.reason = BLOCK_WIDTH; return result;
+    }
+    if (parameters.dt > 0.0f32 and not sleepBodyUpperFit(world)) { result.status = LIMIT; result.reason = BLOCK_WIDTH; return result; }
+    if (parameters.dt > 0.0f32 and not jointUpperBlocksFit(world)) { result.status = LIMIT; result.reason = BLOCK_WIDTH; return result; }
+    let executed: raw.StepResult = solverStep(owner, parameters.dt, parameters.subStepCount, true);
+    result.status = executed.status; result.effectiveSubSteps = executed.effectiveSubSteps; result.didSolve = executed.didSolve;
+    result.sensorReason17 = executed.sensorReason17;
+    if (result.status != OK) return result;
+    var i: i64 = 0i64;
+    while (i < world.bodyMoveEvents.length()) {
+        let event: raw.BodyMoveEvent = world.bodyMoveEvents.at(i);
+        let slot: i32 = event.bodyId.index1 - 1i32;
+        var value = BodyMove();
+        value.number = BodyNumber(slot, world.bodies.at(slot as i64).birthTicket, owner.birthTicket);
+        value.transform = event.transform; value.hasObjectId = event.hasObjectId; value.objectId = event.objectId;
+        value.fellAsleep = event.fellAsleep; result.values.push(value); i = i + 1i64;
+    }
+    return result;
+}
+
+# Box2D 8c661469, src/body.c:900-1020. Lifetime precedes numeric validation, including static bodies.
+fun applyAction(owner: WorldNumber, number: BodyNumber, kind: i32, value: Vec2, point: Vec2, wake: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number);
+    if (status != OK) return status;
+    if (kind < 0i32 or kind > 5i32 or not finiteVector(value) or not finiteVector(point)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_ApplyAction(raw.b2MakeBodyId(world, number.slot), kind, value, point, wake);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:900.
+fun applyForce(owner: WorldNumber, number: BodyNumber, force: Vec2, point: Vec2, wake: bool = true) -> i32 = { return applyAction(owner, number, 0i32, force, point, wake); }
+# Box2D 8c661469, src/body.c:918.
+fun applyForceToCenter(owner: WorldNumber, number: BodyNumber, force: Vec2, wake: bool = true) -> i32 = { return applyAction(owner, number, 1i32, force, Vec2(), wake); }
+# Box2D 8c661469, src/body.c:935.
+fun applyTorque(owner: WorldNumber, number: BodyNumber, torque: f32, wake: bool = true) -> i32 = { return applyAction(owner, number, 2i32, Vec2(torque, 0.0f32), Vec2(), wake); }
+# Box2D 8c661469, src/body.c:952.
+fun applyLinearImpulse(owner: WorldNumber, number: BodyNumber, impulse: Vec2, point: Vec2, wake: bool = true) -> i32 = { return applyAction(owner, number, 3i32, impulse, point, wake); }
+# Box2D 8c661469, src/body.c:975.
+fun applyLinearImpulseToCenter(owner: WorldNumber, number: BodyNumber, impulse: Vec2, wake: bool = true) -> i32 = { return applyAction(owner, number, 4i32, impulse, Vec2(), wake); }
+# Box2D 8c661469, src/body.c:997.
+fun applyAngularImpulse(owner: WorldNumber, number: BodyNumber, impulse: f32, wake: bool = true) -> i32 = { return applyAction(owner, number, 5i32, Vec2(impulse, 0.0f32), Vec2(), wake); }
+# Box2D 8c661469, src/body.c:767-813.
+fun setLinearVelocity(owner: WorldNumber, number: BodyNumber, velocity: Vec2) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not finiteVector(velocity)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetLinearVelocity(raw.b2MakeBodyId(world, number.slot), velocity); return OK;
+}
+# Box2D 8c661469, src/body.c:790-813.
+fun setAngularVelocity(owner: WorldNumber, number: BodyNumber, velocity: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not finite(velocity)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetAngularVelocity(raw.b2MakeBodyId(world, number.slot), velocity); return OK;
+}
+
+# Box2D 8c661469, src/contact.h:41-71. Game-only checked lifetime number.
+class ContactNumber {
+    slot: i32 = -1i32;
+    birthTicket: Key64 = Key64();
+    ownerTicket: Key64 = Key64();
+}
+class ContactValue {
+    number: ContactNumber = ContactNumber();
+    shapeA: ShapeNumber = ShapeNumber();
+    shapeB: ShapeNumber = ShapeNumber();
+    touching: bool = false;
+    manifold: Manifold = Manifold();
+}
+class ContactLookup { status: i32 = STALE; has: bool = false; value: ContactValue = ContactValue(); }
+# Box2D 8c661469, src/body.c:460-495.
+fun emptyContactValues() -> List[ContactValue] = { var values: List[ContactValue]; return values; }
+class ContactList { status: i32 = STALE; values: List[ContactValue] = emptyContactValues(); }
+class ContactBegin {
+    shapeA: ShapeNumber = ShapeNumber();
+    shapeB: ShapeNumber = ShapeNumber();
+    manifold: Manifold = Manifold();
+}
+class ContactEnd { shapeA: ShapeNumber = ShapeNumber(); shapeB: ShapeNumber = ShapeNumber(); }
+# Box2D 8c661469, include/box2d/types.h:1081-1100. Approach speed is not an impulse.
+class ContactHit {
+    shapeA: ShapeNumber = ShapeNumber(); shapeB: ShapeNumber = ShapeNumber();
+    point: Vec2 = Vec2(); normal: Vec2 = Vec2(); approachSpeed: f32 = 0.0f32;
+}
+# Box2D 8c661469, src/world.c:1529-1555.
+fun emptyContactHits() -> List[ContactHit] = { var values: List[ContactHit]; return values; }
+# Box2D 8c661469, src/world.c:1529-1555.
+fun emptyContactBegins() -> List[ContactBegin] = { var values: List[ContactBegin]; return values; }
+# Box2D 8c661469, src/world.c:1529-1555.
+fun emptyContactEnds() -> List[ContactEnd] = { var values: List[ContactEnd]; return values; }
+class ContactEvents {
+    status: i32 = STALE;
+    begin: List[ContactBegin] = emptyContactBegins();
+    end: List[ContactEnd] = emptyContactEnds();
+    hitCount: i32 = 0i32;
+    hits: List[ContactHit] = emptyContactHits();
+}
+# Box2D 8c661469, src/contact.h:43-65.                                                         
+fun contactStatus(owner: WorldNumber, number: ContactNumber) -> i32 = {
+    if (worldStatus(owner) != OK) return STALE;
+    if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (number.slot < 0i32 or number.slot >= world.contactIdPool.nextIndex) return STALE;
+    let record: raw.ContactRecord = world.contacts.at(number.slot as i64);
+    if (record.setIndex == -1i32 or record.contactId == -1i32) return STALE;
+    if (not equalKey(record.birthTicket, number.birthTicket)) return STALE;
+    if (record.contactId != number.slot) return STALE;
+    return OK;
+}
+# Box2D 8c661469, src/contact.c:453-468. Copied numerical value, never an escaped sim reference.
+fun lookupContact(owner: WorldNumber, number: ContactNumber) -> ContactLookup = {
+    var result = ContactLookup(); result.status = contactStatus(owner, number);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let record: raw.ContactRecord = world.contacts.at(number.slot as i64);
+    result.has = true; result.value.number = number;
+    result.value.shapeA = ShapeNumber(record.shapeIdA, world.shapes.at(record.shapeIdA as i64).birthTicket, owner.birthTicket);
+    result.value.shapeB = ShapeNumber(record.shapeIdB, world.shapes.at(record.shapeIdB as i64).birthTicket, owner.birthTicket);
+    result.value.touching = (record.flags & 1u32) != 0u32;
+    result.value.manifold = raw.b2GetContactSim(world, world.contacts.at(number.slot as i64)).manifold;
+    return result;
+}
+# Box2D 8c661469, src/body.c:460-495.                                                              
+fun contacts(owner: WorldNumber, number: BodyNumber) -> ContactList = {
+    var result = ContactList(); result.status = bodyStatus(owner, number);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var key: i32 = world.bodies.at(number.slot as i64).headContactKey;
+    while (key != -1i32) {
+        let id: i32 = key >> 1i32;
+        let record: raw.ContactRecord = world.contacts.at(id as i64);
+        key = raw.contactEdge(world.contacts.at(id as i64), key & 1i32).nextKey;
+        if ((record.flags & 1u32) != 0u32) {
+            let found: ContactLookup = lookupContact(owner, ContactNumber(id, record.birthTicket, owner.birthTicket));
+            result.values.push(found.value);
+        }
+    }
+    return result;
+}
+# Box2D 8c661469, src/contact.c:186-328. Lookup only, does not create or issue a ticket.
+fun findContact(owner: WorldNumber, a: ShapeNumber, b: ShapeNumber) -> ContactLookup = {
+    var result = ContactLookup(); result.status = shapeStatus(owner, a);
+    if (result.status != OK) return result;
+    result.status = shapeStatus(owner, b);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var key: i32 = world.bodies.at(world.shapes.at(a.slot as i64).bodyId as i64).headContactKey;
+    while (key != -1i32) {
+        let id: i32 = key >> 1i32;
+        let record: raw.ContactRecord = world.contacts.at(id as i64);
+        if ((record.shapeIdA == a.slot and record.shapeIdB == b.slot) or (record.shapeIdB == a.slot and record.shapeIdA == b.slot))
+            return lookupContact(owner, ContactNumber(id, record.birthTicket, owner.birthTicket));
+        key = raw.contactEdge(world.contacts.at(id as i64), key & 1i32).nextKey;
+    }
+    return result;
+}
+# Box2D 8c661469, src/world.c:1529-1555. Event metadata was stamped at emission, not looked up here.
+fun copyContactEvents(owner: WorldNumber) -> ContactEvents = {
+    var result = ContactEvents(); result.status = worldStatus(owner);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.hitCount = world.contactHitEvents.length() as i32;
+    var hi: i64 = 0i64;
+    while (hi < world.contactHitEvents.length()) {
+        let hit: raw.ContactHitEvent = world.contactHitEvents.at(hi);
+        result.hits.push(ContactHit(ShapeNumber(hit.shapeA.index1 - 1i32, hit.birthA, hit.ownerTicket),
+            ShapeNumber(hit.shapeB.index1 - 1i32, hit.birthB, hit.ownerTicket), hit.point, hit.normal, hit.approachSpeed));
+        hi = hi + 1i64;
+    }
+    var i: i64 = 0i64;
+    while (i < world.contactBeginEvents.length()) {
+        let event: raw.ContactBeginEvent = world.contactBeginEvents.at(i);
+        result.begin.push(ContactBegin(ShapeNumber(event.shapeA.index1 - 1i32, event.birthA, event.ownerTicket),
+            ShapeNumber(event.shapeB.index1 - 1i32, event.birthB, event.ownerTicket), event.manifold));
+        i = i + 1i64;
+    }
+    var ends: ref List[raw.ContactEndEvent] = raw.b2GetContactEndEvents(world);
+    var j: i64 = 0i64;
+    while (j < ends.length()) {
+        let ended: raw.ContactEndEvent = ends.at(j);
+        result.end.push(ContactEnd(ShapeNumber(ended.shapeA.index1 - 1i32, ended.birthA, ended.ownerTicket),
+            ShapeNumber(ended.shapeB.index1 - 1i32, ended.birthB, ended.ownerTicket)));
+        j = j + 1i64;
+    }
+    return result;
+}
+# Box2D 8c661469, src/array.                                                             
+fun cloneContactEvents(source: ref ContactEvents) -> ContactEvents = {
+    var result = ContactEvents(); result.status = source.status; result.hitCount = source.hitCount;
+    var i: i64 = 0i64;
+    while (i < source.begin.length()) { let begin: ContactBegin = source.begin.at(i); result.begin.push(begin); i = i + 1i64; }
+    var j: i64 = 0i64;
+    while (j < source.end.length()) { let end: ContactEnd = source.end.at(j); result.end.push(end); j = j + 1i64; }
+    var k: i64 = 0i64;
+    while (k < source.hits.length()) { let hit: ContactHit = source.hits.at(k); result.hits.push(hit); k = k + 1i64; }
+    return result;
+}
+# Box2D 8c661469, src/broad_phase.c:376-474. Whole-batch ticket preflight, one real prepare, original request order.
+class ContactPairs {
+    status: i32 = STALE;
+    prepared: broad.PairUpdateResult = broad.PairUpdateResult();
+    created: List[i32] = raw.emptyInts();
+}
+# Box2D 8c661469, src/broad_phase.                             
+fun updateContactPairs(owner: WorldNumber) -> ContactPairs = {
+    var result = ContactPairs(); result.status = worldMutationStatus(owner);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let capacity: i32 = world.broadPhase.movePairCapacity;
+    let index: i32 = world.broadPhase.movePairIndex;
+    var view: broad.CollisionView = raw.collisionView(world);
+    result.prepared = broad.b2PrepareBroadPhasePairs(&world.broadPhase, &view);
+    var reserved: Key64 = lastIssued;
+    var i: i64 = 0i64;
+    while (i < result.prepared.requests.length()) {
+        let request: broad.ContactRequest = result.prepared.requests.at(i);
+        let a: i32 = world.shapes.at(request.shapeIndexA as i64).shapeType;
+        let b: i32 = world.shapes.at(request.shapeIndexB as i64).shapeType;
+        result.created.push(-1i32);
+        if (raw.contactRegisters[5i32 * a + b].kind != -1i32) {
+            if (ticketLimit(reserved)) {
+                result.status = LIMIT;
+                world.broadPhase.movePairCapacity = capacity; world.broadPhase.movePairIndex = index;
+                return result;
+            }
+            reserved = nextTicket(reserved);
+        }
+        i = i + 1i64;
+    }
+    var j: i64 = 0i64;
+    while (j < result.prepared.requests.length()) {
+        let next: broad.ContactRequest = result.prepared.requests.at(j);
+        let id: i32 = raw.b2CreateContact(world, next.shapeIndexA, next.shapeIndexB);
+        result.created.at(j) = id;
+        if (id != -1i32) {
+            lastIssued = nextTicket(lastIssued); world.contacts.at(id as i64).birthTicket = lastIssued;
+        }
+        j = j + 1i64;
+    }
+    if (result.prepared.hadWork) broad.b2CommitBroadPhasePairs(&world.broadPhase);
+    return result;
+}
+
+# Box2D 8c661469, src/solver.                                          
+                                                                                          
+fun contactBlocksFit(upper: i64) -> bool = {
+    if (upper < 0i64) return false;
+    if (upper <= 16i64) return true;
+    return upper / 4i64 + 3i64 <= 32767i64;
+}
+# Box2D 8c661469, src/solver.c:1295-1354. Checked metadata arithmetic, before constructing any solver work.
+fun checkedContactSum(count: i64, added: i64, value: ref i64) -> bool = {
+    value = 0i64;
+    if (count < 0i64 or added < 0i64 or count > 9223372036854775807i64 - added) return false;
+    value = count + added;
+    return true;
+}
+# Box2D 8c661469, src/world.                                                            
+                                                                                                     
+fun solverStep(owner: WorldNumber, dt: f32, requested: i32, guardBlocks: bool) -> raw.StepResult = {
+    var result = raw.StepResult(); result.status = worldMutationStatus(owner);
+    if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (guardBlocks and not validStepParameters(StepParameters(dt,requested))) { result.status = PARAM; return result; }
+    if (dt > 0.0f32 and guardBlocks and (not bodyBlocksFit(raw.b2GetSolverSet(world,2i32).bodyCount)
+        or not sleepBodyUpperFit(world) or not jointUpperBlocksFit(world))) { result.status = LIMIT; return result; }
+    # Box2D 8c661469, src/world.                                                                                                         
+    if (world.callbacks12.filterInstalled and not world.filterUsesRules12) {
+        return rawSolverStep12(owner,dt,requested);
+    }
+    var prepared = broad.PairUpdateResult();
+    var reserved: Key64 = lastIssued;
+    var requiredTickets17: i64 = 0i64;
+    let capacity: i32 = world.broadPhase.movePairCapacity; let index: i32 = world.broadPhase.movePairIndex;
+    if (dt != 0.0f32 and not world.locked) {
+        var view: broad.CollisionView = raw.collisionView(world);
+        if (world.filterUsesRules12 and world.callbacks12.filterInstalled) {
+            view.callback12.installed = true; view.callback12.callback = raw.b2EvaluatePairRules12;
+        }
+        prepared = broad.b2PrepareBroadPhasePairs(&world.broadPhase, &view);
+        # Box2D 8c661469, src/broad_phase.c:376-474. Observation only, including a rejected preflight batch.
+        if (not world.filterUsesRules12) {
+            world.stepRequests.clear(); world.stepCreated.clear();
+            var traceIndex: i64 = 0i64;
+            while (traceIndex < prepared.requests.length()) {
+                let traceRequest: broad.ContactRequest = prepared.requests.at(traceIndex);
+                world.stepRequests.push(traceRequest); world.stepCreated.push(-1i32); traceIndex = traceIndex + 1i64;
+            }
+        }
+        var upper: i64 = (world.contactIdPool.nextIndex - world.contactIdPool.freeCount) as i64;
+        var i: i64 = 0i64;
+        while (i < prepared.requests.length()) {
+            let request: broad.ContactRequest = prepared.requests.at(i);
+            let a: i32 = world.shapes.at(request.shapeIndexA as i64).shapeType;
+            let b: i32 = world.shapes.at(request.shapeIndexB as i64).shapeType;
+            if (raw.contactRegisters[5i32 * a + b].kind != -1i32) {
+                requiredTickets17 = requiredTickets17+1i64;
+                var sum: i64 = 0i64;
+                let fits: bool = checkedContactSum(upper, 1i64, &sum);
+                if (not fits) {
+                    result.status = LIMIT;
+                    world.broadPhase.movePairCapacity = capacity; world.broadPhase.movePairIndex = index; return result;
+                }
+                upper = sum;
+            }
+            i = i + 1i64;
+        }
+        if (guardBlocks and dt > 0.0f32 and not contactBlocksFit(upper)) {
+            result.status = LIMIT; world.broadPhase.movePairCapacity = capacity; world.broadPhase.movePairIndex = index; return result;
+        }
+    }
+                                                                                   
+    var ticketIndex17: i64 = 0i64;
+    while (ticketIndex17 < requiredTickets17) {
+        if (ticketLimit(reserved)) {
+            world.broadPhase.movePairCapacity = capacity; world.broadPhase.movePairIndex = index; result.status = LIMIT; return result;
+        }
+        reserved = nextTicket(reserved); ticketIndex17 = ticketIndex17+1i64;
+    }
+    result = raw.b2World_StepPreparedCounter12(raw.WorldId((owner.slot + 1i32) as u16, world.generation), dt, requested, &prepared, &lastIssued, true);
+    return result;
+}
+
+# Box2D 8c661469, src/world.                                                                            
+fun worldMutationStatus(owner: WorldNumber) -> i32 = {
+    let status: i32 = worldStatus(owner); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).locked) return LOCKED;
+    return OK;
+}
+# Box2D 8c661469, src/body.                                                           
+fun bodyMutationStatus(owner: WorldNumber, number: BodyNumber) -> i32 = {
+    let status: i32 = bodyStatus(owner, number); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).locked) return LOCKED;
+    return OK;
+}
+# Box2D 8c661469, src/shape.                
+fun shapeMutationStatus(owner: WorldNumber, number: ShapeNumber) -> i32 = {
+    let status: i32 = shapeStatus(owner, number); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).locked) return LOCKED;
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1405-1467. Pure predicate used by the real mutation route and GUARD12.
+fun validNonnegative(value: f32) -> bool = { return finite(value) and value >= 0.0f32; }
+# Box2D 8c661469, src/body.c:528-631,1036-1284,1722-1742. Pure target-type/fixed preflight.
+fun safeBodyChange(owner: WorldNumber, number: BodyNumber, bodyType: i32, fixedRotation: bool, zeroAngular: bool) -> bool = {
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+    let sim: raw.BodySim = raw.b2GetBodySim(world, world.bodies.at(number.slot as i64));
+    var state = raw.BodyState();
+    if (body.setIndex == 2i32) state = raw.b2GetSolverSet(world, body.setIndex).bodyStates.at(body.localIndex as i64);
+    body.bodyType = bodyType; body.fixedRotation = fixedRotation;
+    if (zeroAngular) state.angularVelocity = 0.0f32;
+    var shapes: List[raw.ShapeRecord] = raw.bodyShapes(world, number.slot);
+    return safeMass(body, sim, state, &shapes);
+}
+# Box2D 8c661469, src/body.c:1036-1284. Same type bypasses extra mass work.
+fun setType(owner: WorldNumber, number: BodyNumber, bodyType: i32) -> i32 = {
+    let status: i32 = bodyTypePreflight14(owner, number, bodyType); if (status != OK) return status;
+                                                                
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+                                                                           
+    if (body.bodyType == bodyType) return OK;
+                                                                            
+                                                        
+    raw.b2Body_SetType(raw.b2MakeBodyId(world, number.slot), bodyType); return OK;
+}
+# Box2D 8c661469, src/body.c:1557-1720. No ticket, no mass update on enable/no-op.
+fun setEnabled(owner: WorldNumber, number: BodyNumber, enabled: bool) -> i32 = {
+    let status: i32 = bodyEnabledPreflight14(owner, number, enabled); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+                                                                         
+    let id: raw.BodyId = raw.b2MakeBodyId(world, number.slot);
+    if (enabled) raw.b2Body_Enable(id); else raw.b2Body_Disable(id);
+    return OK;
+}
+# Box2D 8c661469, src/body.c:1357-1382. Validate inputs separately from derived inverse/COM safety.
+fun validMassData(data: mass2.MassData) -> bool = {
+    return validNonnegative(data.mass) and validNonnegative(data.rotationalInertia) and finiteVector(data.center);
+}
+# Box2D 8c661469, src/body.c:1376-1382. Pure calculation without trial mutation or a second World.
+fun safeMassData(owner: WorldNumber, number: BodyNumber, data: mass2.MassData) -> bool = {
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let sim: raw.BodySim = raw.b2GetBodySim(world, world.bodies.at(number.slot as i64));
+    let center: Vec2 = b2TransformPoint(sim.transform, data.center);
+    let invMass: f32 = if data.mass > 0.0f32 then 1.0f32 / data.mass else 0.0f32;
+    let invInertia: f32 = if data.rotationalInertia > 0.0f32 then 1.0f32 / data.rotationalInertia else 0.0f32;
+    return finite(invMass) and finite(invInertia) and finiteVector(center);
+}
+# Box2D 8c661469, src/body.c:1357-1382.
+fun setMassData(owner: WorldNumber, number: BodyNumber, data: mass2.MassData) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validMassData(data)) return PARAM;
+    if (not safeMassData(owner, number, data)) return GEOMETRY;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetMassData(raw.b2MakeBodyId(world, number.slot), data); return OK;
+}
+# Box2D 8c661469, src/body.c:1393-1403. Safe convenience route, exactly one raw mass application.
+fun applyMass(owner: WorldNumber, number: BodyNumber) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+    if (not safeBodyChange(owner, number, body.bodyType, body.fixedRotation, false)) return GEOMETRY;
+    raw.b2Body_ApplyMassFromShapes(raw.b2MakeBodyId(world, number.slot)); return OK;
+}
+# Box2D 8c661469, src/body.c:1405-1420.
+fun setLinearDamping(owner: WorldNumber, number: BodyNumber, value: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetLinearDamping(raw.b2MakeBodyId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/body.c:1431-1446.
+fun setAngularDamping(owner: WorldNumber, number: BodyNumber, value: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetAngularDamping(raw.b2MakeBodyId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/body.c:1451-1467.
+fun setGravityScale(owner: WorldNumber, number: BodyNumber, value: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not finite(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetGravityScale(raw.b2MakeBodyId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/body.c:1722-1742. Zero w in the proposed state before computeBodyMass.
+fun setFixedRotation(owner: WorldNumber, number: BodyNumber, flag: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+    if (body.fixedRotation == flag) return OK;
+    if (not safeBodyChange(owner, number, body.bodyType, flag, true)) return GEOMETRY;
+    raw.b2Body_SetFixedRotation(raw.b2MakeBodyId(world, number.slot), flag); return OK;
+}
+# Box2D 8c661469, src/body.                                              
+fun validTargetTransform(target: Transform, timeStep: f32) -> bool = {
+    let norm: f32 = target.q.s * target.q.s + target.q.c * target.q.c;
+    return finiteVector(target.p) and finite(target.q.c) and finite(target.q.s)
+        and 1.0f32 - 0.0006f32 < norm and norm < 1.0f32 + 0.0006f32 and finite(timeStep) and timeStep > 0.0f32;
+}
+# Box2D 8c661469, src/body.c:825-845. Derived calculations must be safe before wake, even for a no-op raw target.
+fun safeTargetTransform(owner: WorldNumber, number: BodyNumber, target: Transform, timeStep: f32) -> bool = {
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let body: raw.BodyRecord = world.bodies.at(number.slot as i64);
+    let sim: raw.BodySim = raw.b2GetBodySim(world, world.bodies.at(number.slot as i64));
+    let velocity: raw.TargetVelocity = raw.b2ComputeTargetVelocity(body, sim, target, timeStep);
+    let invTimeStep: f32 = 1.0f32 / timeStep;
+    return finite(invTimeStep) and finiteVector(velocity.linearVelocity) and finite(velocity.angularVelocity) and finite(velocity.maxVelocity);
+}
+# Box2D 8c661469, src/body.c:815-862.
+fun setTargetTransform(owner: WorldNumber, number: BodyNumber, target: Transform, timeStep: f32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validTargetTransform(target, timeStep) or not safeTargetTransform(owner, number, target, timeStep)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetTargetTransform(raw.b2MakeBodyId(world, number.slot), target, timeStep); return OK;
+}
+# Box2D 8c661469, src/shape.c:1088-1103.
+fun setFriction(owner: WorldNumber, number: ShapeNumber, value: f32) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetFriction(raw.b2MakeShapeId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/shape.c:1108-1123.
+fun setRestitution(owner: WorldNumber, number: ShapeNumber, value: f32) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetRestitution(raw.b2MakeShapeId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/shape.c:1128-1141.
+fun setMaterial(owner: WorldNumber, number: ShapeNumber, value: i32) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetMaterial(raw.b2MakeShapeId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/shape.c:1166-1175.
+fun validSurfaceMaterial(value: raw.SurfaceMaterial) -> bool = {
+    return validNonnegative(value.friction) and validNonnegative(value.restitution)
+        and validNonnegative(value.rollingResistance) and finite(value.tangentSpeed);
+}
+# Box2D 8c661469, src/shape.c:1166-1175.
+fun setSurfaceMaterial(owner: WorldNumber, number: ShapeNumber, value: raw.SurfaceMaterial) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    if (not validSurfaceMaterial(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetSurfaceMaterial(raw.b2MakeShapeId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/shape.c:1234-1261.
+fun setFilter(owner: WorldNumber, number: ShapeNumber, value: broad.ShapeFilter) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_SetFilter(raw.b2MakeShapeId(world, number.slot), value); return OK;
+}
+# Box2D 8c661469, src/shape.c:1386-1456. Preserve properties, replace only the tagged geometry.
+fun prepareReplacement(current: raw.ShapeRecord, geometry: raw.ShapeRecord, prepared: ref raw.ShapeRecord) -> bool = {
+    prepared = current; prepared.shapeType = geometry.shapeType;
+    if (geometry.shapeType == 0i32) prepared.circle = geometry.circle;
+    else if (geometry.shapeType == 1i32) prepared.capsule = geometry.capsule;
+    else if (geometry.shapeType == 2i32) prepared.segment = geometry.segment;
+    else if (geometry.shapeType == 3i32) {
+        prepared.polygon = geometry.polygon;
+        if (not preparePolygon(&prepared.polygon)) return false;
+    } else return false;
+    return validShapeGeometry(prepared);
+}
+# Box2D 8c661469, src/shape.                                                                                     
+fun replaceGeometry(owner: WorldNumber, number: ShapeNumber, geometry: raw.ShapeRecord) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    if (chainChildStatus(owner, number) != OK) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let current: raw.ShapeRecord = world.shapes.at(number.slot as i64);
+    var prepared = raw.ShapeRecord();
+    if (not prepareReplacement(current, geometry, &prepared)) return GEOMETRY;
+    if (not preflight(owner, current.bodyId, 3i32, number.slot, prepared, 0.0f32)) return GEOMETRY;
+    let id: broad.ShapeId = raw.b2MakeShapeId(world, number.slot);
+    if (prepared.shapeType == 0i32) raw.b2Shape_SetCircle(id, prepared.circle);
+    else if (prepared.shapeType == 1i32) raw.b2Shape_SetCapsule(id, prepared.capsule);
+    else if (prepared.shapeType == 2i32) raw.b2Shape_SetSegment(id, prepared.segment);
+    else raw.b2Shape_SetPolygon(id, prepared.polygon);
+    raw.b2UpdateBodyMassData(world, current.bodyId); return OK;
+}
+# Box2D 8c661469, src/body.c:656-686,864-898.                                                        
+class VectorResult { status: i32 = STALE; value: Vec2 = Vec2(); }
+
+# Box2D 8c661469, src/body.                                                                             
+fun validName(name: raw.NameValue) -> bool = {
+    if (name.length < 0i32 or name.length > 31i32) return false;
+    var i: i32 = 0i32;
+    while (i < name.length) {
+        let lead: i32 = name.bytes[i] as i32;
+        if (lead == 0i32) return false;
+        var count: i32 = 0i32;
+        if (lead < 128i32) count = 1i32;
+        else if (lead >= 194i32 and lead <= 223i32) count = 2i32;
+        else if (lead >= 224i32 and lead <= 239i32) count = 3i32;
+        else if (lead >= 240i32 and lead <= 244i32) count = 4i32;
+        else return false;
+        if (i + count > name.length) return false;
+        var j: i32 = 1i32;
+        while (j < count) {
+            let next: i32 = name.bytes[i + j] as i32;
+            if (next < 128i32 or next > 191i32) return false;
+            j = j + 1i32;
+        }
+        if (count >= 3i32) {
+            let second: i32 = name.bytes[i + 1i32] as i32;
+            if (lead == 224i32 and second < 160i32) return false;
+            if (lead == 237i32 and second > 159i32) return false;
+            if (lead == 240i32 and second < 144i32) return false;
+            if (lead == 244i32 and second > 143i32) return false;
+        }
+        i = i + count;
+    }
+    return true;
+}
+# Box2D 8c661469, src/body.c:274-292. Ignore bytes outside the owned string value.
+fun canonicalName(name: raw.NameValue) -> raw.NameValue = {
+    var result = raw.NameValue(); result.length = name.length;
+    var i: i32 = 0i32;
+    while (i < name.length) { result.bytes[i] = name.bytes[i]; i = i + 1i32; }
+    return result;
+}
+# Box2D 8c661469, src/body.c:656-662.
+fun getLocalPoint(owner: WorldNumber, number: BodyNumber, point: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(point)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetLocalPoint(raw.b2MakeBodyId(world, number.slot), point); return result;
+}
+# Box2D 8c661469, src/body.c:664-670.
+fun getWorldPoint(owner: WorldNumber, number: BodyNumber, point: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(point)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetWorldPoint(raw.b2MakeBodyId(world, number.slot), point); return result;
+}
+# Box2D 8c661469, src/body.c:672-678.
+fun getLocalVector(owner: WorldNumber, number: BodyNumber, vector: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(vector)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetLocalVector(raw.b2MakeBodyId(world, number.slot), vector); return result;
+}
+# Box2D 8c661469, src/body.c:680-686.
+fun getWorldVector(owner: WorldNumber, number: BodyNumber, vector: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(vector)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetWorldVector(raw.b2MakeBodyId(world, number.slot), vector); return result;
+}
+# Box2D 8c661469, src/body.c:864-879.
+fun getLocalPointVelocity(owner: WorldNumber, number: BodyNumber, point: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(point)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetLocalPointVelocity(raw.b2MakeBodyId(world, number.slot), point); return result;
+}
+# Box2D 8c661469, src/body.c:881-898.
+fun getWorldPointVelocity(owner: WorldNumber, number: BodyNumber, point: Vec2) -> VectorResult = {
+    var result = VectorResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    if (not finiteVector(point)) { result.status = PARAM; return result; }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    result.value = raw.b2Body_GetWorldPointVelocity(raw.b2MakeBodyId(world, number.slot), point); return result;
+}
+
+# Box2D 8c661469, src/world.                                                                                                
+                                                                                                                       
+fun rawSolverStep12(owner: WorldNumber, dt: f32, requested: i32) -> raw.StepResult = {
+    var result = raw.StepResult(); result.status = worldMutationStatus(owner); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (not world.callbacks12.filterInstalled) return solverStep(owner, dt, requested, false);
+    var prepared = broad.PairUpdateResult();
+    result = raw.b2World_StepPreparedCounter12(raw.WorldId((owner.slot + 1i32) as u16, world.generation), dt, requested, &prepared, &lastIssued, true, true);
+    return result;
+}
+
+# Box2D 8c661469, src/world.                                      
+fun setGravity(owner: WorldNumber, gravity: Vec2) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    if (not finiteVector(gravity)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetGravity(raw.WorldId((owner.slot + 1i32) as u16, world.generation), gravity); return OK;
+}
+
+# Box2D 8c661469, src/shape.                                          
+fun enableShapePreSolveEvents(owner: WorldNumber, number: ShapeNumber, flag: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_EnablePreSolveEvents(raw.b2MakeShapeId(world, number.slot), flag); return OK;
+}
+
+# Box2D 8c661469, src/body.c:1286-1310. Validate owned UTF-8 before any name byte changes.
+fun setName(owner: WorldNumber, number: BodyNumber, name: raw.NameValue) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    if (not validName(name)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_SetName(raw.b2MakeBodyId(world, number.slot), canonicalName(name)); return OK;
+}
+class NameResult { status: i32 = STALE; value: raw.NameValue = raw.NameValue(); }
+# Box2D 8c661469, src/body.c:1306-1310. Own value, no storage reference.
+fun getName(owner: WorldNumber, number: BodyNumber) -> NameResult = {
+    var result = NameResult(); result.status = bodyStatus(owner, number); if (result.status != OK) return result;
+    result.value = raw.b2Body_GetName(raw.b2MakeBodyId(raw.worlds.at(owner.slot as i64), number.slot)); return result;
+}
+# Box2D 8c661469, src/world.c:1893-1903.
+fun setWorldObjectId(owner: WorldNumber, present: bool, value: Key64) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetUserData(raw.WorldId((owner.slot + 1i32) as u16, world.generation), present, value); return OK;
+}
+# Box2D 8c661469, src/world.c:1746-1756.
+fun enableWarmStarting(owner: WorldNumber, flag: bool) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_EnableWarmStarting(raw.WorldId((owner.slot + 1i32) as u16, world.generation), flag); return OK;
+}
+
+# Box2D 8c661469, src/world.c:1789.
+fun setRestitutionThreshold(owner: WorldNumber, value: f32) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetRestitutionThreshold(raw.WorldId((owner.slot + 1i32) as u16, world.generation), value); return OK;
+}
+
+# Box2D 8c661469, src/world.c:1807.
+fun setHitEventThreshold(owner: WorldNumber, value: f32) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    if (not validNonnegative(value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetHitEventThreshold(raw.WorldId((owner.slot + 1i32) as u16, world.generation), value); return OK;
+}
+
+# Box2D 8c661469, src/world.c:1839.
+fun setMaximumLinearSpeed(owner: WorldNumber, value: f32) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    if (not finite(value) or value <= 0.0f32) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetMaximumLinearSpeed(raw.WorldId((owner.slot + 1i32) as u16, world.generation), value); return OK;
+}
+
+# Box2D 8c661469, src/world.c:1825-1837. Game rejects negative instead of clamping.
+fun setContactTuning(owner: WorldNumber, hertz: f32, dampingRatio: f32, pushSpeed: f32) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    if (not validNonnegative(hertz) or not validNonnegative(dampingRatio) or not validNonnegative(pushSpeed)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetContactTuning(raw.WorldId((owner.slot + 1i32) as u16, world.generation), hertz, dampingRatio, pushSpeed); return OK;
+}
+
+# Box2D 8c661469, src/body.c:1772.
+fun enableBodyContactEvents(owner: WorldNumber, number: BodyNumber, flag: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_EnableContactEvents(raw.b2MakeBodyId(world, number.slot), flag); return OK;
+}
+
+# Box2D 8c661469, src/body.c:1785.
+fun enableBodyHitEvents(owner: WorldNumber, number: BodyNumber, flag: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Body_EnableHitEvents(raw.b2MakeBodyId(world, number.slot), flag); return OK;
+}
+
+# Box2D 8c661469, src/shape.c:1282.
+fun enableShapeContactEvents(owner: WorldNumber, number: ShapeNumber, flag: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_EnableContactEvents(raw.b2MakeShapeId(world, number.slot), flag); return OK;
+}
+
+# Box2D 8c661469, src/shape.c:1320.
+fun enableShapeHitEvents(owner: WorldNumber, number: ShapeNumber, flag: bool) -> i32 = {
+    let status: i32 = shapeMutationStatus(owner, number); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2Shape_EnableHitEvents(raw.b2MakeShapeId(world, number.slot), flag); return OK;
+}
+
+# Box2D 8c661469, src/shape.c:1628-1669. Same ContactValue9b and actual edge order, owned nested manifold.
+fun shapeContacts(owner: WorldNumber, number: ShapeNumber) -> ContactList = {
+    var result = ContactList(); result.status = shapeStatus(owner, number); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var key: i32 = world.bodies.at(world.shapes.at(number.slot as i64).bodyId as i64).headContactKey;
+    while (key != -1i32) {
+        let id: i32 = key >> 1i32; let record: raw.ContactRecord = world.contacts.at(id as i64);
+        key = raw.contactEdge(world.contacts.at(id as i64), key & 1i32).nextKey;
+        if ((record.flags & 1u32) != 0u32 and (record.shapeIdA == number.slot or record.shapeIdB == number.slot)) {
+            let found: ContactLookup = lookupContact(owner, ContactNumber(id, record.birthTicket, owner.birthTicket)); result.values.push(found.value);
+        }
+    }
+    return result;
+}
+# Box2D 8c661469, src/shape.                                                    
+fun cloneContactList(source: ref ContactList) -> ContactList = {
+    var result = ContactList(); result.status = source.status; var i: i64 = 0i64;
+    while (i < source.values.length()) { let value: ContactValue = source.values.at(i); result.values.push(value); i = i + 1i64; }
+    return result;
+}
+
+# Box2D 8c661469, src/broad_phase.                                    
+class PairRule12 { a: ShapeNumber = ShapeNumber(); b: ShapeNumber = ShapeNumber(); allow: bool = true; }
+class PreRule12 {
+    a: ShapeNumber = ShapeNumber(); b: ShapeNumber = ShapeNumber(); allow: bool = true;
+    direction: Vec2 = Vec2(); threshold: f32 = 0.0f32; replaceNormal: bool = false; normal: Vec2 = Vec2();
+}
+class MaterialRule12 { materialA: i32 = 0i32; materialB: i32 = 0i32; value: f32 = 0.0f32; }
+# Box2D 8c661469, src/broad_phase.                                           
+fun ruleNumber12(number: ShapeNumber) -> raw.RuleShape12 = { return raw.RuleShape12(number.slot, number.birthTicket, number.ownerTicket); }
+# Box2D 8c661469, src/broad_phase.                                                      
+fun rulePairStatus12(owner: WorldNumber, a: ShapeNumber, b: ShapeNumber) -> i32 = {
+    let status: i32 = shapeStatus(owner, a); if (status != OK) return status;
+    let other: i32 = shapeStatus(owner, b); if (other != OK) return other;
+    return worldMutationStatus(owner);
+}
+# Box2D 8c661469, src/broad_phase.                                                                  
+fun setPairRules(owner: WorldNumber, values: ref List[PairRule12]) -> i32 = {
+    let status: i32 = worldStatus(owner); if (status != OK) return status;
+    var i: i64 = 0i64;
+    while (i < values.length()) {
+        let rule: PairRule12 = values.at(i); let checked: i32 = shapeStatus(owner, rule.a); if (checked != OK) return checked;
+        let second: i32 = shapeStatus(owner, rule.b); if (second != OK) return second; i = i + 1i64;
+    }
+    let unlocked: i32 = worldMutationStatus(owner); if (unlocked != OK) return unlocked;
+    var stored: List[raw.PairRule12]; i = 0i64;
+    while (i < values.length()) { let entry: PairRule12 = values.at(i); stored.push(raw.PairRule12(ruleNumber12(entry.a), ruleNumber12(entry.b), entry.allow)); i = i + 1i64; }
+    raw.worlds.at(owner.slot as i64).pairRules12 = move stored; return OK;
+}
+# Box2D 8c661469, include/box2d/math_functions.                                    
+fun validPreRule12(rule: PreRule12) -> bool = {
+    if (not finiteVector(rule.direction) or not finite(rule.threshold)) return false;
+    if (not rule.replaceNormal) {
+        var normalX: f32 = rule.normal.x; var normalY: f32 = rule.normal.y;
+        let bitsX: u32 = (&normalX as cptr u32)[0]; let bitsY: u32 = (&normalY as cptr u32)[0];
+        return bitsX == 0u32 and bitsY == 0u32;
+    }
+    if (not finiteVector(rule.normal)) return false;
+    let norm: f32 = rule.normal.x * rule.normal.x + rule.normal.y * rule.normal.y;
+    return mass2.b2AbsFloat(1.0f32 - norm) < 100.0f32 * 1.1920928955078125e-7f32;
+}
+# Box2D 8c661469, src/contact.                                                                       
+fun setPreSolveRules(owner: WorldNumber, values: ref List[PreRule12]) -> i32 = {
+    let status: i32 = worldStatus(owner); if (status != OK) return status; var i: i64 = 0i64;
+    while (i < values.length()) {
+        let rule: PreRule12 = values.at(i); let checked: i32 = shapeStatus(owner, rule.a); if (checked != OK) return checked;
+        let second: i32 = shapeStatus(owner, rule.b); if (second != OK) return second; i = i + 1i64;
+    }
+    let unlocked: i32 = worldMutationStatus(owner); if (unlocked != OK) return unlocked;
+    i = 0i64;
+    while (i < values.length()) { let candidate: PreRule12 = values.at(i); if (not validPreRule12(candidate)) return PARAM; i = i + 1i64; }
+    var stored: List[raw.PreRule12]; i = 0i64;
+    while (i < values.length()) {
+        let entry: PreRule12 = values.at(i);
+        stored.push(raw.PreRule12(ruleNumber12(entry.a), ruleNumber12(entry.b), entry.allow, entry.direction, entry.threshold, entry.replaceNormal, entry.normal)); i = i + 1i64;
+    }
+    raw.worlds.at(owner.slot as i64).preRules12 = move stored; return OK;
+}
+
+# Box2D 8c661469, src/contact.                                                            
+fun setFrictionRules(owner: WorldNumber, values: ref List[MaterialRule12]) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status; var i: i64 = 0i64;
+    while (i < values.length()) { let rule: MaterialRule12 = values.at(i); if (not validNonnegative(rule.value)) return PARAM; i = i + 1i64; }
+    var stored: List[raw.MaterialRule12]; i = 0i64;
+    while (i < values.length()) { let entry: MaterialRule12 = values.at(i); stored.push(raw.MaterialRule12(entry.materialA, entry.materialB, entry.value)); i = i + 1i64; }
+    raw.worlds.at(owner.slot as i64).frictionRules12 = move stored; return OK;
+}
+
+# Box2D 8c661469, src/contact.                                                            
+fun setRestitutionRules(owner: WorldNumber, values: ref List[MaterialRule12]) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status; var i: i64 = 0i64;
+    while (i < values.length()) { let rule: MaterialRule12 = values.at(i); if (not validNonnegative(rule.value)) return PARAM; i = i + 1i64; }
+    var stored: List[raw.MaterialRule12]; i = 0i64;
+    while (i < values.length()) { let entry: MaterialRule12 = values.at(i); stored.push(raw.MaterialRule12(entry.materialA, entry.materialB, entry.value)); i = i + 1i64; }
+    raw.worlds.at(owner.slot as i64).restitutionRules12 = move stored; return OK;
+}
+
+# Box2D 8c661469, src/world.                            
+fun enablePairRules(owner: WorldNumber, flag: bool) -> i32 = {
+    let check: SensorAction = pairRulesPreflight17(owner,flag); if (check.status != OK) return check.status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetCustomFilterCallback(raw.WorldId((owner.slot + 1i32) as u16, world.generation), raw.b2EvaluatePairRules12, Key64(), flag);
+    world.filterUsesRules12 = flag;
+    return OK;
+}
+
+# Box2D 8c661469, src/world.                            
+fun enablePreSolveRules(owner: WorldNumber, flag: bool) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetPreSolveCallback(raw.WorldId((owner.slot + 1i32) as u16, world.generation), raw.b2EvaluatePreRules12, Key64(), flag);
+    return OK;
+}
+
+# Box2D 8c661469, src/world.                            
+fun enableFrictionRules(owner: WorldNumber, flag: bool) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetFrictionCallback(raw.WorldId((owner.slot + 1i32) as u16, world.generation), raw.b2EvaluateFrictionRules12, flag);
+    return OK;
+}
+
+# Box2D 8c661469, src/world.                            
+fun enableRestitutionRules(owner: WorldNumber, flag: bool) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    raw.b2World_SetRestitutionCallback(raw.WorldId((owner.slot + 1i32) as u16, world.generation), raw.b2EvaluateRestitutionRules12, flag);
+    return OK;
+}
+
+# Box2D 8c661469, src/broad_phase.                                                                                                 
+fun appendPairRule12(owner: WorldNumber, rule: PairRule12) -> i32 = {
+    let status: i32 = rulePairStatus12(owner, rule.a, rule.b); if (status != OK) return status;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var values: List[raw.PairRule12]; var i: i64 = 0i64;
+    while (i < world.pairRules12.length()) { let entry: raw.PairRule12 = world.pairRules12.at(i); values.push(entry); i = i + 1i64; }
+    values.push(raw.PairRule12(ruleNumber12(rule.a), ruleNumber12(rule.b), rule.allow)); world.pairRules12 = move values; return OK;
+}
+# Box2D 8c661469, src/contact.                               
+fun appendPreRule12(owner: WorldNumber, rule: PreRule12) -> i32 = {
+    let status: i32 = rulePairStatus12(owner, rule.a, rule.b); if (status != OK) return status;
+    if (not validPreRule12(rule)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var values: List[raw.PreRule12]; var i: i64 = 0i64;
+    while (i < world.preRules12.length()) { let entry: raw.PreRule12 = world.preRules12.at(i); values.push(entry); i = i + 1i64; }
+    values.push(raw.PreRule12(ruleNumber12(rule.a), ruleNumber12(rule.b), rule.allow, rule.direction, rule.threshold, rule.replaceNormal, rule.normal));
+    world.preRules12 = move values; return OK;
+}
+
+# Box2D 8c661469, src/contact.                               
+fun appendFrictionRule12(owner: WorldNumber, rule: MaterialRule12) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status; if (not validNonnegative(rule.value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var values: List[raw.MaterialRule12]; var i: i64 = 0i64;
+    while (i < world.frictionRules12.length()) { let entry: raw.MaterialRule12 = world.frictionRules12.at(i); values.push(entry); i = i + 1i64; }
+    values.push(raw.MaterialRule12(rule.materialA, rule.materialB, rule.value)); world.frictionRules12 = move values; return OK;
+}
+
+# Box2D 8c661469, src/contact.                               
+fun appendRestitutionRule12(owner: WorldNumber, rule: MaterialRule12) -> i32 = {
+    let status: i32 = worldMutationStatus(owner); if (status != OK) return status; if (not validNonnegative(rule.value)) return PARAM;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var values: List[raw.MaterialRule12]; var i: i64 = 0i64;
+    while (i < world.restitutionRules12.length()) { let entry: raw.MaterialRule12 = world.restitutionRules12.at(i); values.push(entry); i = i + 1i64; }
+    values.push(raw.MaterialRule12(rule.materialA, rule.materialB, rule.value)); world.restitutionRules12 = move values; return OK;
+}
+
+                                                                           
+class JointNumber { slot: i32 = -1i32; birthTicket: Key64 = Key64(); ownerTicket: Key64 = Key64(); }
+class JointResult { status: i32 = STALE; reason: i32 = 0i32; number: JointNumber = JointNumber(); }
+class JointAction { status: i32 = OK; reason: i32 = 0i32; }
+class DistanceDescription {
+    localAnchorA: Vec2 = Vec2(); localAnchorB: Vec2 = Vec2(); length: f32 = 1.0f32;
+    enableSpring: bool = false; hertz: f32 = 0.0f32; dampingRatio: f32 = 0.0f32;
+    enableLimit: bool = false; minLength: f32 = 0.0f32; maxLength: f32 = 100000.0f32;
+    enableMotor: bool = false; maxMotorForce: f32 = 0.0f32; motorSpeed: f32 = 0.0f32;
+    collideConnected: bool = false; hasObjectId: bool = false; objectId: Key64 = Key64();
+}
+class JointView {
+    number: JointNumber = JointNumber(); bodyA: BodyNumber = BodyNumber(); bodyB: BodyNumber = BodyNumber();
+    jointType: i32 = 0i32; localAnchorA: Vec2 = Vec2(); localAnchorB: Vec2 = Vec2();
+    collideConnected: bool = false; hasObjectId: bool = false; objectId: Key64 = Key64();
+    constraintHertz: f32 = 0.0f32; constraintDampingRatio: f32 = 0.0f32;
+    distanceParameters: DistanceDescription = DistanceDescription();
+    revoluteParameters: RevoluteDescription = RevoluteDescription(); prismaticParameters: PrismaticDescription = PrismaticDescription();
+    referenceAngle: f32 = 0.0f32; localAxisA: Vec2 = Vec2();
+    angle: f32 = 0.0f32; translation: f32 = 0.0f32; speed: f32 = 0.0f32; motorTorque: f32 = 0.0f32;
+    force: Vec2 = Vec2(); torque: f32 = 0.0f32; linearSeparation: f32 = 0.0f32; angularSeparation: f32 = 0.0f32;
+    currentLength: f32 = 0.0f32; motorForce: f32 = 0.0f32;
+}
+class JointLookup { status: i32 = STALE; reason: i32 = 0i32; value: JointView = JointView(); }
+class JointList { status: i32 = STALE; reason: i32 = 0i32; values: List[JointNumber] = emptyJointNumbers(); }
+fun emptyJointNumbers() -> List[JointNumber] = { var values: List[JointNumber]; return values; }
+fun defaultDistanceDescription() -> DistanceDescription = { return DistanceDescription(); }
+                                                                                     
+                                                                          
+fun jointStatus(owner: WorldNumber, number: JointNumber) -> i32 = {
+    if (worldStatus(owner) != OK) return STALE;
+    if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if ((number.slot as u32) >= (world.jointIdPool.nextIndex as u32)) return STALE;
+    if (world.joints.at(number.slot as i64).jointId == -1i32) return STALE;
+    if (not equalKey(world.joints.at(number.slot as i64).birthTicket, number.birthTicket)) return STALE;
+    return OK;
+}
+fun validateJoint(owner: WorldNumber, number: JointNumber) -> i32 = { return jointStatus(owner, number); }
+fun jointMutationStatus(owner: WorldNumber, number: JointNumber) -> i32 = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return status;
+    if (raw.worlds.at(owner.slot as i64).locked) return LOCKED; return OK;
+}
+fun jointActionStatus14(status: i32) -> JointAction = { return JointAction(status, if status == LOCKED then 1i32 else 0i32); }
+                                                                        
+fun validDistanceDescription(value: DistanceDescription) -> bool = {
+    return finiteVector(value.localAnchorA) and finiteVector(value.localAnchorB) and finite(value.length) and value.length > 0.0f32
+        and validNonnegative(value.hertz) and validNonnegative(value.dampingRatio) and validNonnegative(value.maxMotorForce)
+        and finite(value.motorSpeed) and validNonnegative(value.minLength) and validNonnegative(value.maxLength) and value.minLength <= value.maxLength
+        and (value.hasObjectId or (value.objectId.low == 0u32 and value.objectId.high == 0u32));
+}
+fun jointCreatePreflight(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: DistanceDescription) -> JointAction = {
+    let statusA: i32 = bodyStatus(owner, a); if (statusA != OK) return jointActionStatus14(statusA);
+    let statusB: i32 = bodyStatus(owner, b); if (statusB != OK) return jointActionStatus14(statusB);
+    if (raw.worlds.at(owner.slot as i64).locked) return JointAction(LOCKED, 1i32);
+    if (a.slot == b.slot) return JointAction(PARAM, 7i32);
+    if (not validDistanceDescription(description)) return JointAction(PARAM, 10i32);
+    if (not jointReservationFit(lastIssued,1u32,raw.worlds.at(owner.slot as i64).jointIdPool.nextIndex as u32)) return JointAction(LIMIT, 0i32);
+    return JointAction();
+}
+                                                                                              
+fun createDistanceJoint(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: DistanceDescription) -> JointResult = {
+    var result = JointResult(); let check: JointAction = jointCreatePreflight(owner,a,b,description);
+    result.status = check.status; result.reason = check.reason; if (check.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    let ticket: Key64 = nextTicket(lastIssued);
+    var def = raw.DistanceJointDef(); def.bodyIdA = raw.b2MakeBodyId(world, a.slot); def.bodyIdB = raw.b2MakeBodyId(world, b.slot);
+    def.localAnchorA = description.localAnchorA; def.localAnchorB = description.localAnchorB; def.length = description.length;
+    def.enableSpring = description.enableSpring; def.hertz = description.hertz; def.dampingRatio = description.dampingRatio;
+    def.enableLimit = description.enableLimit; def.minLength = description.minLength; def.maxLength = description.maxLength;
+    def.enableMotor = description.enableMotor; def.maxMotorForce = description.maxMotorForce; def.motorSpeed = description.motorSpeed;
+    def.collideConnected = description.collideConnected; def.hasObjectId = description.hasObjectId; def.objectId = description.objectId;
+    let id: raw.JointId = raw.b2CreateDistanceJoint(raw.WorldId((owner.slot + 1i32) as u16, world.generation), def);
+    let slot: i32 = id.index1 - 1i32;
+    world.joints.at(slot as i64).birthTicket = ticket; world.joints.at(slot as i64).ownerTicket = owner.birthTicket; lastIssued = ticket;
+    result.status = OK; result.number = JointNumber(slot, ticket, owner.birthTicket); return result;
+}
+                                                            
+fun makeJointId14(owner: WorldNumber, number: JointNumber) -> raw.JointId = {
+    return raw.JointId(number.slot + 1i32, owner.slot as u16, raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).generation);
+}
+fun destroyJoint(owner: WorldNumber, number: JointNumber) -> JointAction = {
+    let status: i32 = jointMutationStatus(owner, number); if (status != OK) return jointActionStatus14(status);
+    raw.b2DestroyJoint(makeJointId14(owner, number)); return JointAction();
+}
+fun wakeJointBodies(owner: WorldNumber, number: JointNumber) -> JointAction = {
+    let status: i32 = jointMutationStatus(owner, number); if (status != OK) return jointActionStatus14(status);
+    raw.b2Joint_WakeBodies(makeJointId14(owner, number)); return JointAction();
+}
+                                                                    
+fun bodyJoints(owner: WorldNumber, body: BodyNumber) -> JointList = {
+    var result = JointList(); result.status = bodyStatus(owner, body); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    var key: i32 = world.bodies.at(body.slot as i64).headJointKey;
+    while (key != -1i32) {
+        let id: i32 = key >> 1i32; let side: i32 = key & 1i32;
+        let joint: raw.JointRecord = world.joints.at(id as i64);
+        result.values.push(JointNumber(id, joint.birthTicket, joint.ownerTicket));
+        key = raw.jointEdge(world.joints.at(id as i64), side).nextKey;
+    }
+    return result;
+}
+                                                                                   
+fun lookupJoint(owner: WorldNumber, number: JointNumber) -> JointLookup = {
+    var result = JointLookup(); result.status = jointStatus(owner, number); if (result.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+    if (world.locked) { result.status = LOCKED; result.reason = 1i32; return result; }
+    let record: raw.JointRecord = world.joints.at(number.slot as i64); let sim: raw.JointSim = raw.b2GetJointSim(world, number.slot);
+    let id: raw.JointId = makeJointId14(owner, number);
+    result.value.number = number;
+    result.value.bodyA = BodyNumber(record.edgeA.bodyId, world.bodies.at(record.edgeA.bodyId as i64).birthTicket, owner.birthTicket);
+    result.value.bodyB = BodyNumber(record.edgeB.bodyId, world.bodies.at(record.edgeB.bodyId as i64).birthTicket, owner.birthTicket);
+    result.value.jointType = record.jointType; result.value.localAnchorA = sim.localOriginAnchorA; result.value.localAnchorB = sim.localOriginAnchorB;
+    result.value.collideConnected = record.collideConnected; result.value.hasObjectId = record.hasObjectId; result.value.objectId = record.objectId;
+    result.value.constraintHertz = sim.constraintHertz; result.value.constraintDampingRatio = sim.constraintDampingRatio;
+    if (record.jointType == 0i32) {
+    let joint: raw.DistanceJoint = sim.distanceJoint;
+    var d: ref DistanceDescription = &result.value.distanceParameters;
+    d.localAnchorA = sim.localOriginAnchorA; d.localAnchorB = sim.localOriginAnchorB; d.length = joint.length;
+    d.enableSpring = joint.enableSpring; d.hertz = joint.hertz; d.dampingRatio = joint.dampingRatio;
+    d.enableLimit = joint.enableLimit; d.minLength = joint.minLength; d.maxLength = joint.maxLength;
+    d.enableMotor = joint.enableMotor; d.maxMotorForce = joint.maxMotorForce; d.motorSpeed = joint.motorSpeed;
+    d.collideConnected = record.collideConnected; d.hasObjectId = record.hasObjectId; d.objectId = record.objectId;
+    }
+    result.value.force = raw.b2Joint_GetConstraintForce(id); result.value.torque = raw.b2Joint_GetConstraintTorque(id);
+    result.value.linearSeparation = raw.b2Joint_GetLinearSeparation(id); result.value.angularSeparation = raw.b2Joint_GetAngularSeparation(id);
+    if (record.jointType == 0i32) { result.value.currentLength = raw.b2DistanceJoint_GetCurrentLength(id); result.value.motorForce = raw.b2DistanceJoint_GetMotorForce(id); }
+    else if (record.jointType == 5i32) {
+        result.value.referenceAngle = raw.b2Joint_GetReferenceAngle(id); result.value.angle = raw.b2RevoluteJoint_GetAngle(id);
+        result.value.motorTorque = raw.b2RevoluteJoint_GetMotorTorque(id);
+        result.value.revoluteParameters.localAnchorA = sim.localOriginAnchorA;
+        result.value.revoluteParameters.localAnchorB = sim.localOriginAnchorB;
+        result.value.revoluteParameters.referenceAngle = sim.revoluteJoint.referenceAngle;
+        result.value.revoluteParameters.targetAngle = sim.revoluteJoint.targetAngle;
+        result.value.revoluteParameters.hertz = sim.revoluteJoint.hertz;
+        result.value.revoluteParameters.dampingRatio = sim.revoluteJoint.dampingRatio;
+        result.value.revoluteParameters.lowerAngle = sim.revoluteJoint.lowerAngle;
+        result.value.revoluteParameters.upperAngle = sim.revoluteJoint.upperAngle;
+        result.value.revoluteParameters.maxMotorTorque = sim.revoluteJoint.maxMotorTorque;
+        result.value.revoluteParameters.motorSpeed = sim.revoluteJoint.motorSpeed;
+        result.value.revoluteParameters.enableSpring = sim.revoluteJoint.enableSpring;
+        result.value.revoluteParameters.enableLimit = sim.revoluteJoint.enableLimit;
+        result.value.revoluteParameters.enableMotor = sim.revoluteJoint.enableMotor;
+        result.value.revoluteParameters.collideConnected = record.collideConnected;
+        result.value.revoluteParameters.hasObjectId = record.hasObjectId;
+        result.value.revoluteParameters.objectId = record.objectId;
+        result.value.revoluteParameters.drawSize = record.drawSize;
+    } else if (record.jointType == 4i32) {
+        result.value.referenceAngle = raw.b2Joint_GetReferenceAngle(id); result.value.localAxisA = raw.b2Joint_GetLocalAxisA(id);
+        result.value.translation = raw.b2PrismaticJoint_GetTranslation(id); result.value.speed = raw.b2PrismaticJoint_GetSpeed(id);
+        result.value.motorForce = raw.b2PrismaticJoint_GetMotorForce(id);
+        result.value.prismaticParameters.localAnchorA = sim.localOriginAnchorA;
+        result.value.prismaticParameters.localAnchorB = sim.localOriginAnchorB;
+        result.value.prismaticParameters.localAxisA = sim.prismaticJoint.localAxisA;
+        result.value.prismaticParameters.referenceAngle = sim.prismaticJoint.referenceAngle;
+        result.value.prismaticParameters.targetTranslation = sim.prismaticJoint.targetTranslation;
+        result.value.prismaticParameters.hertz = sim.prismaticJoint.hertz;
+        result.value.prismaticParameters.dampingRatio = sim.prismaticJoint.dampingRatio;
+        result.value.prismaticParameters.lowerTranslation = sim.prismaticJoint.lowerTranslation;
+        result.value.prismaticParameters.upperTranslation = sim.prismaticJoint.upperTranslation;
+        result.value.prismaticParameters.maxMotorForce = sim.prismaticJoint.maxMotorForce;
+        result.value.prismaticParameters.motorSpeed = sim.prismaticJoint.motorSpeed;
+        result.value.prismaticParameters.enableSpring = sim.prismaticJoint.enableSpring;
+        result.value.prismaticParameters.enableLimit = sim.prismaticJoint.enableLimit;
+        result.value.prismaticParameters.enableMotor = sim.prismaticJoint.enableMotor;
+        result.value.prismaticParameters.collideConnected = record.collideConnected;
+        result.value.prismaticParameters.hasObjectId = record.hasObjectId;
+        result.value.prismaticParameters.objectId = record.objectId;
+    }
+    return result;
+}
+fun cloneJointView(source: JointView) -> JointView = { return source; }
+fun cloneJointList(source: ref JointList) -> JointList = {
+    var result = JointList(); result.status = source.status; result.reason = source.reason; result.values = copy source.values; return result;
+}
+                                                                                 
+                                                               
+fun jointBlocksFit(count: i64) -> bool = { return count <= 16i64 or count / 4i64 + 3i64 <= 32767i64; }
+fun jointUpperBlocksFit(world: ref raw.World) -> bool = {
+    let count: i64 = (world.jointIdPool.nextIndex as i64) - (world.jointIdPool.freeCount as i64);
+    return jointBlocksFit(count);
+}
+
+                                                                        
+fun jointPreflight14(owner: WorldNumber, number: JointNumber, distanceOnly: bool) -> JointAction = {
+    let status: i32 = jointMutationStatus(owner, number); if (status != OK) return jointActionStatus14(status);
+    if (distanceOnly and raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointAction(PARAM, 6i32);
+    return JointAction();
+}
+
+                                                                                               
+fun setDistanceLength(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not (finite(value) and value > 0.0f32)) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetLength(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                               
+fun setDistanceHertz(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not (validNonnegative(value))) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetSpringHertz(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                               
+fun setDistanceDamping(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not (validNonnegative(value))) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetSpringDampingRatio(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                               
+fun setDistanceSpeed(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not (finite(value))) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetMotorSpeed(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                               
+fun setDistanceMaxForce(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not (validNonnegative(value))) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetMaxMotorForce(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                
+fun setDistanceSpring(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    raw.b2DistanceJoint_EnableSpring(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                
+fun setDistanceLimit(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    raw.b2DistanceJoint_EnableLimit(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                
+fun setDistanceMotor(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    raw.b2DistanceJoint_EnableMotor(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                                                
+fun setJointCollideConnected(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, false); if (check.status != OK) return check;
+    raw.b2Joint_SetCollideConnected(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                  
+fun setJointLocalAnchorA(owner: WorldNumber, number: JointNumber, value: Vec2) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, false); if (check.status != OK) return check;
+    if (not finiteVector(value)) return JointAction(PARAM, 10i32);
+    raw.b2Joint_SetLocalAnchorA(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                  
+fun setJointLocalAnchorB(owner: WorldNumber, number: JointNumber, value: Vec2) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, false); if (check.status != OK) return check;
+    if (not finiteVector(value)) return JointAction(PARAM, 10i32);
+    raw.b2Joint_SetLocalAnchorB(makeJointId14(owner, number), value); return JointAction();
+}
+
+                                                         
+fun setDistanceRange(owner: WorldNumber, number: JointNumber, minimum: f32, maximum: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, true); if (check.status != OK) return check;
+    if (not validNonnegative(minimum) or not validNonnegative(maximum) or minimum > maximum) return JointAction(PARAM, 10i32);
+    raw.b2DistanceJoint_SetLengthRange(makeJointId14(owner, number), minimum, maximum); return JointAction();
+}
+                                                    
+fun setJointConstraintTuning(owner: WorldNumber, number: JointNumber, hertz: f32, damping: f32) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, false); if (check.status != OK) return check;
+    if (not validNonnegative(hertz) or not validNonnegative(damping)) return JointAction(PARAM, 10i32);
+    raw.b2Joint_SetConstraintTuning(makeJointId14(owner, number), hertz, damping); return JointAction();
+}
+                                                    
+fun setJointObjectId(owner: WorldNumber, number: JointNumber, present: bool, value: Key64) -> JointAction = {
+    let check: JointAction = jointPreflight14(owner, number, false); if (check.status != OK) return check;
+    if (not present and (value.low != 0u32 or value.high != 0u32)) return JointAction(PARAM, 10i32);
+    raw.b2Joint_SetUserData(makeJointId14(owner, number), raw.ObjectValue12(present, value)); return JointAction();
+}
+                                                                                         
+# Box2D 8c661469, src/joint.c:1130-1346, revolute_joint.c/prismatic_joint.                                     
+                                                                         
+fun jointSetterPreflightB14(owner: WorldNumber, number: JointNumber, kind: i32, value: f32, other: f32) -> JointAction = {
+    let status: i32 = jointMutationStatus(owner,number); if (status != OK) return jointActionStatus14(status);
+    let typ: i32 = raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType;
+    if ((kind == 2i32 and typ != 4i32 and typ != 5i32) or (kind == 3i32 and typ != 4i32)
+        or (kind >= 32i32 and kind <= 40i32 and typ != 5i32) or (kind >= 48i32 and kind <= 56i32 and typ != 4i32)) return JointAction(PARAM,6i32);
+    if (kind == 3i32) { if (not validJointAxis14(Vec2(value,other))) return JointAction(PARAM,9i32); }
+    else if (kind == 2i32 or kind == 35i32) { if (not validJointAngle14(value)) return JointAction(PARAM,10i32); }
+    else if (kind == 37i32) { if (not validRevoluteLimits14(value,other)) return JointAction(PARAM,10i32); }
+    else if (kind == 53i32) { if (not finite(value) or not finite(other) or value > other) return JointAction(PARAM,10i32); }
+    else if (kind == 33i32 or kind == 34i32 or kind == 40i32 or kind == 49i32 or kind == 50i32 or kind == 56i32) { if (not validNonnegative(value)) return JointAction(PARAM,10i32); }
+    else if (kind == 39i32 or kind == 51i32 or kind == 55i32) { if (not finite(value)) return JointAction(PARAM,10i32); }
+    return JointAction();
+}
+fun setJointReferenceAngle(owner: WorldNumber, number: JointNumber, angle: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,2i32,angle,0.0f32); if (check.status != OK) return check;
+    raw.b2Joint_SetReferenceAngle(makeJointId14(owner,number),angle); return JointAction();
+}
+fun setJointLocalAxisA(owner: WorldNumber, number: JointNumber, axis: Vec2) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,3i32,axis.x,axis.y); if (check.status != OK) return check;
+    raw.b2Joint_SetLocalAxisA(makeJointId14(owner,number),axis); return JointAction();
+}
+class JointScalar { status: i32 = STALE; reason: i32 = 0i32; value: f32 = 0.0f32; }
+class JointVector { status: i32 = STALE; reason: i32 = 0i32; value: Vec2 = Vec2(); }
+fun getJointReferenceAngle(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    let typ: i32 = raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType;
+    if (typ != 4i32 and typ != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2Joint_GetReferenceAngle(makeJointId14(owner,number)));
+}
+fun getJointLocalAxisA(owner: WorldNumber, number: JointNumber) -> JointVector = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointVector(status, 0i32, Vec2());
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointVector(PARAM,6i32,Vec2());
+    return JointVector(OK,0i32,raw.b2Joint_GetLocalAxisA(makeJointId14(owner,number)));
+}
+
+                                                          
+fun getDistanceLength(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetLength(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceMinLength(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetMinLength(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceMaxLength(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetMaxLength(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceHertz(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetSpringHertz(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceDamping(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetSpringDampingRatio(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceSpeed(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetMotorSpeed(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceMaxForce(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetMaxMotorForce(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceCurrentLength(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetCurrentLength(makeJointId14(owner, number)));
+}
+
+                                                          
+fun getDistanceMotorForce(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner, number); if (status != OK) return JointScalar(status, 0i32, 0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointScalar(PARAM, 6i32, 0.0f32);
+    return JointScalar(OK, 0i32, raw.b2DistanceJoint_GetMotorForce(makeJointId14(owner, number)));
+}
+
+                                                                                   
+class JointBoolean { status: i32 = STALE; reason: i32 = 0i32; value: bool = false; }
+class JointTuning { status: i32 = STALE; reason: i32 = 0i32; hertz: f32 = 0.0f32; dampingRatio: f32 = 0.0f32; }
+class JointObject { status: i32 = STALE; reason: i32 = 0i32; present: bool = false; value: Key64 = Key64(); }
+class JointTypeResult { status: i32 = STALE; reason: i32 = 0i32; jointType: i32 = 0i32; }
+fun getJointType(owner: WorldNumber, number: JointNumber) -> JointTypeResult = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointTypeResult(status,0i32,0i32);
+    return JointTypeResult(OK,0i32,raw.b2Joint_GetType(makeJointId14(owner,number)));
+}
+fun getJointCollideConnected(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    return JointBoolean(OK,0i32,raw.b2Joint_GetCollideConnected(makeJointId14(owner,number)));
+}
+fun getJointObjectId(owner: WorldNumber, number: JointNumber) -> JointObject = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointObject(status,0i32,false,Key64());
+    let value: raw.ObjectValue12 = raw.b2Joint_GetUserData(makeJointId14(owner,number)); return JointObject(OK,0i32,value.present,value.value);
+}
+fun getJointConstraintTuning(owner: WorldNumber, number: JointNumber) -> JointTuning = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointTuning(status,0i32,0.0f32,0.0f32);
+    let value: raw.JointTuning14 = raw.b2Joint_GetConstraintTuning(makeJointId14(owner,number)); return JointTuning(OK,0i32,value.hertz,value.dampingRatio);
+}
+
+                                                  
+fun getJointLocalAnchorA(owner: WorldNumber, number: JointNumber) -> JointVector = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointVector(status,0i32,Vec2());
+    return JointVector(OK,0i32,raw.b2Joint_GetLocalAnchorA(makeJointId14(owner,number)));
+}
+
+                                                  
+fun getJointLocalAnchorB(owner: WorldNumber, number: JointNumber) -> JointVector = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointVector(status,0i32,Vec2());
+    return JointVector(OK,0i32,raw.b2Joint_GetLocalAnchorB(makeJointId14(owner,number)));
+}
+
+                                                          
+fun getDistanceSpring(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2DistanceJoint_IsSpringEnabled(makeJointId14(owner,number)));
+}
+
+                                                          
+fun getDistanceLimit(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2DistanceJoint_IsLimitEnabled(makeJointId14(owner,number)));
+}
+
+                                                          
+fun getDistanceMotor(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 0i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2DistanceJoint_IsMotorEnabled(makeJointId14(owner,number)));
+}
+                                                                          
+                                                                    
+fun jointReservationFit(last: Key64, required: u32, slotNext: u32) -> bool = {
+    let available: Key64 = Key64(4294967295u32-last.low,4294967295u32-last.high);
+    return (available.high != 0u32 or required <= available.low) and slotNext < 2147483647u32;
+}
+fun bodyTypePreflight14(owner: WorldNumber, number: BodyNumber, bodyType: i32) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner,number); if (status != OK) return status;
+    if (bodyType < 0i32 or bodyType > 2i32) return PARAM;
+    let body: raw.BodyRecord = raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64);
+    if (chainBodyTypeStatus(owner,number,bodyType) != OK) return PARAM;
+    if (body.bodyType == bodyType) return OK;
+    if (body.jointCount > 0i32) return PARAM;
+    if (not safeBodyChange(owner,number,bodyType,body.fixedRotation,false)) return GEOMETRY;
+    return OK;
+}
+fun bodyEnabledPreflight14(owner: WorldNumber, number: BodyNumber, enabled: bool) -> i32 = {
+    let status: i32 = bodyMutationStatus(owner,number); if (status != OK) return status;
+    let body: raw.BodyRecord = raw.worlds.at(owner.slot as i64).bodies.at(number.slot as i64);
+    if (not enabled and body.setIndex != 1i32 and body.jointCount > 0i32) return PARAM;
+    return OK;
+}
+
+                                                                                             
+fun createPairAfterPreflight17(owner: WorldNumber, def: raw.BodyDef, source: raw.ShapeRecord, invoke: bool, hasObjectId: bool, objectId: Key64) -> PairResult = {
+    var result = PairResult(); var shape: raw.ShapeRecord = source;
+    shape.hasObjectId = hasObjectId; shape.objectId = if hasObjectId then objectId else Key64();
+    result.body = createBody(owner,def); if (result.body.status != OK) { result.status = result.body.status; return result; }
+    raw.worlds.at(owner.slot as i64).bodies.at(result.body.number.slot as i64).hasObjectId = hasObjectId;
+    raw.worlds.at(owner.slot as i64).bodies.at(result.body.number.slot as i64).objectId = shape.objectId;
+    result.shape = createShapeRaw(owner,result.body.number,shape,true,invoke); result.status = result.shape.status; return result;
+}
+
+                                                                       
+class RevoluteDescription {
+
+    localAnchorA: Vec2 = Vec2(); localAnchorB: Vec2 = Vec2();
+    referenceAngle: f32 = 0.0f32;
+    targetAngle: f32 = 0.0f32;
+    hertz: f32 = 0.0f32;
+    dampingRatio: f32 = 0.0f32;
+    lowerAngle: f32 = 0.0f32;
+    upperAngle: f32 = 0.0f32;
+    maxMotorTorque: f32 = 0.0f32;
+    motorSpeed: f32 = 0.0f32;
+    enableSpring: bool = false; enableLimit: bool = false; enableMotor: bool = false;
+    collideConnected: bool = false; hasObjectId: bool = false; objectId: Key64 = Key64();
+    drawSize: f32 = 0.25f32;
+}
+fun defaultRevoluteDescription() -> RevoluteDescription = { return RevoluteDescription(); }
+fun jointCreatePreflight(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: RevoluteDescription) -> JointAction = {
+    let statusA: i32 = bodyStatus(owner,a); if (statusA != OK) return jointActionStatus14(statusA);
+    let statusB: i32 = bodyStatus(owner,b); if (statusB != OK) return jointActionStatus14(statusB);
+    if (raw.worlds.at(owner.slot as i64).locked) return JointAction(LOCKED,1i32);
+    if (a.slot == b.slot) return JointAction(PARAM,7i32);
+    if (not validRevoluteDescription(description)) return JointAction(PARAM,10i32);
+    if (not jointReservationFit(lastIssued,1u32,raw.worlds.at(owner.slot as i64).jointIdPool.nextIndex as u32)) return JointAction(LIMIT,0i32);
+    return JointAction();
+}
+fun validRevoluteDescription(value: RevoluteDescription) -> bool = {
+    return finiteVector(value.localAnchorA) and finiteVector(value.localAnchorB)
+        and validJointAngle14(value.referenceAngle) and validJointAngle14(value.targetAngle) and finite(value.drawSize)
+        and validRevoluteLimits14(value.lowerAngle,value.upperAngle)
+        and validNonnegative(value.hertz) and validNonnegative(value.dampingRatio)
+        and validNonnegative(value.maxMotorTorque) and finite(value.motorSpeed)
+        and (value.hasObjectId or (value.objectId.low == 0u32 and value.objectId.high == 0u32));
+}
+fun createRevoluteJoint(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: RevoluteDescription) -> JointResult = {
+    var result = JointResult(); let check: JointAction = jointCreatePreflight(owner,a,b,description);
+    result.status = check.status; result.reason = check.reason; if (check.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); let ticket: Key64 = nextTicket(lastIssued);
+    var def = raw.RevoluteJointDef(); def.bodyIdA = raw.b2MakeBodyId(world,a.slot); def.bodyIdB = raw.b2MakeBodyId(world,b.slot);
+    def.localAnchorA = description.localAnchorA;
+    def.localAnchorB = description.localAnchorB;
+    def.referenceAngle = description.referenceAngle;
+    def.targetAngle = description.targetAngle;
+    def.hertz = description.hertz;
+    def.dampingRatio = description.dampingRatio;
+    def.lowerAngle = description.lowerAngle;
+    def.upperAngle = description.upperAngle;
+    def.maxMotorTorque = description.maxMotorTorque;
+    def.motorSpeed = description.motorSpeed;
+    def.enableSpring = description.enableSpring;
+    def.enableLimit = description.enableLimit;
+    def.enableMotor = description.enableMotor;
+    def.collideConnected = description.collideConnected;
+    def.hasObjectId = description.hasObjectId;
+    def.objectId = description.objectId;
+    def.drawSize = description.drawSize;
+    let id: raw.JointId = raw.b2CreateRevoluteJoint(raw.WorldId((owner.slot+1i32) as u16,world.generation),def);
+    let slot: i32 = id.index1-1i32; world.joints.at(slot as i64).birthTicket = ticket;
+    world.joints.at(slot as i64).ownerTicket = owner.birthTicket; lastIssued = ticket;
+    result.status = OK; result.number = JointNumber(slot,ticket,owner.birthTicket); return result;
+}
+fun setRevoluteSpring(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,32i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_EnableSpring(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteSpring(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2RevoluteJoint_IsSpringEnabled(makeJointId14(owner,number)));
+}
+fun setRevoluteHertz(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,33i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetSpringHertz(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteHertz(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetSpringHertz(makeJointId14(owner,number)));
+}
+fun setRevoluteDamping(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,34i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetSpringDampingRatio(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteDamping(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetSpringDampingRatio(makeJointId14(owner,number)));
+}
+fun setRevoluteTargetAngle(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,35i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetTargetAngle(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteTargetAngle(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetTargetAngle(makeJointId14(owner,number)));
+}
+fun setRevoluteLimit(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,36i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_EnableLimit(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteLimit(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2RevoluteJoint_IsLimitEnabled(makeJointId14(owner,number)));
+}
+fun setRevoluteMotor(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,38i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_EnableMotor(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteMotor(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2RevoluteJoint_IsMotorEnabled(makeJointId14(owner,number)));
+}
+fun setRevoluteMotorSpeed(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,39i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetMotorSpeed(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteMotorSpeed(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetMotorSpeed(makeJointId14(owner,number)));
+}
+fun setRevoluteMaxMotorTorque(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,40i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetMaxMotorTorque(makeJointId14(owner,number),value); return JointAction();
+}
+fun getRevoluteMaxMotorTorque(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetMaxMotorTorque(makeJointId14(owner,number)));
+}
+fun setRevoluteLimits(owner: WorldNumber, number: JointNumber, lower: f32, upper: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,37i32,lower,upper); if (check.status != OK) return check;
+    raw.b2RevoluteJoint_SetLimits(makeJointId14(owner,number),lower,upper); return JointAction();
+}
+fun getRevoluteLowerLimit(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetLowerLimit(makeJointId14(owner,number)));
+}
+fun getRevoluteUpperLimit(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetUpperLimit(makeJointId14(owner,number)));
+}
+fun getRevoluteAngle(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetAngle(makeJointId14(owner,number)));
+}
+fun getRevoluteMotorTorque(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 5i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2RevoluteJoint_GetMotorTorque(makeJointId14(owner,number)));
+}
+class PrismaticDescription {
+
+    localAnchorA: Vec2 = Vec2(); localAnchorB: Vec2 = Vec2();
+    localAxisA: Vec2 = Vec2(1.0f32,0.0f32);
+    referenceAngle: f32 = 0.0f32;
+    targetTranslation: f32 = 0.0f32;
+    hertz: f32 = 0.0f32;
+    dampingRatio: f32 = 0.0f32;
+    lowerTranslation: f32 = 0.0f32;
+    upperTranslation: f32 = 0.0f32;
+    maxMotorForce: f32 = 0.0f32;
+    motorSpeed: f32 = 0.0f32;
+    enableSpring: bool = false; enableLimit: bool = false; enableMotor: bool = false;
+    collideConnected: bool = false; hasObjectId: bool = false; objectId: Key64 = Key64();
+}
+fun defaultPrismaticDescription() -> PrismaticDescription = { return PrismaticDescription(); }
+fun jointCreatePreflight(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: PrismaticDescription) -> JointAction = {
+    let statusA: i32 = bodyStatus(owner,a); if (statusA != OK) return jointActionStatus14(statusA);
+    let statusB: i32 = bodyStatus(owner,b); if (statusB != OK) return jointActionStatus14(statusB);
+    if (raw.worlds.at(owner.slot as i64).locked) return JointAction(LOCKED,1i32);
+    if (a.slot == b.slot) return JointAction(PARAM,7i32);
+    if (not validJointAxis14(description.localAxisA)) return JointAction(PARAM,9i32);
+    if (not validPrismaticDescription(description)) return JointAction(PARAM,10i32);
+    if (not jointReservationFit(lastIssued,1u32,raw.worlds.at(owner.slot as i64).jointIdPool.nextIndex as u32)) return JointAction(LIMIT,0i32);
+    return JointAction();
+}
+fun validPrismaticDescription(value: PrismaticDescription) -> bool = {
+    return finiteVector(value.localAnchorA) and finiteVector(value.localAnchorB)
+        and validJointAngle14(value.referenceAngle) and finite(value.targetTranslation)
+        and finite(value.lowerTranslation) and finite(value.upperTranslation) and value.lowerTranslation <= value.upperTranslation
+        and validNonnegative(value.hertz) and validNonnegative(value.dampingRatio)
+        and validNonnegative(value.maxMotorForce) and finite(value.motorSpeed)
+        and (value.hasObjectId or (value.objectId.low == 0u32 and value.objectId.high == 0u32));
+}
+fun createPrismaticJoint(owner: WorldNumber, a: BodyNumber, b: BodyNumber, description: PrismaticDescription) -> JointResult = {
+    var result = JointResult(); let check: JointAction = jointCreatePreflight(owner,a,b,description);
+    result.status = check.status; result.reason = check.reason; if (check.status != OK) return result;
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); let ticket: Key64 = nextTicket(lastIssued);
+    var def = raw.PrismaticJointDef(); def.bodyIdA = raw.b2MakeBodyId(world,a.slot); def.bodyIdB = raw.b2MakeBodyId(world,b.slot);
+    def.localAnchorA = description.localAnchorA;
+    def.localAnchorB = description.localAnchorB;
+    def.localAxisA = description.localAxisA;
+    def.referenceAngle = description.referenceAngle;
+    def.targetTranslation = description.targetTranslation;
+    def.hertz = description.hertz;
+    def.dampingRatio = description.dampingRatio;
+    def.lowerTranslation = description.lowerTranslation;
+    def.upperTranslation = description.upperTranslation;
+    def.maxMotorForce = description.maxMotorForce;
+    def.motorSpeed = description.motorSpeed;
+    def.enableSpring = description.enableSpring;
+    def.enableLimit = description.enableLimit;
+    def.enableMotor = description.enableMotor;
+    def.collideConnected = description.collideConnected;
+    def.hasObjectId = description.hasObjectId;
+    def.objectId = description.objectId;
+    let id: raw.JointId = raw.b2CreatePrismaticJoint(raw.WorldId((owner.slot+1i32) as u16,world.generation),def);
+    let slot: i32 = id.index1-1i32; world.joints.at(slot as i64).birthTicket = ticket;
+    world.joints.at(slot as i64).ownerTicket = owner.birthTicket; lastIssued = ticket;
+    result.status = OK; result.number = JointNumber(slot,ticket,owner.birthTicket); return result;
+}
+fun setPrismaticSpring(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,48i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_EnableSpring(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticSpring(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2PrismaticJoint_IsSpringEnabled(makeJointId14(owner,number)));
+}
+fun setPrismaticHertz(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,49i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetSpringHertz(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticHertz(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetSpringHertz(makeJointId14(owner,number)));
+}
+fun setPrismaticDamping(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,50i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetSpringDampingRatio(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticDamping(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetSpringDampingRatio(makeJointId14(owner,number)));
+}
+fun setPrismaticTargetTranslation(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,51i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetTargetTranslation(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticTargetTranslation(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetTargetTranslation(makeJointId14(owner,number)));
+}
+fun setPrismaticLimit(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,52i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_EnableLimit(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticLimit(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2PrismaticJoint_IsLimitEnabled(makeJointId14(owner,number)));
+}
+fun setPrismaticMotor(owner: WorldNumber, number: JointNumber, value: bool) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,54i32,0.0f32,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_EnableMotor(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticMotor(owner: WorldNumber, number: JointNumber) -> JointBoolean = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointBoolean(status,0i32,false);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointBoolean(PARAM,6i32,false);
+    return JointBoolean(OK,0i32,raw.b2PrismaticJoint_IsMotorEnabled(makeJointId14(owner,number)));
+}
+fun setPrismaticMotorSpeed(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,55i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetMotorSpeed(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticMotorSpeed(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetMotorSpeed(makeJointId14(owner,number)));
+}
+fun setPrismaticMaxMotorForce(owner: WorldNumber, number: JointNumber, value: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,56i32,value,0.0f32); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetMaxMotorForce(makeJointId14(owner,number),value); return JointAction();
+}
+fun getPrismaticMaxMotorForce(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetMaxMotorForce(makeJointId14(owner,number)));
+}
+fun setPrismaticLimits(owner: WorldNumber, number: JointNumber, lower: f32, upper: f32) -> JointAction = {
+    let check: JointAction = jointSetterPreflightB14(owner,number,53i32,lower,upper); if (check.status != OK) return check;
+    raw.b2PrismaticJoint_SetLimits(makeJointId14(owner,number),lower,upper); return JointAction();
+}
+fun getPrismaticLowerLimit(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetLowerLimit(makeJointId14(owner,number)));
+}
+fun getPrismaticUpperLimit(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetUpperLimit(makeJointId14(owner,number)));
+}
+fun getPrismaticTranslation(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetTranslation(makeJointId14(owner,number)));
+}
+fun getPrismaticSpeed(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetSpeed(makeJointId14(owner,number)));
+}
+fun getPrismaticMotorForce(owner: WorldNumber, number: JointNumber) -> JointScalar = {
+    let status: i32 = jointStatus(owner,number); if (status != OK) return JointScalar(status,0i32,0.0f32);
+    if (raw.worlds.at(owner.slot as i64).joints.at(number.slot as i64).jointType != 4i32) return JointScalar(PARAM,6i32,0.0f32);
+    return JointScalar(OK,0i32,raw.b2PrismaticJoint_GetMotorForce(makeJointId14(owner,number)));
+}
+fun validJointAngle14(value: f32) -> bool = { return value >= -mass2.B2_PI and value <= mass2.B2_PI; }
+fun validRevoluteLimits14(lower: f32, upper: f32) -> bool = { return lower >= -0.99f32 * mass2.B2_PI and upper <= 0.99f32 * mass2.B2_PI and lower <= upper; }
+fun validJointAxis14(axis: Vec2) -> bool = { return mass2.b2AbsFloat(1.0f32 - mass2.b2Dot(axis,axis)) < 100.0f32 * 0.00000011920928955078125f32; }

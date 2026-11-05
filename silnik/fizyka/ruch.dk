@@ -1,0 +1,442 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import fizyka.kola.*;
+import fizyka.wielokaty.*;
+import std.math;
+
+# Box2D 8c661469, include/box2d/math_functions.                         
+const B2_PI: f32 = 3.14159265359f32;
+const B2_MAX_ROTATION: f32 = 0.25f32 * B2_PI;
+
+# Box2D 8c661469, include/box2d/collision.h:91.
+class MassData {
+    mass: f32 = 0.0f32;
+    center: Vec2 = Vec2();
+    rotationalInertia: f32 = 0.0f32;
+}
+
+# Box2D 8c661469, src/shape.h:13. Only the two KONTRAKT-3 shape types.
+                                                                     
+class BodyShape {
+    shapeType: u32 = 0u32;
+    density: f32 = 0.0f32;
+    circle: Circle = Circle();
+    polygon: Polygon = Polygon();
+}
+
+# Box2D 8c661469, src/body.                                         
+                                                                                
+                                                                               
+class Body {
+    transform: Transform = Transform(Vec2(), Rot(1.0f32, 0.0f32));
+    center: Vec2 = Vec2();
+    localCenter: Vec2 = Vec2();
+    mass: f32 = 0.0f32;
+    inertia: f32 = 0.0f32;
+    invMass: f32 = 0.0f32;
+    invInertia: f32 = 0.0f32;
+    linearVelocity: Vec2 = Vec2();
+    angularVelocity: f32 = 0.0f32;
+    deltaPosition: Vec2 = Vec2();
+    deltaRotation: Rot = Rot(1.0f32, 0.0f32);
+    force: Vec2 = Vec2();
+    torque: f32 = 0.0f32;
+    linearDamping: f32 = 0.0f32;
+    angularDamping: f32 = 0.0f32;
+    gravityScale: f32 = 1.0f32;
+    fixedRotation: bool = false;
+    allowFastRotation: bool = false;
+    shape0: BodyShape = BodyShape();
+    shape1: BodyShape = BodyShape();
+    shapeCount: i32 = 0i32;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:138.
+fun b2AbsFloat(a: f32) -> f32 = {
+    if (a < 0.0f32) return -a;
+    return a;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:166.
+fun b2Cross(a: Vec2, b: Vec2) -> f32 = {
+    return a.x * b.y - a.y * b.x;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:227.
+fun b2MulSV(s: f32, v: Vec2) -> Vec2 = {
+    return Vec2(s * v.x, s * v.y);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:281.
+fun b2Length(v: Vec2) -> f32 = {
+    return math.sqrt(v.x * v.x + v.y * v.y);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:357.
+fun b2LengthSquared(v: Vec2) -> f32 = {
+    return v.x * v.x + v.y * v.y;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:296.
+fun b2Normalize(v: Vec2) -> Vec2 = {
+    let length: f32 = math.sqrt(v.x * v.x + v.y * v.y);
+    if (length < FLT_EPSILON) return Vec2(0.0f32, 0.0f32);
+    let invLength: f32 = 1.0f32 / length;
+    return Vec2(invLength * v.x, invLength * v.y);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:332.
+fun b2NormalizeRot(q: Rot) -> Rot = {
+    let mag: f32 = math.sqrt(q.s * q.s + q.c * q.c);
+    let invMag: f32 = if mag > 0.0f32 then 1.0f32 / mag else 0.0f32;
+    return Rot(q.c * invMag, q.s * invMag);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:343.
+fun b2IntegrateRotation(q1: Rot, deltaAngle: f32) -> Rot = {
+    let q2: Rot = Rot(q1.c - deltaAngle * q1.s, q1.s + deltaAngle * q1.c);
+    let mag: f32 = math.sqrt(q2.s * q2.s + q2.c * q2.c);
+    let invMag: f32 = if mag > 0.0f32 then 1.0f32 / mag else 0.0f32;
+    return Rot(q2.c * invMag, q2.s * invMag);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.h:445.
+fun b2MulRot(q: Rot, r: Rot) -> Rot = {
+    var qr = Rot();
+    qr.s = q.s * r.c + q.c * r.s;
+    qr.c = q.c * r.c - q.s * r.s;
+    return qr;
+}
+
+# Box2D 8c661469, src/geometry.c:185.
+fun b2MakeOffsetRoundedBox(halfWidth: f32, halfHeight: f32, center: Vec2, rotation: Rot, radius: f32) -> Polygon = {
+    let xf: Transform = Transform(center, rotation);
+    var shape = Polygon();
+    shape.count = 4i32;
+    shape.vertices[0] = b2TransformPoint(xf, Vec2(-halfWidth, -halfHeight));
+    shape.vertices[1] = b2TransformPoint(xf, Vec2(halfWidth, -halfHeight));
+    shape.vertices[2] = b2TransformPoint(xf, Vec2(halfWidth, halfHeight));
+    shape.vertices[3] = b2TransformPoint(xf, Vec2(-halfWidth, halfHeight));
+    shape.normals[0] = b2RotateVector(xf.q, Vec2(0.0f32, -1.0f32));
+    shape.normals[1] = b2RotateVector(xf.q, Vec2(1.0f32, 0.0f32));
+    shape.normals[2] = b2RotateVector(xf.q, Vec2(0.0f32, 1.0f32));
+    shape.normals[3] = b2RotateVector(xf.q, Vec2(-1.0f32, 0.0f32));
+    shape.radius = radius;
+    shape.centroid = xf.p;
+    return shape;
+}
+
+# Box2D 8c661469, src/geometry.c:220.
+fun b2ComputeCircleMassCentral(shape: ref Circle, density: f32) -> MassData = {
+    let rr: f32 = shape.radius * shape.radius;
+    var massData = MassData();
+    massData.mass = density * B2_PI * rr;
+    massData.center = shape.center;
+    massData.rotationalInertia = massData.mass * (0.5f32 * rr);
+    return massData;
+}
+
+                                                                          
+fun b2ComputeCapsuleMassCentral(p1: Vec2, p2: Vec2, radius: f32, density: f32) -> MassData = {
+    let rr: f32 = radius * radius;
+    let length: f32 = b2Length(b2Sub(p2, p1));
+    let ll: f32 = length * length;
+    let circleMass: f32 = density * (B2_PI * radius * radius);
+    let boxMass: f32 = density * (2.0f32 * radius * length);
+    var result = MassData();
+    result.mass = circleMass + boxMass;
+    result.center = Vec2(0.5f32 * (p1.x + p2.x), 0.5f32 * (p1.y + p2.y));
+    let lc: f32 = 4.0f32 * radius / (3.0f32 * B2_PI);
+    let h: f32 = 0.5f32 * length;
+    let circleInertia: f32 = circleMass * (0.5f32 * rr + h * h + 2.0f32 * h * lc);
+    let boxInertia: f32 = boxMass * (4.0f32 * rr + ll) / 12.0f32;
+    result.rotationalInertia = circleInertia + boxInertia;
+    return result;
+}
+
+                                                                
+fun b2ComputeCircleMass(shape: ref Circle, density: f32) -> MassData = {
+    var result: MassData = b2ComputeCircleMassCentral(shape, density);
+    result.rotationalInertia = result.rotationalInertia + result.mass * b2Dot(result.center, result.center);
+    return result;
+}
+
+# Box2D 8c661469, src/geometry.c:276,321-398.
+                                                                         
+fun b2ComputePolygonMassCentral(shape: ref Polygon, density: f32) -> MassData = {
+    if (shape.count == 1i32) {
+        var circle = Circle(shape.vertices[0], shape.radius);
+        return b2ComputeCircleMassCentral(&circle, density);
+    }
+    if (shape.count == 2i32) return b2ComputeCapsuleMassCentral(shape.vertices[0], shape.vertices[1], shape.radius, density);
+    var vertices: Vec2[8];
+    let count: i32 = shape.count;
+    let radius: f32 = shape.radius;
+    if (radius > 0.0f32) {
+        let sqrt2: f32 = 1.412f32;
+        var roundIndex: i32 = 0i32;
+        while (roundIndex < count) {
+            let previous: i32 = if roundIndex == 0i32 then count - 1i32 else roundIndex - 1i32;
+            let n1: Vec2 = shape.normals[previous];
+            let n2: Vec2 = shape.normals[roundIndex];
+            let mid: Vec2 = b2Normalize(b2Add(n1, n2));
+            vertices[roundIndex] = b2MulAdd(shape.vertices[roundIndex], sqrt2 * radius, mid);
+            roundIndex = roundIndex + 1i32;
+        }
+    } else {
+        var copyIndex: i32 = 0i32;
+        while (copyIndex < count) {
+            vertices[copyIndex] = shape.vertices[copyIndex];
+            copyIndex = copyIndex + 1i32;
+        }
+    }
+    var center = Vec2();
+    var area: f32 = 0.0f32;
+    var rotationalInertia: f32 = 0.0f32;
+    let r: Vec2 = vertices[0];
+    let inv3: f32 = 1.0f32 / 3.0f32;
+    var triangleIndex: i32 = 1i32;
+    while (triangleIndex < count - 1i32) {
+        let e1: Vec2 = b2Sub(vertices[triangleIndex], r);
+        let e2: Vec2 = b2Sub(vertices[triangleIndex + 1i32], r);
+        let D: f32 = b2Cross(e1, e2);
+        let triangleArea: f32 = 0.5f32 * D;
+        area = area + triangleArea;
+        center = b2MulAdd(center, triangleArea * inv3, b2Add(e1, e2));
+        let ex1: f32 = e1.x;
+        let ey1: f32 = e1.y;
+        let ex2: f32 = e2.x;
+        let ey2: f32 = e2.y;
+        let intx2: f32 = ex1 * ex1 + ex2 * ex1 + ex2 * ex2;
+        let inty2: f32 = ey1 * ey1 + ey2 * ey1 + ey2 * ey2;
+        rotationalInertia = rotationalInertia + (0.25f32 * inv3 * D) * (intx2 + inty2);
+        triangleIndex = triangleIndex + 1i32;
+    }
+    var massData = MassData();
+    massData.mass = density * area;
+    let invArea: f32 = 1.0f32 / area;
+    center.x = center.x * invArea;
+    center.y = center.y * invArea;
+    massData.center = b2Add(r, center);
+    massData.rotationalInertia = density * rotationalInertia - massData.mass * b2Dot(center, center);
+    return massData;
+}
+
+fun b2ComputePolygonMass(shape: ref Polygon, density: f32) -> MassData = {
+    var result: MassData = b2ComputePolygonMassCentral(shape, density);
+    result.rotationalInertia = result.rotationalInertia + result.mass * b2Dot(result.center, result.center);
+    return result;
+}
+
+# Box2D 8c661469, src/shape.c:707. Only circle and polygon are in this slice.
+fun b2ComputeShapeMass(shape: ref BodyShape) -> MassData = {
+    if (shape.shapeType == 0u32) return b2ComputeCircleMass(&shape.circle, shape.density);
+    return b2ComputePolygonMass(&shape.polygon, shape.density);
+}
+
+fun b2ComputeShapeMassCentral(shape: ref BodyShape) -> MassData = {
+    if (shape.shapeType == 0u32) return b2ComputeCircleMassCentral(&shape.circle, shape.density);
+    return b2ComputePolygonMassCentral(&shape.polygon, shape.density);
+}
+
+# Box2D 8c661469, src/body.c:177,237-260,310-316.
+fun b2CreateBody(position: Vec2, rotation: Rot, linearVelocity: Vec2, angularVelocity: f32,
+    linearDamping: f32, angularDamping: f32, gravityScale: f32, fixedRotation: bool, allowFastRotation: bool) -> Body = {
+    var body = Body();
+    body.transform.p = position;
+    body.transform.q = rotation;
+    body.center = position;
+    body.linearDamping = linearDamping;
+    body.angularDamping = angularDamping;
+    body.gravityScale = gravityScale;
+    body.allowFastRotation = allowFastRotation;
+    body.linearVelocity = linearVelocity;
+    body.angularVelocity = angularVelocity;
+    body.deltaRotation = Rot(1.0f32, 0.0f32);
+    body.fixedRotation = fixedRotation;
+    return body;
+}
+
+# Box2D 8c661469, src/body.c:528. Awake dynamic branch, extents excluded by plan.
+fun b2UpdateBodyMassData(body: ref Body) -> () = {
+    body.mass = 0.0f32;
+    body.inertia = 0.0f32;
+    body.invMass = 0.0f32;
+    body.invInertia = 0.0f32;
+    body.localCenter = Vec2();
+    var localCenter = Vec2();
+                                                                              
+    var shapeIndex: i32 = body.shapeCount - 1i32;
+    while (shapeIndex >= 0i32) {
+        var shape: BodyShape = if shapeIndex == 0i32 then body.shape0 else body.shape1;
+        if (shape.density != 0.0f32) {
+            let massData: MassData = b2ComputeShapeMassCentral(&shape);
+            body.mass = body.mass + massData.mass;
+            localCenter = b2MulAdd(localCenter, massData.mass, massData.center);
+        }
+        shapeIndex = shapeIndex - 1i32;
+    }
+    if (body.mass > 0.0f32) {
+        body.invMass = 1.0f32 / body.mass;
+        localCenter = b2MulSV(body.invMass, localCenter);
+    }
+    shapeIndex = body.shapeCount - 1i32;
+    while (shapeIndex >= 0i32) {
+        var shape: BodyShape = if shapeIndex == 0i32 then body.shape0 else body.shape1;
+        if (shape.density != 0.0f32) {
+            let md: MassData = b2ComputeShapeMassCentral(&shape);
+            let offset: Vec2 = b2Sub(md.center, localCenter);
+            body.inertia = body.inertia + (md.rotationalInertia + md.mass * b2Dot(offset, offset));
+        }
+        shapeIndex = shapeIndex - 1i32;
+    }
+    if (body.inertia > 0.0f32 and body.fixedRotation == false) {
+        body.invInertia = 1.0f32 / body.inertia;
+    } else {
+        body.inertia = 0.0f32;
+        body.invInertia = 0.0f32;
+    }
+    let oldCenter: Vec2 = body.center;
+    body.localCenter = localCenter;
+    body.center = b2TransformPoint(body.transform, body.localCenter);
+    let deltaLinear: Vec2 = b2CrossSV(body.angularVelocity, b2Sub(body.center, oldCenter));
+    body.linearVelocity = b2Add(body.linearVelocity, deltaLinear);
+}
+
+# Box2D 8c661469, src/shape.c:131-141,163-190.
+                                                                    
+fun b2CreateShape(body: ref Body, shape: BodyShape) -> () = {
+    if (body.shapeCount == 0i32) {
+        body.shape0 = shape;
+    } else {
+        body.shape1 = shape;
+    }
+    body.shapeCount = body.shapeCount + 1i32;
+    b2UpdateBodyMassData(body);
+}
+
+# Box2D 8c661469, src/body.c:28. Immediate clamp used by both linear impulse APIs.
+fun b2LimitVelocity(body: ref Body, maxLinearSpeed: f32) -> () = {
+    let v2: f32 = b2LengthSquared(body.linearVelocity);
+    if (v2 > maxLinearSpeed * maxLinearSpeed) {
+        body.linearVelocity = b2MulSV(maxLinearSpeed / math.sqrt(v2), body.linearVelocity);
+    }
+}
+
+# Box2D 8c661469, src/body.c:900.                                 
+fun b2Body_ApplyForce(body: ref Body, force: Vec2, point: Vec2) -> () = {
+    body.force = b2Add(body.force, force);
+    body.torque = body.torque + b2Cross(b2Sub(point, body.center), force);
+}
+
+# Box2D 8c661469, src/body.c:918.                                 
+fun b2Body_ApplyForceToCenter(body: ref Body, force: Vec2) -> () = {
+    body.force = b2Add(body.force, force);
+}
+
+# Box2D 8c661469, src/body.c:935.                                 
+fun b2Body_ApplyTorque(body: ref Body, torque: f32) -> () = {
+    body.torque = body.torque + torque;
+}
+
+# Box2D 8c661469, src/body.c:952.                                 
+fun b2Body_ApplyLinearImpulse(body: ref Body, impulse: Vec2, point: Vec2, maxLinearSpeed: f32) -> () = {
+    body.linearVelocity = b2MulAdd(body.linearVelocity, body.invMass, impulse);
+    body.angularVelocity = body.angularVelocity + body.invInertia * b2Cross(b2Sub(point, body.center), impulse);
+    b2LimitVelocity(body, maxLinearSpeed);
+}
+
+# Box2D 8c661469, src/body.c:975.                                 
+fun b2Body_ApplyLinearImpulseToCenter(body: ref Body, impulse: Vec2, maxLinearSpeed: f32) -> () = {
+    body.linearVelocity = b2MulAdd(body.linearVelocity, body.invMass, impulse);
+    b2LimitVelocity(body, maxLinearSpeed);
+}
+
+# Box2D 8c661469, src/body.c:997.                                 
+fun b2Body_ApplyAngularImpulse(body: ref Body, impulse: f32) -> () = {
+    body.angularVelocity = body.angularVelocity + body.invInertia * impulse;
+}
+
+# Box2D 8c661469, src/solver.c:65.                                 
+fun b2IntegrateVelocitiesTask(body: ref Body, gravity: Vec2, h: f32, inv_dt: f32, maxLinearSpeed: f32) -> () = {
+    let maxAngularSpeed: f32 = B2_MAX_ROTATION * inv_dt;
+    let maxLinearSpeedSquared: f32 = maxLinearSpeed * maxLinearSpeed;
+    let maxAngularSpeedSquared: f32 = maxAngularSpeed * maxAngularSpeed;
+    var v: Vec2 = body.linearVelocity;
+    var w: f32 = body.angularVelocity;
+    let linearDamping: f32 = 1.0f32 / (1.0f32 + h * body.linearDamping);
+    let angularDamping: f32 = 1.0f32 / (1.0f32 + h * body.angularDamping);
+    let gravityScale: f32 = if body.invMass > 0.0f32 then body.gravityScale else 0.0f32;
+    let linearVelocityDelta: Vec2 = b2Add(b2MulSV(h * body.invMass, body.force), b2MulSV(h * gravityScale, gravity));
+    let angularVelocityDelta: f32 = h * body.invInertia * body.torque;
+    v = b2MulAdd(linearVelocityDelta, linearDamping, v);
+    w = angularVelocityDelta + angularDamping * w;
+    if (b2Dot(v, v) > maxLinearSpeedSquared) {
+        let linearRatio: f32 = maxLinearSpeed / b2Length(v);
+        v = b2MulSV(linearRatio, v);
+    }
+    if (w * w > maxAngularSpeedSquared and body.allowFastRotation == false) {
+        let angularRatio: f32 = maxAngularSpeed / b2AbsFloat(w);
+        w = w * angularRatio;
+    }
+    body.linearVelocity = v;
+    body.angularVelocity = w;
+}
+
+# Box2D 8c661469, src/solver.c:182.
+fun b2IntegratePositionsTask(body: ref Body, h: f32) -> () = {
+    body.deltaRotation = b2IntegrateRotation(body.deltaRotation, h * body.angularVelocity);
+    body.deltaPosition = b2MulAdd(body.deltaPosition, h, body.linearVelocity);
+}
+
+# Box2D 8c661469, src/solver.c:543,584-614. Only the contracted state writes.
+fun b2FinalizeBodiesTask(body: ref Body) -> () = {
+    body.center = b2Add(body.center, body.deltaPosition);
+    body.transform.q = b2NormalizeRot(b2MulRot(body.deltaRotation, body.transform.q));
+    body.deltaPosition = Vec2();
+    body.deltaRotation = Rot(1.0f32, 0.0f32);
+    body.transform.p = b2Sub(body.center, b2RotateVector(body.transform.q, body.localCenter));
+    body.force = Vec2();
+    body.torque = 0.0f32;
+}
+
+# Box2D 8c661469, src/world.                              
+                                                      
+                                                                                        
+fun b2World_Step(body: ref Body, gravity: Vec2, maxLinearSpeed: f32, timeStep: f32, subStepCount: i32) -> () = {
+    if (timeStep <= 0.0f32) return;
+    let inv_dt: f32 = 1.0f32 / timeStep;
+    let h: f32 = timeStep / (subStepCount as f32);
+    var subStep: i32 = 0i32;
+    while (subStep < subStepCount) {
+        b2IntegrateVelocitiesTask(body, gravity, h, inv_dt, maxLinearSpeed);
+        b2IntegratePositionsTask(body, h);
+        subStep = subStep + 1i32;
+    }
+    b2FinalizeBodiesTask(body);
+}

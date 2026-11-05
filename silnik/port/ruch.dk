@@ -1,0 +1,512 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+                                                      
+                                                                               
+import fizyka.kola as physics;
+import fizyka.ruch as motion;
+import core.builtins as builtins;
+import core.primitive_io as io;
+
+                                                                                     
+extern("C") {
+    fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64;
+}
+
+var inputOk = true;
+var inputEnded = false;
+
+                                                                                  
+                                                            
+fun fromBits(word: u32) -> f32 = {
+    var raw: u32 = word;
+    let value: f32 = (&raw as cptr f32)[0];
+    return value;
+}
+
+                                                                               
+fun toBits(value: f32) -> u32 = {
+    var raw: f32 = value;
+    let word: u32 = (&raw as cptr u32)[0];
+    return word;
+}
+
+fun error(message: str) -> () = {
+    write(2i32, builtins.ptr_from_slice[char](message) as cptr char, message.length() as u64);
+}
+
+fun checkBits(word: u32, expected: f32, label: str) -> bool = {
+    let decoded: f32 = fromBits(word);
+                                                                    
+    if (decoded != expected or toBits(expected) != word or toBits(decoded) != word) {
+        error("BLAD samosprawdzenia f32 <-> u32: ");
+        error(label);
+        error("; E72d1df2d36c6 Ee015828237b8 E118553a0da6a E95d3b17f0fb1 Ede7d1b721a1e E2f2457405c54.\n");
+        return false;
+    }
+    return true;
+}
+
+fun checkTransport() -> bool = {
+    if (not checkBits(0u32, 0.0f32, "+zero")) return false;
+    if (not checkBits(2147483648u32, -0.0f32, "-zero")) return false;
+    if (not checkBits(1065353216u32, 1.0f32, "+1")) return false;
+    if (not checkBits(3212836864u32, -1.0f32, "-1")) return false;
+    if (not checkBits(1u32, 1.401298464324817e-45f32, "najmniejsza podnormalna")) return false;
+    if (not checkBits(2139095039u32, 3.4028234663852886e38f32, "najwieksza skonczona")) return false;
+                                                                              
+    if (not checkBits(1073825710u32, 2.02f32, "prog: 0x400147ae")) return false;
+    if (not checkBits(1058642330u32, 0.6f32, "obrot: 0x3f19999a")) return false;
+    if (not checkBits(1061997773u32, 0.8f32, "obrot: 0x3f4ccccd")) return false;
+    if (not checkBits(813694976u32, 0.000000000931322574615478515625f32, "mala skala: 0x30800000")) return false;
+    return true;
+}
+
+fun blank(c: i32) -> bool = {
+    return c == 32i32 or c == 9i32 or c == 10i32 or c == 13i32;
+}
+
+                                                                           
+                                                                               
+fun readWord(allowEnd: bool) -> u32 = {
+    if (not inputOk) return 0u32;
+    var c: i32 = io.readCharCode();
+    while (blank(c)) c = io.readCharCode();
+    if (c < 0i32 and allowEnd) {
+        inputEnded = true;
+        return 0u32;
+    }
+    if (c < 48i32 or c > 57i32) {
+        error("BLAD E95d3b17f0fb1: E946d517eef62 Edcd4a212f815 E68c534c16ec7 u32 (Ed0afe5ed2bd6 Ee67a21a6ca9a Efc403754e0b0).\n");
+        inputOk = false;
+        return 0u32;
+    }
+    var value: u64 = 0u64;
+    var digits: i32 = 0i32;
+    while (c >= 48i32 and c <= 57i32) {
+        value = value * 10u64 + (c - 48i32) as u64;
+        digits = digits + 1i32;
+        if (digits > 10i32 or value > 4294967295u64) {
+            error("BLAD E95d3b17f0fb1: E8dc44deebc2b Ea277b9950b3a E0a0f9d1b1051 u32.\n");
+            inputOk = false;
+            return 0u32;
+        }
+        c = io.readCharCode();
+    }
+    if (c >= 0i32 and not blank(c)) {
+        error("BLAD E95d3b17f0fb1: Ec00d78b6d8c2 Ee41ba6702c93 E6199aecf23ab E13832048fccd.\n");
+        inputOk = false;
+    }
+    return value as u32;
+}
+
+fun readFloat() -> f32 = {
+    let word: u32 = readWord(false);
+    if ((word & 2139095040u32) == 2139095040u32) {
+        error("BLAD E95d3b17f0fb1: NaN/E1daec9c71ee2 Ea277b9950b3a E93a55f3eced4 E4faac89e8e31 f32.\n");
+        inputOk = false;
+    }
+    return fromBits(word);
+}
+
+                                                                                 
+fun outUnsigned(x: u64) -> () = {
+    if (x >= 10u64) outUnsigned(x / 10u64);
+    io.writeChar(('0' as u64 + x % 10u64) as char);
+}
+
+                                                                       
+fun outWord(x: u32) -> () = {
+    io.writeChar(' ');
+    outUnsigned(x as u64);
+}
+
+fun outFloat(x: f32) -> () = {
+    outWord(toBits(x));
+}
+
+fun outVec(v: physics.Vec2) -> () = {
+    outFloat(v.x);
+    outFloat(v.y);
+}
+
+                                                                                      
+class ShapeInput {
+    shapeType: u32 = 0u32;
+    density: f32 = 0.0f32;
+    p0: f32 = 0.0f32;
+    p1: f32 = 0.0f32;
+    p2: f32 = 0.0f32;
+    p3: f32 = 0.0f32;
+    p4: f32 = 0.0f32;
+    p5: f32 = 0.0f32;
+    p6: f32 = 0.0f32;
+}
+
+class Command {
+    step: u32 = 0u32;
+    commandType: u32 = 0u32;
+    a: f32 = 0.0f32;
+    b: f32 = 0.0f32;
+    c: f32 = 0.0f32;
+    d: f32 = 0.0f32;
+}
+
+                                                                           
+fun zeroCommands() -> Command[8] = {
+    var commands: Command[8];
+    return commands;
+}
+
+                                                                         
+class MotionCase {
+    id: u32 = 0u32;
+    gravity: physics.Vec2 = physics.Vec2();
+    maximumLinearSpeed: f32 = 0.0f32;
+    timeStep: f32 = 0.0f32;
+    subStepCount: u32 = 0u32;
+    stepCount: u32 = 0u32;
+    position: physics.Vec2 = physics.Vec2();
+    rotation: physics.Rot = physics.Rot();
+    linearVelocity: physics.Vec2 = physics.Vec2();
+    angularVelocity: f32 = 0.0f32;
+    linearDamping: f32 = 0.0f32;
+    angularDamping: f32 = 0.0f32;
+    gravityScale: f32 = 0.0f32;
+    fixedRotation: bool = false;
+    allowFastRotation: bool = false;
+    shapeCount: u32 = 0u32;
+    shape0: ShapeInput = ShapeInput();
+    shape1: ShapeInput = ShapeInput();
+    commandCount: u32 = 0u32;
+    commands: Command[8] = zeroCommands();
+}
+
+fun invalid(message: str) -> () = {
+    error("BLAD E95d3b17f0fb1: ");
+    error(message);
+    error("\n");
+    inputOk = false;
+}
+
+fun readVec() -> physics.Vec2 = {
+    let x: f32 = readFloat();
+    let y: f32 = readFloat();
+    return physics.Vec2(x, y);
+}
+
+fun readRot() -> physics.Rot = {
+    let c: f32 = readFloat();
+    let s: f32 = readFloat();
+    return physics.Rot(c, s);
+}
+
+fun readFlag() -> bool = {
+    let word: u32 = readWord(false);
+    if (word > 1u32) invalid("flaga musi byc 0 albo 1.");
+    return word == 1u32;
+}
+
+fun shapeIsZero(shape: ref ShapeInput) -> bool = {
+    return shape.shapeType == 0u32 and toBits(shape.density) == 0u32
+        and toBits(shape.p0) == 0u32 and toBits(shape.p1) == 0u32 and toBits(shape.p2) == 0u32
+        and toBits(shape.p3) == 0u32 and toBits(shape.p4) == 0u32 and toBits(shape.p5) == 0u32
+        and toBits(shape.p6) == 0u32;
+}
+
+fun readShape(active: bool) -> ShapeInput = {
+    var shape = ShapeInput();
+    shape.shapeType = readWord(false);
+    shape.density = readFloat();
+    shape.p0 = readFloat();
+    shape.p1 = readFloat();
+    shape.p2 = readFloat();
+    shape.p3 = readFloat();
+    shape.p4 = readFloat();
+    shape.p5 = readFloat();
+    shape.p6 = readFloat();
+    if (active) {
+        if (shape.shapeType > 1u32) invalid("typ ksztaltu poza zakresem 0..1.");
+        if (shape.density < 0.0f32) invalid("ujemna gestosc.");
+        if (shape.shapeType == 0u32) {
+            if (shape.p2 < 0.0f32) invalid("ujemny promien kola.");
+            if (toBits(shape.p3) != 0u32 or toBits(shape.p4) != 0u32
+                or toBits(shape.p5) != 0u32 or toBits(shape.p6) != 0u32) {
+                invalid("nieuzywane parametry kola musza miec slowa +0.");
+            }
+        } else {
+            if (shape.p0 <= 0.0f32 or shape.p1 <= 0.0f32 or shape.p6 < 0.0f32) {
+                invalid("niepoprawne rozmiary pudelka.");
+            }
+        }
+    } else {
+        if (not shapeIsZero(&shape)) invalid("nieuzywany ksztalt musi miec slowa +0.");
+    }
+    return shape;
+}
+
+fun commandIsZero(command: Command) -> bool = {
+    return command.step == 0u32 and command.commandType == 0u32
+        and toBits(command.a) == 0u32 and toBits(command.b) == 0u32
+        and toBits(command.c) == 0u32 and toBits(command.d) == 0u32;
+}
+
+fun readCommand(active: bool, stepCount: u32) -> Command = {
+    var command = Command();
+    command.step = readWord(false);
+    command.commandType = readWord(false);
+    command.a = readFloat();
+    command.b = readFloat();
+    command.c = readFloat();
+    command.d = readFloat();
+    if (active) {
+        if (command.step < 1u32 or command.step > stepCount or command.commandType > 5u32) {
+            invalid("E18ea6f66fee8 E594e944ffb2d Ecca3b972a695 E5a5538c7c55f Ea11c79130f7c.");
+        }
+        if (command.commandType == 1u32 or command.commandType == 4u32) {
+            if (toBits(command.c) != 0u32 or toBits(command.d) != 0u32) {
+                invalid("nieuzywany punkt polecenia musi miec slowa +0.");
+            }
+        }
+        if (command.commandType == 2u32 or command.commandType == 5u32) {
+            if (toBits(command.b) != 0u32 or toBits(command.c) != 0u32 or toBits(command.d) != 0u32) {
+                invalid("nieuzywane parametry momentu/uderzenia musza miec slowa +0.");
+            }
+        }
+    } else {
+        if (not commandIsZero(command)) invalid("nieuzywane polecenie musi miec slowa +0.");
+    }
+    return command;
+}
+
+fun readCase(id: u32) -> MotionCase = {
+    var record = MotionCase();
+    record.id = id;
+                                        
+    record.gravity = readVec();
+    record.maximumLinearSpeed = readFloat();
+    record.timeStep = readFloat();
+    record.subStepCount = readWord(false);
+    record.stepCount = readWord(false);
+    if (record.subStepCount < 1u32 or record.subStepCount > 8u32
+        or record.stepCount < 1u32 or record.stepCount > 600u32) {
+        invalid("liczba podkrokow/krokow poza kontraktem.");
+    }
+    if (record.maximumLinearSpeed <= 0.0f32) {
+        invalid("predkosc maksymalna musi byc dodatnia.");
+    }
+                                                                              
+    record.position = readVec();
+    record.rotation = readRot();
+    record.linearVelocity = readVec();
+    record.angularVelocity = readFloat();
+    record.linearDamping = readFloat();
+    record.angularDamping = readFloat();
+    record.gravityScale = readFloat();
+    record.fixedRotation = readFlag();
+    record.allowFastRotation = readFlag();
+    record.shapeCount = readWord(false);
+    if (record.linearDamping < 0.0f32 or record.angularDamping < 0.0f32) invalid("Eb042c7642310 Eb6112cde002b.");
+    if (record.shapeCount < 1u32 or record.shapeCount > 2u32) invalid("liczba ksztaltow poza zakresem 1..2.");
+                                                                           
+    record.shape0 = readShape(true);
+    record.shape1 = readShape(record.shapeCount == 2u32);
+                                                           
+    record.commandCount = readWord(false);
+    if (record.commandCount > 8u32) invalid("liczba polecen poza zakresem 0..8.");
+    var commandIndex: i32 = 0i32;
+    while (commandIndex < 8i32) {
+        record.commands[commandIndex] = readCommand((commandIndex as u32) < record.commandCount, record.stepCount);
+        commandIndex = commandIndex + 1i32;
+    }
+    return record;
+}
+
+fun outShape(shape: ref ShapeInput) -> () = {
+    outWord(shape.shapeType);
+    outFloat(shape.density);
+    outFloat(shape.p0);
+    outFloat(shape.p1);
+    outFloat(shape.p2);
+    outFloat(shape.p3);
+    outFloat(shape.p4);
+    outFloat(shape.p5);
+    outFloat(shape.p6);
+}
+
+fun outCommand(command: Command) -> () = {
+    outWord(command.step);
+    outWord(command.commandType);
+    outFloat(command.a);
+    outFloat(command.b);
+    outFloat(command.c);
+    outFloat(command.d);
+}
+
+fun outCase(record: ref MotionCase) -> () = {
+    outVec(record.gravity);
+    outFloat(record.maximumLinearSpeed);
+    outFloat(record.timeStep);
+    outWord(record.subStepCount);
+    outWord(record.stepCount);
+    outVec(record.position);
+    outFloat(record.rotation.c);
+    outFloat(record.rotation.s);
+    outVec(record.linearVelocity);
+    outFloat(record.angularVelocity);
+    outFloat(record.linearDamping);
+    outFloat(record.angularDamping);
+    outFloat(record.gravityScale);
+    outWord(record.fixedRotation as u32);
+    outWord(record.allowFastRotation as u32);
+    outWord(record.shapeCount);
+    outShape(&record.shape0);
+    outShape(&record.shape1);
+    outWord(record.commandCount);
+    var commandIndex: i32 = 0i32;
+    while (commandIndex < 8i32) {
+        outCommand(record.commands[commandIndex]);
+        commandIndex = commandIndex + 1i32;
+    }
+}
+
+# Box2D 8c661469, src/shape.                              
+fun buildShape(input: ref ShapeInput) -> motion.BodyShape = {
+    var shape = motion.BodyShape();
+    shape.shapeType = input.shapeType;
+    shape.density = input.density;
+    if (input.shapeType == 0u32) {
+        shape.circle = physics.Circle(physics.Vec2(input.p0, input.p1), input.p2);
+    } else {
+        shape.polygon = motion.b2MakeOffsetRoundedBox(input.p0, input.p1,
+            physics.Vec2(input.p2, input.p3), physics.Rot(input.p4, input.p5), input.p6);
+    }
+    return shape;
+}
+
+# Box2D 8c661469, src/body.c:900-1020. Indices with equal step retain input order.
+fun applyCommand(body: ref motion.Body, command: Command, maximumLinearSpeed: f32) -> () = {
+    if (command.commandType == 0u32) {
+        motion.b2Body_ApplyForce(body, physics.Vec2(command.a, command.b), physics.Vec2(command.c, command.d));
+    } else if (command.commandType == 1u32) {
+        motion.b2Body_ApplyForceToCenter(body, physics.Vec2(command.a, command.b));
+    } else if (command.commandType == 2u32) {
+        motion.b2Body_ApplyTorque(body, command.a);
+    } else if (command.commandType == 3u32) {
+        motion.b2Body_ApplyLinearImpulse(body, physics.Vec2(command.a, command.b), physics.Vec2(command.c, command.d), maximumLinearSpeed);
+    } else if (command.commandType == 4u32) {
+        motion.b2Body_ApplyLinearImpulseToCenter(body, physics.Vec2(command.a, command.b), maximumLinearSpeed);
+    } else {
+        motion.b2Body_ApplyAngularImpulse(body, command.a);
+    }
+}
+
+# Box2D 8c661469, src/body.c:649,743,755,1349.
+                                                                         
+fun outState(body: ref motion.Body) -> () = {
+    outVec(body.transform.p);
+    outFloat(body.transform.q.c);
+    outFloat(body.transform.q.s);
+    outVec(body.center);
+    outVec(body.linearVelocity);
+    outFloat(body.angularVelocity);
+}
+
+fun runCase(record: ref MotionCase) -> () = {
+    var body: motion.Body = motion.b2CreateBody(record.position, record.rotation,
+        record.linearVelocity, record.angularVelocity, record.linearDamping,
+        record.angularDamping, record.gravityScale, record.fixedRotation, record.allowFastRotation);
+                                                                                 
+    let shape0: motion.BodyShape = buildShape(&record.shape0);
+    motion.b2CreateShape(&body, shape0);
+    if (record.shapeCount == 2u32) {
+        let shape1: motion.BodyShape = buildShape(&record.shape1);
+        motion.b2CreateShape(&body, shape1);
+    }
+    io.writeChar('M');
+    outWord(record.id);
+    outCase(record);
+    # Box2D 8c661469, src/body.                                 
+    outFloat(body.mass);
+    outFloat(body.inertia);
+    outVec(body.localCenter);
+    io.writeChar('\n');
+    var step: u32 = 1u32;
+    while (step <= record.stepCount) {
+        var commandIndex: i32 = 0i32;
+        while ((commandIndex as u32) < record.commandCount) {
+            let command: Command = record.commands[commandIndex];
+            if (command.step == step) applyCommand(&body, command, record.maximumLinearSpeed);
+            commandIndex = commandIndex + 1i32;
+        }
+        motion.b2World_Step(&body, record.gravity, record.maximumLinearSpeed, record.timeStep, record.subStepCount as i32);
+        io.writeChar('S');
+        outWord(record.id);
+        outWord(step);
+        outState(&body);
+        io.writeChar('\n');
+        step = step + 1u32;
+    }
+}
+
+fun main() -> i64 = {
+    if (not checkTransport()) return 2i64;
+    var cases: List[MotionCase];
+    var expectedId: u32 = 1u32;
+    while (not inputEnded and inputOk) {
+        let id: u32 = readWord(true);
+        if (not inputEnded and inputOk) {
+            if (id != expectedId) {
+                invalid("identyfikatory musza isc kolejno od 1.");
+                return 3i64;
+            }
+            var record: MotionCase = readCase(id);
+            if (not inputOk) return 3i64;
+            cases.push(move record);
+            expectedId = expectedId + 1u32;
+        }
+    }
+    if (not inputOk) return 3i64;
+    let count: i64 = cases.length();
+    if (count == 0i64) {
+        invalid("E946d517eef62 E7ef3142429d2.");
+        return 3i64;
+    }
+    io.writeStr("PORT3");
+    outWord(count as u32);
+    io.writeChar('\n');
+    var caseIndex: i64 = 0i64;
+    while (caseIndex < count) {
+        var current: MotionCase = cases.at(caseIndex);
+        runCase(&current);
+        caseIndex = caseIndex + 1i64;
+    }
+    io.writeStr("END");
+    outWord(count as u32);
+    io.writeChar('\n');
+    return 0i64;
+}

@@ -1,0 +1,29 @@
+                                                                            
+import fizyka.kola as math2;
+import fizyka.swiat as raw;
+import fizyka.gra as game;
+import core.primitive_io as io;
+fun outUnsigned(value: u64) -> () = {
+    if (value >= 10u64) outUnsigned(value / 10u64);
+    io.writeChar(('0' as u64 + value % 10u64) as char);
+}
+fun field(value: u64) -> () = { io.writeChar(' '); outUnsigned(value); }
+fun main() -> i64 = {
+    var parameters = game.SolverWorldParameters(); parameters.gravity = math2.Vec2();
+    let owner: game.WorldResult = game.createSleepWorld(parameters.gravity, parameters.maximumLinearSpeed, parameters, true);
+    var def = raw.BodyDef(); def.bodyType = 2i32;
+    let first: game.BodyResult = game.createBody8(owner.number, def);
+    if (owner.status != game.OK or first.status != game.OK) return 2i64;
+    let stepped: game.StepResult = game.step(owner.number, game.StepParameters(0.125f32, 1i32));
+    if (stepped.status != game.OK) return 2i64;
+    var saved: List[raw.BodyMoveEvent] = raw.b2World_GetBodyEvents(owner.id);
+    if (saved.length() != 1i64) return 2i64;
+    let before: u16 = saved.at(0i64).bodyId.generation;
+    let oldSlot: i32 = first.id.index1;
+    if (game.destroyBody(owner.number, first.number) != game.OK) return 2i64;
+    let second: game.BodyResult = game.createBody8(owner.number, def);
+    if (second.status != game.OK) return 2i64;
+    io.writeStr("RAWHISTORY11"); field(before as u64); field(saved.at(0i64).bodyId.generation as u64);
+    field(second.id.generation as u64); field(oldSlot as u64); field(second.id.index1 as u64);
+    io.writeChar('\n'); return 0i64;
+}

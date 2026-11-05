@@ -1,0 +1,436 @@
+{
+  "contract": "KONTRAKT-6.md",
+  "box2d_commit": "8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3",
+  "status": "UNMEASURED: Ed0bf986778c1 Ee0d2e2b4638f Eac0b52a2ae6e Ed501189d1a9a E0c162970a870 R-6; missing Ed54dc313906d C Ede7d1b721a1e Ee6b67ce8a51d",
+  "mutations": [
+    {
+      "name": "pokolenie-bez-inkrementacji",
+      "source": "src/body.c:263-297",
+      "cases": [
+        2,
+        21,
+        57,
+        59,
+        60
+      ],
+      "observe": [
+        "R.generation",
+        "J.generation",
+        "V.rawValid"
+      ],
+      "result": null
+    },
+    {
+      "name": "fifo-zamiast-lifo",
+      "source": "src/id_pool.c:19-37",
+      "change": "Pobierz najstarszy zwolniony indeks zamiast ostatniego.",
+      "cases": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observe": [
+        "R.index1",
+        "B.index1"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-index-plus-jeden",
+      "source": "src/body.c:328; include/box2d/id.h:106-117",
+      "cases": [
+        2,
+        33,
+        58
+      ],
+      "observe": [
+        "R.index1",
+        "R.packed.high",
+        "B.index1"
+      ],
+      "result": null
+    },
+    {
+      "name": "zamiana-world-generation",
+      "source": "include/box2d/id.h:106-117",
+      "cases": [
+        33,
+        58,
+        60
+      ],
+      "observe": [
+        "R.packed.low",
+        "J.packed.low"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-owner-ticket",
+      "source": "World mutation specification: E1c2604085b25 E21caadf4454b E5ea52c02e5e6 E47277ce02c5e E9e25bc8715e7 3",
+      "cases": [
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "observe": [
+        "R.status",
+        "B.position.x",
+        "Z.liveBodies"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-birth-ticket",
+      "source": "World mutation specification: E1c2604085b25 E21caadf4454b E5ea52c02e5e6 E47277ce02c5e E9e25bc8715e7 3",
+      "cases": [
+        5,
+        8,
+        33,
+        57,
+        60
+      ],
+      "observe": [
+        "R.status",
+        "J.oldGameValid",
+        "B.position.x"
+      ],
+      "result": null
+    },
+    {
+      "name": "reset-biletow",
+      "source": "World mutation specification: E1c2604085b25 E21caadf4454b E5ea52c02e5e6 E47277ce02c5e E9e25bc8715e7 2-5",
+      "cases": [
+        5,
+        6,
+        8,
+        33,
+        61,
+        62,
+        63,
+        64
+      ],
+      "observe": [
+        "R.birth.low",
+        "R.owner.low",
+        "V.gameValid"
+      ],
+      "result": null
+    },
+    {
+      "name": "tylko-low-u64",
+      "source": "World mutation specification: KONTRAKT-6 u64",
+      "cases": [],
+      "observe": [
+        "fixtura granicy u64",
+        "R.birth.high"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-przeniesienia-low-high",
+      "source": "World mutation specification: E1c2604085b25 E21caadf4454b E5ea52c02e5e6 E47277ce02c5e E9e25bc8715e7 4",
+      "cases": [],
+      "observe": [
+        "fixtura 00000000 00000001"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-odmowy-maksimum",
+      "source": "World mutation specification: E1c2604085b25 E21caadf4454b E5ea52c02e5e6 E47277ce02c5e E9e25bc8715e7 4",
+      "cases": [],
+      "observe": [
+        "E8bb8f8dcb536 u64: LIMIT Ede7d1b721a1e E1a5e497a2bfa E283ada7088c2 E669673d4ce6c"
+      ],
+      "result": null
+    },
+    {
+      "name": "stabilne-usuniecie-bez-napraw",
+      "source": "src/body.c:408-441; src/array.h:91-102",
+      "cases": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observe": [
+        "B.position.x",
+        "B.linearVelocity.x",
+        "B.rotation.s"
+      ],
+      "result": null
+    },
+    {
+      "name": "brak-moved-local-index",
+      "source": "src/body.c:410-420",
+      "cases": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "observe": [
+        "B.position.x",
+        "B.rotation.s"
+      ],
+      "result": null
+    },
+    {
+      "name": "wyspa-nieusunieta",
+      "source": "src/island.c:55-83; src/body.c:408",
+      "cases": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        57,
+        59,
+        60
+      ],
+      "observe": [
+        "W.islandCount",
+        "J.islandCount"
+      ],
+      "result": null
+    },
+    {
+      "name": "referencja-przez-wzrost",
+      "source": "World mutation specification: command order",
+      "cases": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ],
+      "observe": [
+        "B.position.x",
+        "B.type",
+        "B.linearVelocity.x"
+      ],
+      "result": null
+    },
+    {
+      "name": "gettery-z-wejsc",
+      "source": "World mutation specification: Eb9c568b2b28f E3d92283ddbf7 E9e25bc8715e7 3",
+      "cases": [
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56
+      ],
+      "observe": [
+        "B.position.x",
+        "B.rotation.c"
+      ],
+      "result": null
+    },
+    {
+      "name": "static-z-body-state",
+      "source": "src/body.c:197-213,252-260,743-765,1476-1481",
+      "cases": [
+        10,
+        11,
+        12,
+        21,
+        22,
+        23
+      ],
+      "observe": [
+        "B.linearVelocity.x",
+        "B.angularVelocity",
+        "B.isAwake"
+      ],
+      "result": null
+    },
+    {
+      "name": "stary-numer-zmienia-nowy-po-wrap",
+      "source": "World mutation specification: KONTRAKT-6 CHURN",
+      "cases": [
+        60
+      ],
+      "observe": [
+        "R.status",
+        "J.oldRawValid",
+        "J.oldGameValid",
+        "B.position.x",
+        "Z.liveBodies"
+      ],
+      "result": null
+    }
+  ],
+  "comparator_mutations": {
+    "native_result": null
+  },
+  "ticket_fixtures": [
+    {
+      "last": [
+        0,
+        0
+      ],
+      "next": [
+        1,
+        0
+      ],
+      "status": 0
+    },
+    {
+      "last": [
+        4294967295,
+        0
+      ],
+      "next": [
+        0,
+        1
+      ],
+      "status": 0
+    },
+    {
+      "last": [
+        4294967294,
+        4294967295
+      ],
+      "next": [
+        4294967295,
+        4294967295
+      ],
+      "status": 0
+    },
+    {
+      "last": [
+        4294967295,
+        4294967295
+      ],
+      "next": null,
+      "status": 3,
+      "unchanged": [
+        "lastIssued",
+        "saved target register",
+        "physics allocation counters"
+      ]
+    }
+  ],
+  "dogrywka_6_1": {
+    "contract": "NATIVE_REQUIRED",
+    "native_status": "NATIVE_REQUIRED",
+    "stages": [
+      "bilety-proba",
+      "bilety-port",
+      "mutacje-swiat",
+      "ujemne-swiat"
+    ],
+    "native_mutations": [
+      {
+        "name": "carry",
+        "source": "silnik/fizyka/gra.dk",
+        "expression": "return Key64(0u32, last.high + 1u32);",
+        "replacement": "return Key64(0u32, last.high);",
+        "probes": [
+          "proba",
+          "port"
+        ],
+        "expected": "code!=0 lub stdout!=BILETY OK\\n",
+        "result": null
+      },
+      {
+        "name": "limit",
+        "source": "silnik/fizyka/gra.dk",
+        "expression": "return last.low == 4294967295u32 and last.high == 4294967295u32;",
+        "replacement": "return false;",
+        "probes": [
+          "proba",
+          "port"
+        ],
+        "expected": "code!=0 lub stdout!=BILETY OK\\n",
+        "result": null
+      },
+      {
+        "name": "high",
+        "source": "silnik/fizyka/gra.dk",
+        "expression": "return Key64(last.low + 1u32, last.high);",
+        "replacement": "return Key64(last.low + 1u32, 0u32);",
+        "probes": [
+          "proba",
+          "port"
+        ],
+        "expected": "code!=0 lub stdout!=BILETY OK\\n",
+        "result": null
+      },
+      {
+        "name": "island",
+        "source": "silnik/fizyka/swiat.dk",
+        "expression": "world.islands.at(movedId as i64).localIndex = local;",
+        "replacement": "# mutation: no island localIndex repair",
+        "probes": [
+          "port"
+        ],
+        "expected": "code=4, stderr=BLAD: indeks wyspy.\\n",
+        "result": null
+      }
+    ],
+    "negative_inputs": 23,
+    "negative_executions": 46,
+    "rotation_lower_outside_c": "3f7fec55",
+    "rotation_upper_outside_c": "3f8009d5",
+    "first_new_case": 65,
+    "total_cases": 72,
+    "legacy_sha256": {
+      "przypadki-swiat.csv": "137769ee1a8fe95a5d7f17529a3e35e66480a0be8653abb40e5f5cb079a3b6d1",
+      "przypadki-swiat-stdin.csv": "e04f4d31463f492f42856fe9f75b5ba79231dde8913b141c1237fc98231d8290"
+    }
+  }
+}

@@ -1,0 +1,297 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+                                                                      
+                                                                                 
+import fizyka.kola.*;
+import fizyka.odleglosc as distance;
+import fizyka.wielokaty as poly;
+import fizyka.ruch as motion;
+import fizyka.swiat as world;
+import fizyka.gra as game;
+import fizyka.drzewo as tree;
+import std.math;
+
+class RayCastInput { origin: Vec2 = Vec2(); translation: Vec2 = Vec2(); maxFraction: f32 = 0.0f32; }
+class ShapeCastInput { proxy: distance.ShapeProxy = distance.ShapeProxy(); translation: Vec2 = Vec2(); maxFraction: f32 = 0.0f32; canEncroach: bool = false; }
+class ShapeCastPairInput { proxyA: distance.ShapeProxy = distance.ShapeProxy(); proxyB: distance.ShapeProxy = distance.ShapeProxy(); transformA: Transform = Transform(Vec2(), Rot(1.0f32, 0.0f32)); transformB: Transform = Transform(Vec2(), Rot(1.0f32, 0.0f32)); translationB: Vec2 = Vec2(); maxFraction: f32 = 0.0f32; canEncroach: bool = false; }
+class CastOutput { normal: Vec2 = Vec2(); point: Vec2 = Vec2(); fraction: f32 = 0.0f32; iterations: i32 = 0i32; hit: bool = false; }
+class BoolQueryResult { status: i32 = 0i32; reason: i32 = 0i32; value: bool = false; }
+class CastQueryResult { status: i32 = 0i32; reason: i32 = 0i32; value: CastOutput = CastOutput(); }
+
+fun finiteVector(v: Vec2) -> bool = { return distance.finite(v.x) and distance.finite(v.y); }
+fun b2IsValidRay(input: ref RayCastInput) -> bool = {
+    return finiteVector(input.origin) and finiteVector(input.translation) and distance.finite(input.maxFraction) and 0.0f32 <= input.maxFraction and input.maxFraction < 100000.0f32;
+}
+fun b2PointInCircle(point: Vec2, shape: ref Circle) -> bool = { return poly.b2DistanceSquared(point, shape.center) <= shape.radius * shape.radius; }
+fun b2PointInCapsule(point: Vec2, shape: ref world.Capsule) -> bool = {
+    let rr: f32 = shape.radius * shape.radius;
+    let p1: Vec2 = shape.center1; let p2: Vec2 = shape.center2; let d: Vec2 = b2Sub(p2, p1); let dd: f32 = poly.b2Dot(d, d);
+    if (dd == 0.0f32) return poly.b2DistanceSquared(point, p1) <= rr;
+    var t: f32 = poly.b2Dot(b2Sub(point, p1), d) / dd; t = poly.b2ClampFloat(t, 0.0f32, 1.0f32);
+    let c: Vec2 = b2MulAdd(p1, t, d); return poly.b2DistanceSquared(point, c) <= rr;
+}
+fun b2PointInPolygon(point: Vec2, shape: ref poly.Polygon) -> bool = {
+    var input = distance.DistanceInput(); input.proxyA = distance.b2MakeProxy(&shape.vertices, shape.count, 0.0f32);
+    input.proxyB.points[0i32] = point; input.proxyB.count = 1i32;
+    input.transformA = Transform(Vec2(), Rot(1.0f32, 0.0f32)); input.transformB = input.transformA;
+    var cache = distance.SimplexCache(); var trace = distance.SimplexTrace();
+    let output: distance.DistanceOutput = distance.b2ShapeDistance(&input, &cache, &trace, 0i32, false); return output.distance <= shape.radius;
+}
+fun b2ShapeCast(input: ref ShapeCastPairInput) -> CastOutput = {
+    let linearSlop: f32 = B2_LINEAR_SLOP; let totalRadius: f32 = input.proxyA.radius + input.proxyB.radius;
+    var target: f32 = tree.b2MaxFloat(linearSlop, totalRadius - linearSlop); let tolerance: f32 = 0.25f32 * linearSlop;
+    var cache = distance.SimplexCache(); var trace = distance.SimplexTrace(); var fraction: f32 = 0.0f32;
+    var distanceInput = distance.DistanceInput(); distanceInput.proxyA = input.proxyA; distanceInput.proxyB = input.proxyB;
+    distanceInput.transformA = input.transformA; distanceInput.transformB = input.transformB;
+    let delta2: Vec2 = input.translationB; var output = CastOutput(); var iteration: i32 = 0i32;
+    while (iteration < 20i32) {
+        output.iterations = output.iterations + 1i32;
+        let distanceOutput: distance.DistanceOutput = distance.b2ShapeDistance(&distanceInput, &cache, &trace, 0i32, false);
+        if (distanceOutput.distance < target + tolerance) {
+            if (iteration == 0i32) {
+                if (input.canEncroach and distanceOutput.distance > 2.0f32 * linearSlop) target = distanceOutput.distance - linearSlop;
+                else {
+                    output.hit = true;
+                    let c1: Vec2 = b2MulAdd(distanceOutput.pointA, input.proxyA.radius, distanceOutput.normal);
+                    let c2: Vec2 = b2MulAdd(distanceOutput.pointB, -input.proxyB.radius, distanceOutput.normal);
+                    output.point = b2Lerp(c1, c2, 0.5f32); return output;
+                }
+            } else {
+                output.fraction = fraction; output.point = b2MulAdd(distanceOutput.pointA, input.proxyA.radius, distanceOutput.normal);
+                output.normal = distanceOutput.normal; output.hit = true; return output;
+            }
+        }
+        let denominator: f32 = poly.b2Dot(delta2, distanceOutput.normal); if (denominator >= 0.0f32) return output;
+        fraction = fraction + (target - distanceOutput.distance) / denominator;
+        if (fraction >= input.maxFraction) return output;
+        distanceInput.transformB.p = b2MulAdd(input.transformB.p, fraction, delta2); iteration = iteration + 1i32;
+    }
+    return output;
+}
+fun b2RayCastCircle(input: ref RayCastInput, shape: ref Circle) -> CastOutput = {
+    let p: Vec2 = shape.center; var output = CastOutput(); let s: Vec2 = b2Sub(input.origin, p);
+    let r: f32 = shape.radius; let rr: f32 = r * r; var length: f32 = 0.0f32; let d: Vec2 = b2GetLengthAndNormalize(&length, input.translation);
+    if (length == 0.0f32) { if (motion.b2LengthSquared(s) < rr) { output.point = input.origin; output.hit = true; } return output; }
+    let t: f32 = -poly.b2Dot(s, d); let c: Vec2 = b2MulAdd(s, t, d); let cc: f32 = poly.b2Dot(c, c);
+    if (cc > rr) return output;
+    let h: f32 = math.sqrt(rr - cc); let fraction: f32 = t - h;
+    if (fraction < 0.0f32 or input.maxFraction * length < fraction) { if (motion.b2LengthSquared(s) < rr) { output.point = input.origin; output.hit = true; } return output; }
+    let hitPoint: Vec2 = b2MulAdd(s, fraction, d); output.fraction = fraction / length; output.normal = motion.b2Normalize(hitPoint);
+    output.point = b2MulAdd(p, shape.radius, output.normal); output.hit = true; return output;
+}
+fun b2RayCastCapsule(input: ref RayCastInput, shape: ref world.Capsule) -> CastOutput = {
+    var output = CastOutput(); let v1: Vec2 = shape.center1; let v2: Vec2 = shape.center2; let e: Vec2 = b2Sub(v2, v1);
+    var capsuleLength: f32 = 0.0f32; let a: Vec2 = b2GetLengthAndNormalize(&capsuleLength, e);
+    if (capsuleLength < FLT_EPSILON) { var circle = Circle(v1, shape.radius); return b2RayCastCircle(input, &circle); }
+    let p1: Vec2 = input.origin; let d: Vec2 = input.translation; let q: Vec2 = b2Sub(p1, v1); let qa: f32 = poly.b2Dot(q, a);
+    let qp: Vec2 = b2MulAdd(q, -qa, a); let radius: f32 = shape.radius;
+    if (poly.b2Dot(qp, qp) < radius * radius) {
+        if (qa < 0.0f32) { var startCircle = Circle(v1, shape.radius); return b2RayCastCircle(input, &startCircle); }
+        if (qa > capsuleLength) { var endCircle = Circle(v2, shape.radius); return b2RayCastCircle(input, &endCircle); }
+        output.point = input.origin; output.hit = true; return output;
+    }
+    var n = Vec2(a.y, -a.x); var rayLength: f32 = 0.0f32; let u: Vec2 = b2GetLengthAndNormalize(&rayLength, d);
+    let den: f32 = -a.x * u.y + u.x * a.y; if (-FLT_EPSILON < den and den < FLT_EPSILON) return output;
+    let b1: Vec2 = distance.b2MulSub(q, radius, n); let b2: Vec2 = b2MulAdd(q, radius, n); let invDen: f32 = 1.0f32 / den;
+    let s21: f32 = (a.x * b1.y - b1.x * a.y) * invDen; let s22: f32 = (a.x * b2.y - b2.x * a.y) * invDen;
+    var s2: f32 = 0.0f32; var b = Vec2();
+    if (s21 < s22) { s2 = s21; b = b1; } else { s2 = s22; b = b2; n = poly.b2Neg(n); }
+    if (s2 < 0.0f32 or input.maxFraction * rayLength < s2) return output;
+    let s1: f32 = (-b.x * u.y + u.x * b.y) * invDen;
+    if (s1 < 0.0f32) { var behindCircle = Circle(v1, shape.radius); return b2RayCastCircle(input, &behindCircle); }
+    if (capsuleLength < s1) { var aheadCircle = Circle(v2, shape.radius); return b2RayCastCircle(input, &aheadCircle); }
+    output.fraction = s2 / rayLength; output.point = b2Add(b2Lerp(v1, v2, s1 / capsuleLength), motion.b2MulSV(shape.radius, n));
+    output.normal = n; output.hit = true; return output;
+}
+fun b2RayCastSegment(input: ref RayCastInput, shape: ref world.Segment, oneSided: bool) -> CastOutput = {
+    var output = CastOutput();
+    if (oneSided) { let offset: f32 = motion.b2Cross(b2Sub(input.origin, shape.point1), b2Sub(shape.point2, shape.point1)); if (offset < 0.0f32) return output; }
+    let p1: Vec2 = input.origin; let d: Vec2 = input.translation; let v1: Vec2 = shape.point1; let v2: Vec2 = shape.point2; let e: Vec2 = b2Sub(v2, v1);
+    var length: f32 = 0.0f32; let eUnit: Vec2 = b2GetLengthAndNormalize(&length, e); if (length == 0.0f32) return output;
+    var normal = Vec2(eUnit.y, -eUnit.x); let numerator: f32 = poly.b2Dot(normal, b2Sub(v1, p1)); let denominator: f32 = poly.b2Dot(normal, d);
+    if (denominator == 0.0f32) return output;
+    let t: f32 = numerator / denominator; if (t < 0.0f32 or input.maxFraction < t) return output;
+    let p: Vec2 = b2MulAdd(p1, t, d); let s: f32 = poly.b2Dot(b2Sub(p, v1), eUnit); if (s < 0.0f32 or length < s) return output;
+    if (numerator > 0.0f32) normal = poly.b2Neg(normal);
+    output.fraction = t; output.point = p; output.normal = normal; output.hit = true; return output;
+}
+fun b2RayCastPolygon(input: ref RayCastInput, shape: ref poly.Polygon) -> CastOutput = {
+    if (shape.radius == 0.0f32) {
+        let base: Vec2 = shape.vertices[0i32]; let p1: Vec2 = b2Sub(input.origin, base); let d: Vec2 = input.translation;
+        var lower: f32 = 0.0f32; var upper: f32 = input.maxFraction; var index: i32 = -1i32; var output = CastOutput(); var i: i32 = 0i32;
+        while (i < shape.count) {
+            let vertex: Vec2 = b2Sub(shape.vertices[i], base); let numerator: f32 = poly.b2Dot(shape.normals[i], b2Sub(vertex, p1)); let denominator: f32 = poly.b2Dot(shape.normals[i], d);
+            if (denominator == 0.0f32) { if (numerator < 0.0f32) return output; }
+            else {
+                if (denominator < 0.0f32 and numerator < lower * denominator) { lower = numerator / denominator; index = i; }
+                else if (denominator > 0.0f32 and numerator < upper * denominator) upper = numerator / denominator;
+            }
+            if (upper < lower) return output; i = i + 1i32;
+        }
+        if (index >= 0i32) { output.fraction = lower; output.normal = shape.normals[index]; output.point = b2MulAdd(input.origin, lower, d); output.hit = true; }
+        else { output.point = input.origin; output.hit = true; }
+        return output;
+    }
+    var castInput = ShapeCastPairInput(); castInput.proxyA = distance.b2MakeProxy(&shape.vertices, shape.count, shape.radius);
+    castInput.proxyB.points[0i32] = input.origin; castInput.proxyB.count = 1i32;
+    castInput.translationB = input.translation; castInput.maxFraction = input.maxFraction; return b2ShapeCast(&castInput);
+}
+                                                                                      
+fun castProxy(input: ref ShapeCastInput, target: distance.ShapeProxy) -> CastOutput = {
+    var pairInput = ShapeCastPairInput(); pairInput.proxyA = target; pairInput.proxyB = input.proxy;
+    pairInput.translationB = input.translation; pairInput.maxFraction = input.maxFraction; pairInput.canEncroach = input.canEncroach; return b2ShapeCast(&pairInput);
+}
+fun b2ShapeCastCircle(input: ref ShapeCastInput, shape: ref Circle) -> CastOutput = {
+    var target = distance.ShapeProxy(); target.points[0i32] = shape.center; target.count = 1i32; target.radius = shape.radius; return castProxy(input, target);
+}
+fun b2ShapeCastCapsule(input: ref ShapeCastInput, shape: ref world.Capsule) -> CastOutput = {
+    var target = distance.ShapeProxy(); target.points[0i32] = shape.center1; target.points[1i32] = shape.center2; target.count = 2i32; target.radius = shape.radius; return castProxy(input, target);
+}
+fun b2ShapeCastSegment(input: ref ShapeCastInput, shape: ref world.Segment) -> CastOutput = {
+    var target = distance.ShapeProxy(); target.points[0i32] = shape.point1; target.points[1i32] = shape.point2; target.count = 2i32; return castProxy(input, target);
+}
+fun b2ShapeCastPolygon(input: ref ShapeCastInput, shape: ref poly.Polygon) -> CastOutput = { return castProxy(input, distance.b2MakeProxy(&shape.vertices, shape.count, shape.radius)); }
+
+                                                                          
+                                                                
+class QueryInput {
+    kind: i32 = 0i32; point: Vec2 = Vec2(); ray: RayCastInput = RayCastInput();
+    shape: ShapeCastInput = ShapeCastInput(); target: distance.ShapeProxy = distance.ShapeProxy();
+    pair: ShapeCastPairInput = ShapeCastPairInput(); oneSided: bool = false;
+}
+fun polygonDescription(target: ref distance.ShapeProxy) -> poly.Polygon = {
+    var polygon = poly.Polygon(); polygon.count = target.count; polygon.radius = target.radius; polygon.vertices = target.points; return polygon;
+}
+fun validateQuery(input: ref QueryInput) -> distance.Validation = {
+    let kind: i32 = input.kind; if (kind == 0i32) return distance.Validation();
+    if (kind < 1i32 or kind > 12i32) return distance.Validation(5i32, 22i32);
+    if (kind <= 3i32 and not finiteVector(input.point)) return distance.Validation(5i32, 22i32);
+    if (kind >= 4i32 and kind <= 7i32 and not b2IsValidRay(&input.ray)) return distance.Validation(5i32, 22i32);
+    if (kind >= 8i32 and kind <= 11i32 and (not finiteVector(input.shape.translation) or not distance.finite(input.shape.maxFraction) or input.shape.maxFraction < 0.0f32)) return distance.Validation(5i32, 22i32);
+    if (kind == 12i32 and (not finiteVector(input.pair.translationB) or not distance.finite(input.pair.maxFraction) or input.pair.maxFraction < 0.0f32)) return distance.Validation(5i32, 22i32);
+    if (kind >= 8i32 and kind <= 11i32 and not distance.validRadius(input.shape.proxy.radius)) return distance.Validation(5i32, 22i32);
+    if (kind == 12i32) {
+        if (not distance.validRadius(input.pair.proxyA.radius) or not distance.validRadius(input.pair.proxyB.radius)) return distance.Validation(5i32, 22i32);
+        if (not distance.validTransform(input.pair.transformA) or not distance.validTransform(input.pair.transformB)) return distance.Validation(5i32, 22i32);
+        if (not distance.validProxyCount(input.pair.proxyA.count) or not distance.validProxyCount(input.pair.proxyB.count)) return distance.Validation(4i32, 0i32);
+        if (not distance.validProxyPoints(&input.pair.proxyA.points, input.pair.proxyA.count) or not distance.validProxyPoints(&input.pair.proxyB.points, input.pair.proxyB.count)) return distance.Validation(4i32, 0i32);
+        return distance.Validation();
+    }
+    if (kind != 6i32 and kind != 10i32 and not distance.validRadius(input.target.radius)) return distance.Validation(5i32, 22i32);
+    if (kind >= 8i32 and not distance.validProxyCount(input.shape.proxy.count)) return distance.Validation(4i32, 0i32);
+    var targetKind: i32 = kind; if (kind >= 8i32) targetKind = kind - 7i32; else if (kind >= 4i32) targetKind = kind - 3i32;
+    if (targetKind == 1i32 and input.target.count != 1i32) return distance.Validation(4i32, 0i32);
+    if ((targetKind == 2i32 or targetKind == 3i32 and kind >= 4i32) and input.target.count != 2i32) return distance.Validation(4i32, 0i32);
+    let polygonTarget: bool = kind == 3i32 or kind == 7i32 or kind == 11i32;
+    if (polygonTarget and (input.target.count < 3i32 or input.target.count > 8i32)) return distance.Validation(4i32, 0i32);
+    if (kind >= 8i32 and not distance.validProxyPoints(&input.shape.proxy.points, input.shape.proxy.count)) return distance.Validation(4i32, 0i32);
+    if (not distance.validProxyPoints(&input.target.points, input.target.count)) return distance.Validation(4i32, 0i32);
+    if (polygonTarget) { var polygon: poly.Polygon = polygonDescription(&input.target); if (not game.preparePolygon(&polygon)) return distance.Validation(4i32, 0i32); }
+    return distance.Validation();
+}
+fun rawBoolQuery(input: ref QueryInput) -> bool = {
+    if (input.kind == 0i32) return b2IsValidRay(&input.ray);
+    if (input.kind == 1i32) { var circle = Circle(input.target.points[0i32], input.target.radius); return b2PointInCircle(input.point, &circle); }
+    if (input.kind == 2i32) { var capsule = world.Capsule(input.target.points[0i32], input.target.points[1i32], input.target.radius); return b2PointInCapsule(input.point, &capsule); }
+    var polygon: poly.Polygon = polygonDescription(&input.target); world.b2MakePolygon(&polygon); return b2PointInPolygon(input.point, &polygon);
+}
+fun rawCastQuery(input: ref QueryInput) -> CastOutput = {
+    if (input.kind == 12i32) return b2ShapeCast(&input.pair);
+    var circle = Circle(input.target.points[0i32], input.target.radius);
+    var capsule = world.Capsule(input.target.points[0i32], input.target.points[1i32], input.target.radius);
+    var segment = world.Segment(input.target.points[0i32], input.target.points[1i32]);
+    if (input.kind == 4i32) return b2RayCastCircle(&input.ray, &circle);
+    if (input.kind == 5i32) return b2RayCastCapsule(&input.ray, &capsule);
+    if (input.kind == 6i32) return b2RayCastSegment(&input.ray, &segment, input.oneSided);
+    if (input.kind == 8i32) return b2ShapeCastCircle(&input.shape, &circle);
+    if (input.kind == 9i32) return b2ShapeCastCapsule(&input.shape, &capsule);
+    if (input.kind == 10i32) return b2ShapeCastSegment(&input.shape, &segment);
+    var polygon: poly.Polygon = polygonDescription(&input.target); world.b2MakePolygon(&polygon);
+    if (input.kind == 7i32) return b2RayCastPolygon(&input.ray, &polygon);
+    return b2ShapeCastPolygon(&input.shape, &polygon);
+}
+fun checkedBoolQuery(input: ref QueryInput) -> BoolQueryResult = {
+    if (input.kind < 0i32 or input.kind > 3i32) return BoolQueryResult(5i32, 22i32, false);
+    let check: distance.Validation = validateQuery(input); if (check.status != 0i32) return BoolQueryResult(check.status, check.reason, false);
+    return BoolQueryResult(0i32, 0i32, rawBoolQuery(input));
+}
+fun checkedCastQuery(input: ref QueryInput) -> CastQueryResult = {
+    if (input.kind < 4i32 or input.kind > 12i32) return CastQueryResult(5i32, 22i32, CastOutput());
+    let check: distance.Validation = validateQuery(input); if (check.status != 0i32) return CastQueryResult(check.status, check.reason, CastOutput());
+    let output: CastOutput = rawCastQuery(input);
+    if (not finiteVector(output.point) or not finiteVector(output.normal) or not distance.finite(output.fraction)) return CastQueryResult(5i32, 22i32, CastOutput());
+    return CastQueryResult(0i32, 0i32, output);
+}
+
+                                                                                         
+fun circleProxy(shape: Circle) -> distance.ShapeProxy = {
+    var target = distance.ShapeProxy(); target.count = 1i32; target.radius = shape.radius; target.points[0i32] = shape.center; return target;
+}
+fun capsuleProxy(shape: world.Capsule) -> distance.ShapeProxy = {
+    var target = distance.ShapeProxy(); target.count = 2i32; target.radius = shape.radius; target.points[0i32] = shape.center1; target.points[1i32] = shape.center2; return target;
+}
+fun segmentProxy(shape: world.Segment) -> distance.ShapeProxy = {
+    var target = distance.ShapeProxy(); target.count = 2i32; target.points[0i32] = shape.point1; target.points[1i32] = shape.point2; return target;
+}
+fun isValidRay(input: ref RayCastInput) -> BoolQueryResult = { return BoolQueryResult(0i32, 0i32, b2IsValidRay(input)); }
+fun pointInCircle(point: Vec2, shape: Circle) -> BoolQueryResult = {
+    var input = QueryInput(); input.kind = 1i32; input.point = point; input.target = circleProxy(shape); return checkedBoolQuery(&input);
+}
+fun pointInCapsule(point: Vec2, shape: world.Capsule) -> BoolQueryResult = {
+    var input = QueryInput(); input.kind = 2i32; input.point = point; input.target = capsuleProxy(shape); return checkedBoolQuery(&input);
+}
+fun pointInPolygon(point: Vec2, description: ref distance.ShapeProxy) -> BoolQueryResult = {
+    var input = QueryInput(); input.kind = 3i32; input.point = point; input.target = description; return checkedBoolQuery(&input);
+}
+fun rayCastCircle(ray: ref RayCastInput, shape: Circle) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 4i32; input.ray = ray; input.target = circleProxy(shape); return checkedCastQuery(&input);
+}
+fun rayCastCapsule(ray: ref RayCastInput, shape: world.Capsule) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 5i32; input.ray = ray; input.target = capsuleProxy(shape); return checkedCastQuery(&input);
+}
+fun rayCastSegment(ray: ref RayCastInput, shape: world.Segment, oneSided: bool) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 6i32; input.ray = ray; input.target = segmentProxy(shape); input.oneSided = oneSided; return checkedCastQuery(&input);
+}
+fun rayCastPolygon(ray: ref RayCastInput, description: ref distance.ShapeProxy) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 7i32; input.ray = ray; input.target = description; return checkedCastQuery(&input);
+}
+fun shapeCastCircle(shapeInput: ref ShapeCastInput, shape: Circle) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 8i32; input.shape = shapeInput; input.target = circleProxy(shape); return checkedCastQuery(&input);
+}
+fun shapeCastCapsule(shapeInput: ref ShapeCastInput, shape: world.Capsule) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 9i32; input.shape = shapeInput; input.target = capsuleProxy(shape); return checkedCastQuery(&input);
+}
+fun shapeCastSegment(shapeInput: ref ShapeCastInput, shape: world.Segment) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 10i32; input.shape = shapeInput; input.target = segmentProxy(shape); return checkedCastQuery(&input);
+}
+fun shapeCastPolygon(shapeInput: ref ShapeCastInput, description: ref distance.ShapeProxy) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 11i32; input.shape = shapeInput; input.target = description; return checkedCastQuery(&input);
+}
+fun shapeCast(pair: ref ShapeCastPairInput) -> CastQueryResult = {
+    var input = QueryInput(); input.kind = 12i32; input.pair = pair; return checkedCastQuery(&input);
+}

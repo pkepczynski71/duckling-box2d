@@ -1,0 +1,48 @@
+                                                                              
+                                                                  
+import fizyka.swiat as raw;
+import fizyka.kola as geo;
+import fizyka.zbior as keys;
+import core.primitive_io as io;
+
+                                                                           
+fun unsigned14(value: u64) -> () = {
+    if (value >= 10u64) unsigned14(value / 10u64);
+    io.writeChar(('0' as u64 + value % 10u64) as char);
+}
+fun word14(value: u32) -> () = { io.writeChar(' '); unsigned14(value as u64); }
+
+fun bits14(value: f32) -> u32 = {
+    var rawValue: f32 = value;
+    let result: u32 = (&rawValue as cptr u32)[0];
+    return result;
+}
+
+fun observe14(id: raw.JointId, index: i32) -> () = {
+    let data: raw.ObjectValue12 = raw.b2Joint_GetUserData(id);
+    let axis: geo.Vec2 = raw.b2Joint_GetLocalAxisA(id);
+    let angle: f32 = raw.b2Joint_GetReferenceAngle(id);
+    var present: u32 = 0u32; var low: u32 = 0u32; var high: u32 = 0u32;
+    if (data.present) { present = 1u32; low = data.value.low; high = data.value.high; }
+    io.writeStr("GET14"); word14(index as u32); word14(present); word14(low); word14(high);
+    word14(bits14(angle)); word14(bits14(axis.x)); word14(bits14(axis.y)); io.writeChar('\n');
+}
+
+fun main() -> i64 = {
+    let world: raw.WorldId = raw.b2CreateWorld(geo.Vec2(0.0f32,-10.0f32),400.0f32);
+    var bodyA = raw.BodyDef();
+    let first: raw.BodyId = raw.b2CreateBody(world,bodyA);
+    var bodyB = raw.BodyDef(); bodyB.bodyType = 2i32; bodyB.position = geo.Vec2(2.0f32,0.0f32);
+    let second: raw.BodyId = raw.b2CreateBody(world,bodyB);
+    var def = raw.b2DefaultDistanceJointDef(); def.bodyIdA = first; def.bodyIdB = second;
+    let joint: raw.JointId = raw.b2CreateDistanceJoint(world,def);
+    observe14(joint,1i32);
+    raw.b2Joint_SetUserData(joint,raw.ObjectValue12(true,keys.Key64(123u32,456u32)));
+    raw.b2Joint_SetReferenceAngle(joint,0.5f32); raw.b2Joint_SetLocalAxisA(joint,geo.Vec2(1.0f32,0.0f32));
+    observe14(joint,2i32);
+    raw.b2Joint_SetUserData(joint,raw.ObjectValue12());
+    raw.b2Joint_SetReferenceAngle(joint,-0.5f32); raw.b2Joint_SetLocalAxisA(joint,geo.Vec2(0.0f32,1.0f32));
+    observe14(joint,3i32);
+    raw.b2DestroyWorld(world);
+    return 0i64;
+}

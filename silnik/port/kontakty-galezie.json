@@ -1,0 +1,3829 @@
+{
+  "profile": "COMPONENT_A9",
+  "recipe_count": 203,
+  "replaced_native_mutations": [
+    {
+      "definition": {
+        "name": "material-route-addPreparedShape",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "addPreparedShapeFlags12",
+        "expression": "if (not validContactMaterial(&checked)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [
+          {
+            "name": "observe-material-addPreparedShape",
+            "scope": "addPreparedShapeFlags12",
+            "expression": "if (not validContactMaterial(&checked)) { result.status = PARAM; return result; }",
+            "replacement": "if (not validContactMaterial(&checked)) { result.status = PARAM; return result; }\n    if (not validContactMaterial(&checked)) { result.status = GEOMETRY; return result; }"
+          }
+        ],
+        "specimen_seed": "specimen.friction = -1.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.addPreparedShape(reg.worlds[op.b].number, reg.bodies[op.c].number, specimen, op.invoke)",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "Invalid material to real constructor; stop after its own guard before redundant next stage.",
+        "port_line": 475,
+        "original_anchor": "Box2D 8c661469, src/shape.c:183-185. Game path always applies mass after preflight."
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    },
+    {
+      "definition": {
+        "name": "material-route-addShape",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "addShapeFlags12",
+        "expression": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [
+          {
+            "name": "observe-material-addShape",
+            "scope": "addShapeFlags12",
+            "expression": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }",
+            "replacement": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }\n    if (not validContactMaterial(&prepared)) { result.status = GEOMETRY; return result; }"
+          }
+        ],
+        "specimen_seed": "specimen.friction = -1.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.addShape(reg.worlds[op.b].number, reg.bodies[op.c].number, specimen, op.invoke)",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "Invalid material to real constructor; stop after its own guard before redundant next stage.",
+        "port_line": 637,
+        "original_anchor": "Box2D 8c661469, src/geometry.c:56-89; src/shape.c:163-191. Safe entry for an ordered polygon description."
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    },
+    {
+      "definition": {
+        "name": "material-route-addBox",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "addBoxFlags12",
+        "expression": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [
+          {
+            "name": "observe-material-addBox",
+            "scope": "addBoxFlags12",
+            "expression": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }",
+            "replacement": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }\n    if (not validContactMaterial(&material)) { result.status = GEOMETRY; return result; }"
+          }
+        ],
+        "specimen_seed": "specimen.friction = -1.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.addBox(reg.worlds[op.b].number, reg.bodies[op.c].number, boxGeometry, specimen, op.invoke)",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "Invalid material to real constructor; stop after its own guard before redundant next stage.",
+        "port_line": 648,
+        "original_anchor": "Box2D 8c661469, src/geometry.c:185-203; src/shape.c:163-191. Positive boxes need no hull simplification tolerance."
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    },
+    {
+      "definition": {
+        "name": "material-route-createBodyWithBox",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "createBodyWithBox",
+        "expression": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [],
+        "specimen_seed": "specimen.friction = -1.0f32; boxGeometry.halfWidth = 0.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.createBodyWithBox(reg.worlds[op.b].number, raw.BodyDef(), boxGeometry, specimen, op.invoke, false, words64.Key64())",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "KONTRAKT-9B:1145; invalid material plus invalid box: PARAM before GEOMETRY, no allocation.",
+        "port_line": 672,
+        "result_type": "game.PairResult",
+        "original_anchor": "Game guard: KONTRAKT-9B:1145; opcode16/tag4 -> createBodyWithBox"
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    },
+    {
+      "definition": {
+        "name": "material-route-createBodyWithShape",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "createBodyWithShape",
+        "expression": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [
+          {
+            "name": "observe-material-createBodyWithShape",
+            "scope": "createBodyWithShape",
+            "expression": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }",
+            "replacement": "if (not validContactMaterial(&prepared)) { result.status = PARAM; return result; }\n    if (not validContactMaterial(&prepared)) { result.status = GEOMETRY; return result; }"
+          }
+        ],
+        "specimen_seed": "specimen.friction = -1.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.createBodyWithShape(reg.worlds[op.b].number, raw.BodyDef(), specimen, op.invoke, false, words64.Key64())",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "Invalid material to real constructor; stop after its own guard before redundant next stage.",
+        "port_line": 661,
+        "result_type": "game.PairResult",
+        "original_anchor": "Box2D 8c661469, src/body.c:177; src/geometry.c:56-89. Preparation is before reservation of either ticket."
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    },
+    {
+      "definition": {
+        "name": "material-route-createBodyWithPreparedShape",
+        "class_id": null,
+        "guards": [
+          "G-MAT-ROUTES"
+        ],
+        "probe": "game-boundary",
+        "source": "silnik/fizyka/gra.dk",
+        "scope": "createBodyWithPreparedShape",
+        "expression": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }",
+        "replacement": "if (false) { result.status = PARAM; return result; }",
+        "fixture_edits": [
+          {
+            "name": "observe-material-createBodyWithPreparedShape",
+            "scope": "createBodyWithPreparedShape",
+            "expression": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }",
+            "replacement": "if (not validContactMaterial(&material)) { result.status = PARAM; return result; }\n    if (not validContactMaterial(&material)) { result.status = GEOMETRY; return result; }"
+          }
+        ],
+        "specimen_seed": "specimen.friction = -1.0f32;",
+        "geometry": "circle",
+        "entry_call": "game.createBodyWithPreparedShape(reg.worlds[op.b].number, raw.BodyDef(), specimen, op.invoke, false, words64.Key64())",
+        "baseline_status": 5,
+        "mutant_status": 4,
+        "witness_id": 1,
+        "expected_tags": [
+          "R"
+        ],
+        "seed_description": "Invalid material to real constructor; stop after its own guard before redundant next stage.",
+        "port_line": 536,
+        "result_type": "game.PairResult",
+        "original_anchor": "Box2D 8c661469, src/body.c:177; src/shape.c:163-191. Two-ticket reservation before either allocation."
+      },
+      "status": "ZASTĄPIONE",
+      "replaced_by": "material-shared-preflight",
+      "current_target": "silnik/fizyka/gra.dk:811"
+    }
+  ],
+  "input_predicates": [
+    {
+      "branch": "circle speculative squared > / separation",
+      "id": 9,
+      "original": "src/manifold.c:43-76",
+      "f32": {
+        "dx": "3cb3d709",
+        "dy": "00000000",
+        "distanceSquared": "39fcacd6",
+        "radiusSum": "3b000000",
+        "maxDistance": "3cb3d70a",
+        "maxSquared": "39fcacd9",
+        "separation": "3ca3d709",
+        "speculativeDistance": "3ca3d70a"
+      },
+      "predicate": false,
+      "pointCount": 1,
+      "after_removal": "id11: pointCount 0 -> 1; CS/CT/GB/GE differ"
+    },
+    {
+      "branch": "circle speculative squared > / separation",
+      "id": 10,
+      "original": "src/manifold.c:43-76",
+      "f32": {
+        "dx": "3cb3d70a",
+        "dy": "00000000",
+        "distanceSquared": "39fcacd9",
+        "radiusSum": "3b000000",
+        "maxDistance": "3cb3d70a",
+        "maxSquared": "39fcacd9",
+        "separation": "3ca3d70a",
+        "speculativeDistance": "3ca3d70a"
+      },
+      "predicate": false,
+      "pointCount": 1,
+      "after_removal": "id11: pointCount 0 -> 1; CS/CT/GB/GE differ"
+    },
+    {
+      "branch": "circle speculative squared > / separation",
+      "id": 11,
+      "original": "src/manifold.c:43-76",
+      "f32": {
+        "dx": "3cb3d70b",
+        "dy": "00000000",
+        "distanceSquared": "39fcacdc",
+        "radiusSum": "3b000000",
+        "maxDistance": "3cb3d70a",
+        "maxSquared": "39fcacd9",
+        "separation": "3ca3d70b",
+        "speculativeDistance": "3ca3d70a"
+      },
+      "predicate": true,
+      "pointCount": 0,
+      "after_removal": "id11: pointCount 0 -> 1; CS/CT/GB/GE differ"
+    },
+    {
+      "branch": "circle speculative squared > / separation",
+      "id": 12,
+      "original": "src/manifold.c:43-76",
+      "f32": {
+        "dx": "bcb3d709",
+        "dy": "00000000",
+        "distanceSquared": "39fcacd6",
+        "radiusSum": "3b000000",
+        "maxDistance": "3cb3d70a",
+        "maxSquared": "39fcacd9",
+        "separation": "3ca3d709",
+        "speculativeDistance": "3ca3d70a"
+      },
+      "predicate": false,
+      "pointCount": 1,
+      "after_removal": "id11: pointCount 0 -> 1; CS/CT/GB/GE differ"
+    },
+    {
+      "branch": "enableSpeculative=false first / literal repeated else-if",
+      "fixture": "speculative-false-1002740646",
+      "original": "src/contact.c:515-532",
+      "f32": {
+        "positionB.y": "3f80c49c",
+        "separation": "3bc49c00",
+        "threshold": "3bf5c28f"
+      },
+      "first": false,
+      "second_when_reached": false,
+      "pointCount": 2,
+      "proof": "The else-if repeats the same point0 predicate. On entry first is false, so second is false. Preserved original branch; no input can make it true.",
+      "after_removal": "speculative-false native mutation restores pointCount 2 at .009/.019"
+    },
+    {
+      "branch": "enableSpeculative=false first / literal repeated else-if",
+      "fixture": "speculative-false-1007908028",
+      "original": "src/contact.c:515-532",
+      "f32": {
+        "positionB.y": "3f8126e9",
+        "separation": "3c137480",
+        "threshold": "3bf5c28f"
+      },
+      "first": true,
+      "second_when_reached": false,
+      "pointCount": 1,
+      "proof": "The else-if repeats the same point0 predicate. On entry first is false, so second is false. Preserved original branch; no input can make it true.",
+      "after_removal": "speculative-false native mutation restores pointCount 2 at .009/.019"
+    },
+    {
+      "branch": "enableSpeculative=false first / literal repeated else-if",
+      "fixture": "speculative-false-1016833507",
+      "original": "src/contact.c:515-532",
+      "f32": {
+        "positionB.y": "3f826e98",
+        "separation": "3c9ba600",
+        "threshold": "3bf5c28f"
+      },
+      "first": true,
+      "second_when_reached": false,
+      "pointCount": 1,
+      "proof": "The else-if repeats the same point0 predicate. On entry first is false, so second is false. Preserved original branch; no input can make it true.",
+      "after_removal": "speculative-false native mutation restores pointCount 2 at .009/.019"
+    },
+    {
+      "branch": "129 filtered pairs / small stops / large remains",
+      "id": 49,
+      "original": "src/world.c:548-657;src/bitset.h:25-59",
+      "pairs": 129,
+      "contactIds": [
+        31,
+        32,
+        63,
+        64,
+        127,
+        128
+      ],
+      "bodyIds": [
+        63,
+        64
+      ],
+      "transfer_batches": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32": {
+        "distanceSquared": "3c04b5dd",
+        "smallMaxSquared": "3bd1b717",
+        "largeMaxSquared": "3c6bedfb"
+      },
+      "predicate": {
+        "smallDisjoint": true,
+        "largeDisjoint": false
+      },
+      "after_removal": "CS/CT localIndex, CB high blocks, GB body64, counters differ"
+    },
+    {
+      "branch": "129 filtered pairs / small stops / large remains",
+      "id": 50,
+      "original": "src/world.c:548-657;src/bitset.h:25-59",
+      "pairs": 129,
+      "contactIds": [
+        31,
+        32,
+        63,
+        64,
+        127,
+        128
+      ],
+      "bodyIds": [
+        63,
+        64
+      ],
+      "transfer_batches": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32": {
+        "distanceSquared": "3c04b5dd",
+        "smallMaxSquared": "3bd1b717",
+        "largeMaxSquared": "3c6bedfb"
+      },
+      "predicate": {
+        "smallDisjoint": true,
+        "largeDisjoint": false
+      },
+      "after_removal": "CS/CT localIndex, CB high blocks, GB body64, counters differ"
+    },
+    {
+      "branch": "129 filtered pairs / small stops / large remains",
+      "id": 51,
+      "original": "src/world.c:548-657;src/bitset.h:25-59",
+      "pairs": 129,
+      "contactIds": [
+        31,
+        32,
+        63,
+        64,
+        127,
+        128
+      ],
+      "bodyIds": [
+        63,
+        64
+      ],
+      "transfer_batches": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32": {
+        "distanceSquared": "3c04b5dd",
+        "smallMaxSquared": "3bd1b717",
+        "largeMaxSquared": "3c6bedfb"
+      },
+      "predicate": {
+        "smallDisjoint": true,
+        "largeDisjoint": false
+      },
+      "after_removal": "CS/CT localIndex, CB high blocks, GB body64, counters differ"
+    },
+    {
+      "branch": "129 filtered pairs / small stops / large remains",
+      "id": 52,
+      "original": "src/world.c:548-657;src/bitset.h:25-59",
+      "pairs": 129,
+      "contactIds": [
+        31,
+        32,
+        63,
+        64,
+        127,
+        128
+      ],
+      "bodyIds": [
+        63,
+        64
+      ],
+      "transfer_batches": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "f32": {
+        "distanceSquared": "3c04b5dd",
+        "smallMaxSquared": "3bd1b717",
+        "largeMaxSquared": "3c6bedfb"
+      },
+      "predicate": {
+        "smallDisjoint": true,
+        "largeDisjoint": false
+      },
+      "after_removal": "CS/CT localIndex, CB high blocks, GB body64, counters differ"
+    },
+    {
+      "branch": "nonzero rotated COM input, both sides",
+      "id": 17,
+      "original": "src/world.c:381-415;src/contact.c:549-585",
+      "f32": [
+        {
+          "shapeRegister": 0,
+          "localCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ],
+          "rotatedInputCenter": [
+            "bdcccccd",
+            "3e4ccccd"
+          ]
+        },
+        {
+          "shapeRegister": 2,
+          "localCenter": [
+            "becccccd",
+            "3e4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "be4ccccd",
+            "becccccd"
+          ]
+        },
+        {
+          "shapeRegister": 1,
+          "localCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ]
+        }
+      ],
+      "after_removal": "M20 six real native substitutions; TASK/CS anchorA/B differ"
+    },
+    {
+      "branch": "nonzero rotated COM input, both sides",
+      "id": 18,
+      "original": "src/world.c:381-415;src/contact.c:549-585",
+      "f32": [
+        {
+          "shapeRegister": 0,
+          "localCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ],
+          "rotatedInputCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ]
+        },
+        {
+          "shapeRegister": 2,
+          "localCenter": [
+            "becccccd",
+            "3e4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3ecccccd"
+          ]
+        },
+        {
+          "shapeRegister": 1,
+          "localCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ]
+        }
+      ],
+      "after_removal": "M20 six real native substitutions; TASK/CS anchorA/B differ"
+    },
+    {
+      "branch": "nonzero rotated COM input, both sides",
+      "id": 19,
+      "original": "src/world.c:381-415;src/contact.c:549-585",
+      "f32": [
+        {
+          "shapeRegister": 0,
+          "localCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ],
+          "rotatedInputCenter": [
+            "bdcccccd",
+            "3e4ccccd"
+          ]
+        },
+        {
+          "shapeRegister": 2,
+          "localCenter": [
+            "becccccd",
+            "3e4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "be4ccccd",
+            "becccccd"
+          ]
+        },
+        {
+          "shapeRegister": 1,
+          "localCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ]
+        }
+      ],
+      "after_removal": "M20 six real native substitutions; TASK/CS anchorA/B differ"
+    },
+    {
+      "branch": "nonzero rotated COM input, both sides",
+      "id": 20,
+      "original": "src/world.c:381-415;src/contact.c:549-585",
+      "f32": [
+        {
+          "shapeRegister": 0,
+          "localCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ],
+          "rotatedInputCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ]
+        },
+        {
+          "shapeRegister": 2,
+          "localCenter": [
+            "becccccd",
+            "3e4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3ecccccd"
+          ]
+        },
+        {
+          "shapeRegister": 1,
+          "localCenter": [
+            "3dcccccd",
+            "be4ccccd"
+          ],
+          "rotatedInputCenter": [
+            "3e4ccccd",
+            "3dcccccd"
+          ]
+        }
+      ],
+      "after_removal": "M20 six real native substitutions; TASK/CS anchorA/B differ"
+    },
+    {
+      "branch": "overflow RemoveSwap middle j1/3",
+      "id": 39,
+      "original": "src/constraint_graph.c:192-233",
+      "expected": {
+        "contactId": 11,
+        "localIndex": 1,
+        "count": 3
+      },
+      "after_removal": "M28 CT moved localIndex differs"
+    },
+    {
+      "branch": "overflow RemoveSwap first j0/2",
+      "id": 42,
+      "original": "src/constraint_graph.c:192-233",
+      "expected": {
+        "contactId": 11,
+        "localIndex": 0,
+        "count": 2
+      },
+      "after_removal": "M28 CT moved localIndex differs"
+    },
+    {
+      "branch": "raw UpdateContact hit set then clear",
+      "fixture": "raw-hit-cycle",
+      "original": "src/contact.c:535-542",
+      "f32": [
+        {
+          "distance": "3f666666",
+          "separation": "bdccccd0",
+          "distanceSquared": "3f4f5c28",
+          "maxSquared": "3f852bd3",
+          "pointCount": 1
+        },
+        {
+          "distance": "3f851eb8",
+          "separation": "3d23d700",
+          "distanceSquared": "3f8a71de",
+          "maxSquared": "3f852bd3",
+          "pointCount": 0
+        }
+      ],
+      "expected_task_sequences": [
+        8,
+        14
+      ],
+      "expected_hit_bit": [
+        true,
+        false
+      ],
+      "expected_hit_buffer_count": 0,
+      "after_removal": "CS.simFlags bit 0x100000 differs; TASK and retained CS checked independently"
+    }
+  ],
+  "branches": [
+    {
+      "recipe": "m01-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2489",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "contactManifold(entry.kind, a, xfA, b, xfB, &sim.cache)",
+      "witness": "N64 id 6",
+      "id": 6,
+      "classes": [
+        "M01"
+      ],
+      "guards": [],
+      "difference_after_removal": "contactManifold(0i32, a, xfA, b, xfB, &sim.cache); observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m02-b2CreateContact",
+      "port": "silnik/fizyka/swiat.dk:2105",
+      "original": "Box2D 8c661469, src/contact.c:186-328. Returns the actual created id; no allocation for empty registry cells.",
+      "scope": "b2CreateContact",
+      "branch_or_assignment": "let a: i32 = if entry.primary then inputA else inputB;\n    let b: i32 = if entry.primary then inputB else inputA;",
+      "witness": "N64 id 6",
+      "id": 6,
+      "classes": [
+        "M02"
+      ],
+      "guards": [],
+      "difference_after_removal": "let a: i32 = inputA;\n    let b: i32 = inputB;; observe RQ,CT,CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m03-b2CreateContact",
+      "port": "silnik/fizyka/swiat.dk:2104",
+      "original": "Box2D 8c661469, src/contact.c:186-328. Returns the actual created id; no allocation for empty registry cells.",
+      "scope": "b2CreateContact",
+      "branch_or_assignment": "if (entry.kind == -1i32) return -1i32;",
+      "witness": "N64 id 48",
+      "id": 48,
+      "classes": [
+        "M03"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) return -1i32;; observe RQ,CP,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m04-b2CreateContact",
+      "port": "silnik/fizyka/swiat.dk:2135",
+      "original": "Box2D 8c661469, src/contact.c:186-328. Returns the actual created id; no allocation for empty registry cells.",
+      "scope": "b2CreateContact",
+      "branch_or_assignment": "    return id;",
+      "witness": "N64 id 5",
+      "id": 5,
+      "classes": [
+        "M04"
+      ],
+      "guards": [],
+      "difference_after_removal": "    emitContactBegin(world, a, b, Manifold());\n    return id;; observe EB,GE",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m05-b2CollideTask",
+      "port": "silnik/fizyka/swiat.dk:2491",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "let touching: bool = b2UpdateContact(world, sim, a, xfA, offsetA, b, xfB, offsetB);",
+      "witness": "N64 id 11",
+      "id": 11,
+      "classes": [
+        "M05"
+      ],
+      "guards": [],
+      "difference_after_removal": "let touching: bool = b2UpdateContact(world, sim, a, xfA, offsetA, b, xfB, offsetB);\n    if (not touching) { sim.simFlags = sim.simFlags | 131072u32; bits.b2SetBit(&world.contactStateBitSet, sim.contactId); }; observe CP,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m06-b2DestroyContact",
+      "port": "silnik/fizyka/swiat.dk:2413",
+      "original": "Box2D 8c661469, src/contact.c:337-454. wakeBodies is a no-op for already awake bodies.",
+      "scope": "b2DestroyContact",
+      "branch_or_assignment": "b2RemoveKey(&world.broadPhase.pairSet, B2_SHAPE_PAIR_KEY(record.shapeIdA, record.shapeIdB));",
+      "witness": "N64 id 25",
+      "id": 25,
+      "classes": [
+        "M06"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { b2RemoveKey(&world.broadPhase.pairSet, B2_SHAPE_PAIR_KEY(record.shapeIdA, record.shapeIdB)); }; observe H",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m07-b2DestroyContact",
+      "port": "silnik/fizyka/swiat.dk:2419",
+      "original": "Box2D 8c661469, src/contact.c:337-454. wakeBodies is a no-op for already awake bodies.",
+      "scope": "b2DestroyContact",
+      "branch_or_assignment": "if (edge.nextKey != -1i32) contactEdge(world.contacts.at((edge.nextKey >> 1i32) as i64), edge.nextKey & 1i32).prevKey = edge.prevKey;",
+      "witness": "N64 id 25",
+      "id": 25,
+      "classes": [
+        "M07"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (side != 0i32 and edge.nextKey != -1i32) contactEdge(world.contacts.at((edge.nextKey >> 1i32) as i64), edge.nextKey & 1i32).prevKey = edge.prevKey;; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m07-b2DestroyContact-prev-next",
+      "port": "silnik/fizyka/swiat.dk:2418",
+      "original": "Box2D 8c661469, src/contact.c:368-372 (A)",
+      "scope": "b2DestroyContact",
+      "branch_or_assignment": "if (edge.prevKey != -1i32) contactEdge(world.contacts.at((edge.prevKey >> 1i32) as i64), edge.prevKey & 1i32).nextKey = edge.nextKey;",
+      "witness": "N64 id 25",
+      "id": 25,
+      "classes": [
+        "M07"
+      ],
+      "guards": [],
+      "difference_after_removal": "CT of previous edge: nextKey remains deleted 2*contactId+side instead of edge.nextKey; edge list/count reciprocity fails.",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m08-b2DestroyContact",
+      "port": "silnik/fizyka/swiat.dk:2419",
+      "original": "Box2D 8c661469, src/contact.c:337-454. wakeBodies is a no-op for already awake bodies.",
+      "scope": "b2DestroyContact",
+      "branch_or_assignment": "if (edge.nextKey != -1i32) contactEdge(world.contacts.at((edge.nextKey >> 1i32) as i64), edge.nextKey & 1i32).prevKey = edge.prevKey;",
+      "witness": "N64 id 26",
+      "id": 26,
+      "classes": [
+        "M08"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (side != 1i32 and edge.nextKey != -1i32) contactEdge(world.contacts.at((edge.nextKey >> 1i32) as i64), edge.nextKey & 1i32).prevKey = edge.prevKey;; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m08-b2DestroyContact-prev-next",
+      "port": "silnik/fizyka/swiat.dk:2418",
+      "original": "Box2D 8c661469, src/contact.c:393-397 (B)",
+      "scope": "b2DestroyContact",
+      "branch_or_assignment": "if (edge.prevKey != -1i32) contactEdge(world.contacts.at((edge.prevKey >> 1i32) as i64), edge.prevKey & 1i32).nextKey = edge.nextKey;",
+      "witness": "N64 id 26",
+      "id": 26,
+      "classes": [
+        "M08"
+      ],
+      "guards": [],
+      "difference_after_removal": "CT of previous edge: nextKey remains deleted 2*contactId+side instead of edge.nextKey; edge list/count reciprocity fails.",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m09-b2RemoveNonTouchingContact",
+      "port": "silnik/fizyka/swiat.dk:2097",
+      "original": "Box2D 8c661469, src/world.c:460.",
+      "scope": "b2RemoveNonTouchingContact",
+      "branch_or_assignment": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "witness": "N64 id 25",
+      "id": 25,
+      "classes": [
+        "M09"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { world.contacts.at(moved.contactId as i64).localIndex = local; }; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m10-b2RemoveContactFromGraph",
+      "port": "silnik/fizyka/swiat.dk:2271",
+      "original": "Box2D 8c661469, src/constraint_graph.c:184-212.",
+      "scope": "b2RemoveContactFromGraph",
+      "branch_or_assignment": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "witness": "N64 id 29",
+      "id": 29,
+      "classes": [
+        "M10"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { world.contacts.at(moved.contactId as i64).localIndex = local; }; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m11-b2CollideChanges",
+      "port": "silnik/fizyka/swiat.dk:2519",
+      "original": "Box2D 8c661469, src/world.c:586-687. Iterate set bits in increasing contactId order.",
+      "scope": "b2CollideChanges",
+      "branch_or_assignment": "fun b2CollideChanges(world: ref World) -> () = {\n    var id: i32 = 0i32;\n    while (id < world.contactIdPool.nextIndex) {\n        if (bits.b2GetBit(&world.contactStateBitSet, id)) {\n            let record: ContactRecord = world.contacts.at(id as i64);\n            let flags: u32 = b2GetContactSim(world, world.contacts.at(id as i64)).simFlags;\n            if ((flags & 131072u32) != 0u32) b2DestroyContact(world, id, false);\n            else if ((flags & 262144u32) != 0u32) {\n                if ((record.flags & 4u32) != 0u32) emitContactBegin(world, record.shapeIdA, record.shapeIdB,\n                    b2GetContactSim(world, world.contacts.at(id as i64)).manifold);\n                world.contacts.at(id as i64).flags = record.flags | 1u32;\n                b2LinkContact(world, id);\n                # Reacquire from the owning array after Link, before graph growth.\n                var fresh: ref ContactSim = b2GetSolverSet(world, 2i32).contactSims.at(record.localIndex as i64);\n                fresh.simFlags = fresh.simFlags & (4294967295u32 ^ 262144u32);\n                let transfer: ContactSim = fresh;\n                b2AddContactToGraph(world, id, transfer);\n                b2RemoveNonTouchingContact(world, record.localIndex);\n            } else if ((flags & 524288u32) != 0u32) {\n                var stopped: ref ContactSim = b2GetContactSim(world, world.contacts.at(id as i64));\n                stopped.simFlags = stopped.simFlags & (4294967295u32 ^ 524288u32);\n                world.contacts.at(id as i64).flags = record.flags & (4294967295u32 ^ 1u32);\n                if ((record.flags & 4u32) != 0u32) emitContactEnd(world, record.shapeIdA, record.shapeIdB);\n                b2UnlinkContact(world, id);\n                let stoppedCopy: ContactSim = stopped;\n                b2AddNonTouchingContact(world, id, stoppedCopy);\n                b2RemoveContactFromGraph(world, record.edgeA.bodyId, record.edgeB.bodyId, record.colorIndex, record.localIndex);\n            }\n        }\n        id = id + 1i32;\n    }\n}",
+      "witness": "N64 id 49",
+      "id": 49,
+      "classes": [
+        "M11"
+      ],
+      "guards": [],
+      "difference_after_removal": "fun b2CollideChanges(world: ref World) -> () = {\n    var order: List[i32]; var color: i32 = 0i32;\n    while (color < 12i32) { var c: i32 = 0i32; while (c < world.constraintGraph.colors[color].contactCount) { order.push(world.constraintGraph.colors[color].contactSims.at(c as i64).contactId); c = c + 1i32; } color = color + 1i32; }\n    var n: i32 = 0i32; while (n < b2GetSolverSet(world, 2i32).contactCount) { order.push(b2GetSolverSet(world, 2i32).contactSims.at(n as i64).contactId); n = n + 1i32; }\n    var ordinal: i64 = 0i64;\n    while (ordinal < order.length()) { let id: i32 = order.at(ordinal);\n        if (bits.b2GetBit(&world.contactStateBitSet, id)) {\n            let record: ContactRecord = world.contacts.at(id as i64);\n            let flags: u32 = b2GetContactSim(world, world.contacts.at(id as i64)).simFlags;\n            if ((flags & 131072u32) != 0u32) b2DestroyContact(world, id, false);\n            else if ((flags & 262144u32) != 0u32) {\n                if ((record.flags & 4u32) != 0u32) emitContactBegin(world, record.shapeIdA, record.shapeIdB,\n                    b2GetContactSim(world, world.contacts.at(id as i64)).manifold);\n                world.contacts.at(id as i64).flags = record.flags | 1u32;\n                b2LinkContact(world, id);\n                # Reacquire from the owning array after Link, before graph growth.\n                var fresh: ref ContactSim = b2GetSolverSet(world, 2i32).contactSims.at(record.localIndex as i64);\n                fresh.simFlags = fresh.simFlags & (4294967295u32 ^ 262144u32);\n                let transfer: ContactSim = fresh;\n                b2AddContactToGraph(world, id, transfer);\n                b2RemoveNonTouchingContact(world, record.localIndex);\n            } else if ((flags & 524288u32) != 0u32) {\n                var stopped: ref ContactSim = b2GetContactSim(world, world.contacts.at(id as i64));\n                stopped.simFlags = stopped.simFlags & (4294967295u32 ^ 524288u32);\n                world.contacts.at(id as i64).flags = record.flags & (4294967295u32 ^ 1u32);\n                if ((record.flags & 4u32) != 0u32) emitContactEnd(world, record.shapeIdA, record.shapeIdB);\n                b2UnlinkContact(world, id);\n                let stoppedCopy: ContactSim = stopped;\n                b2AddNonTouchingContact(world, id, stoppedCopy);\n                b2RemoveContactFromGraph(world, record.edgeA.bodyId, record.edgeB.bodyId, record.colorIndex, record.localIndex);\n            }\n        }\n        ordinal = ordinal + 1i64;\n    }\n}; observe EB,EE0,EE1,CS,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m13-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2193",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "if (previous.id == point.id)",
+      "witness": "N64 id 21",
+      "id": 21,
+      "classes": [
+        "M13"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (j == i); observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m13-b2UpdateContact-last-id",
+      "port": "silnik/fizyka/swiat.dk:2191",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "while (j < old.pointCount and not found)",
+      "witness": "N64 id 24",
+      "id": 24,
+      "classes": [
+        "M13"
+      ],
+      "guards": [],
+      "difference_after_removal": "while (j < old.pointCount); observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m14-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2199",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "        i = i + 1i32;",
+      "witness": "N64 id 23",
+      "id": 23,
+      "classes": [
+        "M14"
+      ],
+      "guards": [],
+      "difference_after_removal": "        if (not found) { point.normalImpulse = old.point0.normalImpulse; point.tangentImpulse = old.point0.tangentImpulse; }\n        i = i + 1i32;; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m15-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2188",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "point.totalNormalImpulse = 0.0f32;",
+      "witness": "N64 id 21",
+      "id": 21,
+      "classes": [
+        "M15"
+      ],
+      "guards": [],
+      "difference_after_removal": "point.totalNormalImpulse = old.point0.totalNormalImpulse;; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m16-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2188",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "point.normalVelocity = 0.0f32;",
+      "witness": "N64 id 21",
+      "id": 21,
+      "classes": [
+        "M16"
+      ],
+      "guards": [],
+      "difference_after_removal": "point.normalVelocity = old.point0.normalVelocity;; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m17-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2188",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "point.persisted = false;",
+      "witness": "N64 id 23",
+      "id": 23,
+      "classes": [
+        "M17"
+      ],
+      "guards": [],
+      "difference_after_removal": "point.persisted = true;; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m18-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2182",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "if (count > 0i32) sim.manifold.rollingImpulse = old.rollingImpulse;",
+      "witness": "N64 id 23",
+      "id": 23,
+      "classes": [
+        "M18"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (count > 0i32) sim.manifold.rollingImpulse = 0.0f32;; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m19-b2UpdateContact",
+      "port": "silnik/fizyka/swiat.dk:2487",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "var old: Manifold = sim.manifold;",
+      "witness": "N64 id 23",
+      "id": 23,
+      "classes": [
+        "M19"
+      ],
+      "guards": [],
+      "difference_after_removal": "var old: Manifold = sim.manifold; sim.cache = distance.SimplexCache();; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "hit-b2UpdateContact-set",
+      "port": "silnik/fizyka/swiat.dk:2180",
+      "original": "Box2D 8c661469, src/contact.c:535-537",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "if (touching and (a.enableHitEvents or b.enableHitEvents))",
+      "witness": "fixture raw-hit-cycle",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "seq8 TASK and CS: hit bit 0x100000 missing; retained CS.simFlags 0x110000 -> 0x10000; hit buffer remains empty.",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "hit-b2UpdateContact-clear",
+      "port": "silnik/fizyka/swiat.dk:2181",
+      "original": "Box2D 8c661469, src/contact.c:539-541",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "else sim.simFlags = sim.simFlags & (4294967295u32 ^ 1048576u32);",
+      "witness": "fixture raw-hit-cycle",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "seq14 TASK and CS: hit bit 0x100000 retained after pointCount becomes 0; retained CS.simFlags 0 -> 0x100000; hit buffer remains empty.",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-A-local",
+      "port": "silnik/fizyka/swiat.dk:2489",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfA.q, bodySimA.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "bodySimA.localCenter; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-A-position",
+      "port": "silnik/fizyka/swiat.dk:2489",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfA.q, bodySimA.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "xfA.p; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-A-zero",
+      "port": "silnik/fizyka/swiat.dk:2489",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfA.q, bodySimA.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "Vec2(); observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-B-local",
+      "port": "silnik/fizyka/swiat.dk:2490",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfB.q, bodySimB.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "bodySimB.localCenter; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-B-position",
+      "port": "silnik/fizyka/swiat.dk:2490",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfB.q, bodySimB.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "xfB.p; observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m20-b2CollideTask-B-zero",
+      "port": "silnik/fizyka/swiat.dk:2490",
+      "original": "Box2D 8c661469, src/world.c:357-428. No dense transfer occurs while this task runs.",
+      "scope": "b2CollideTask",
+      "branch_or_assignment": "b2RotateVector(xfB.q, bodySimB.localCenter)",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M20"
+      ],
+      "guards": [],
+      "difference_after_removal": "Vec2(); observe CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-friction",
+      "port": "silnik/fizyka/swiat.dk:2156",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "sim.friction = b2MixFriction12(world, a.friction, a.userMaterialId, b.friction, b.userMaterialId);",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "sim.friction = sim.friction;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-restitution",
+      "port": "silnik/fizyka/swiat.dk:2157",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "sim.restitution = b2MixRestitution12(world, a.restitution, a.userMaterialId, b.restitution, b.userMaterialId);",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "sim.restitution = sim.restitution;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-tangentSpeed",
+      "port": "silnik/fizyka/swiat.dk:2165",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "sim.tangentSpeed = a.tangentSpeed + b.tangentSpeed;",
+      "witness": "N64 id 17",
+      "id": 17,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "sim.tangentSpeed = sim.tangentSpeed;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-rolling-positive",
+      "port": "silnik/fizyka/swiat.dk:2162",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "sim.rollingResistance = tree.b2MaxFloat(a.rollingResistance, b.rollingResistance) * maxRadius;",
+      "witness": "N64 id 18",
+      "id": 18,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "sim.rollingResistance = sim.rollingResistance;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-rolling-zero",
+      "port": "silnik/fizyka/swiat.dk:2163",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "else sim.rollingResistance = 0.0f32;",
+      "witness": "N64 id 19",
+      "id": 19,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "else sim.rollingResistance = sim.rollingResistance;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2GetShapeRadius-radius-circle",
+      "port": "silnik/fizyka/swiat.dk:2139",
+      "original": "Box2D 8c661469, src/shape.h:107.",
+      "scope": "b2GetShapeRadius",
+      "branch_or_assignment": "return shape.circle.radius;",
+      "witness": "fixture registry-0-0",
+      "id": 1,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "return 0.0f32;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2GetShapeRadius-radius-capsule",
+      "port": "silnik/fizyka/swiat.dk:2140",
+      "original": "Box2D 8c661469, src/shape.h:107.",
+      "scope": "b2GetShapeRadius",
+      "branch_or_assignment": "return shape.capsule.radius;",
+      "witness": "fixture registry-1-1",
+      "id": 1,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "return 0.0f32;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2GetShapeRadius-radius-polygon",
+      "port": "silnik/fizyka/swiat.dk:2141",
+      "original": "Box2D 8c661469, src/shape.h:107.",
+      "scope": "b2GetShapeRadius",
+      "branch_or_assignment": "return shape.polygon.radius;",
+      "witness": "fixture registry-3-3",
+      "id": 1,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "return 0.0f32;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2GetShapeRadius-radius-segment",
+      "port": "silnik/fizyka/swiat.dk:2142",
+      "original": "Box2D 8c661469, src/shape.h:107.",
+      "scope": "b2GetShapeRadius",
+      "branch_or_assignment": "return 0.0f32;",
+      "witness": "fixture registry-2-0",
+      "id": 1,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "return 1.0f32;; observe CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m21-b2UpdateContact-speculative-false",
+      "port": "silnik/fizyka/swiat.dk:2174",
+      "original": "Box2D 8c661469, src/contact.c:472-588,623-633. The #if 0 impulse redistribution is deliberately absent.",
+      "scope": "b2UpdateContact",
+      "branch_or_assignment": "if (not world.enableSpeculative and count == 2i32)",
+      "witness": "fixture speculative-false-1007908028",
+      "id": 1,
+      "classes": [
+        "M21"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false); observe TASK,CS,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m22-b2AddContactToGraph",
+      "port": "silnik/fizyka/swiat.dk:2232",
+      "original": "Box2D 8c661469, src/constraint_graph.c:70-182.",
+      "scope": "b2AddContactToGraph",
+      "branch_or_assignment": "var i: i32 = if staticA or staticB then 1i32 else 0i32;",
+      "witness": "N64 id 37",
+      "id": 37,
+      "classes": [
+        "M22"
+      ],
+      "guards": [],
+      "difference_after_removal": "var i: i32 = 0i32;; observe CT,GB",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m23-b2AddContactToGraph",
+      "port": "silnik/fizyka/swiat.dk:2238",
+      "original": "Box2D 8c661469, src/constraint_graph.c:70-182.",
+      "scope": "b2AddContactToGraph",
+      "branch_or_assignment": "if (not staticA) bits.b2SetBitGrow(&color.bodySet, a.id);",
+      "witness": "N64 id 38",
+      "id": 38,
+      "classes": [
+        "M23"
+      ],
+      "guards": [],
+      "difference_after_removal": "bits.b2SetBitGrow(&color.bodySet, a.id);; observe GB",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m24-b2AddContactToGraph",
+      "port": "silnik/fizyka/swiat.dk:2229",
+      "original": "Box2D 8c661469, src/constraint_graph.c:70-182.",
+      "scope": "b2AddContactToGraph",
+      "branch_or_assignment": "let staticA: bool = a.setIndex == 0i32;",
+      "witness": "N64 id 46",
+      "id": 46,
+      "classes": [
+        "M24"
+      ],
+      "guards": [],
+      "difference_after_removal": "let staticA: bool = a.setIndex == 0i32 or a.bodyType == 1i32;; observe CT,GB",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m25-b2AddContactToGraph",
+      "port": "silnik/fizyka/swiat.dk:2244",
+      "original": "Box2D 8c661469, src/constraint_graph.c:70-182.",
+      "scope": "b2AddContactToGraph",
+      "branch_or_assignment": "let local: i32 = world.constraintGraph.colors[selected].contactCount;",
+      "witness": "N64 id 37",
+      "id": 37,
+      "classes": [
+        "M25"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (selected == 11i32) return;\n    let local: i32 = world.constraintGraph.colors[selected].contactCount;; observe CA,CT,CS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m26-b2AddContactToGraph",
+      "port": "silnik/fizyka/swiat.dk:2232",
+      "original": "Box2D 8c661469, src/constraint_graph.c:70-182.",
+      "scope": "b2AddContactToGraph",
+      "branch_or_assignment": "var i: i32 = if staticA or staticB then 1i32 else 0i32;",
+      "witness": "N64 id 41",
+      "id": 41,
+      "classes": [
+        "M26"
+      ],
+      "guards": [],
+      "difference_after_removal": "var i: i32 = 11i32;; observe CA,CT,GB",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m27-b2RemoveContactFromGraph",
+      "port": "silnik/fizyka/swiat.dk:2266",
+      "original": "Box2D 8c661469, src/constraint_graph.c:184-212.",
+      "scope": "b2RemoveContactFromGraph",
+      "branch_or_assignment": "if (colorIndex != 11i32) { bits.b2ClearBit(&color.bodySet, a); bits.b2ClearBit(&color.bodySet, b); }",
+      "witness": "N64 id 31",
+      "id": 31,
+      "classes": [
+        "M27"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { bits.b2ClearBit(&color.bodySet, a); bits.b2ClearBit(&color.bodySet, b); }; observe GB,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m28-b2RemoveContactFromGraph-39",
+      "port": "silnik/fizyka/swiat.dk:2271",
+      "original": "Box2D 8c661469, src/constraint_graph.c:184-212.",
+      "scope": "b2RemoveContactFromGraph",
+      "branch_or_assignment": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "witness": "N64 id 39",
+      "id": 39,
+      "classes": [
+        "M28"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (colorIndex != 11i32) world.contacts.at(moved.contactId as i64).localIndex = local;; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m28-b2RemoveContactFromGraph-42",
+      "port": "silnik/fizyka/swiat.dk:2271",
+      "original": "Box2D 8c661469, src/constraint_graph.c:184-212.",
+      "scope": "b2RemoveContactFromGraph",
+      "branch_or_assignment": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "witness": "N64 id 42",
+      "id": 42,
+      "classes": [
+        "M28"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (colorIndex != 11i32) world.contacts.at(moved.contactId as i64).localIndex = local;; observe CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m29-b2LinkContact",
+      "port": "silnik/fizyka/swiat.dk:2312",
+      "original": "Box2D 8c661469, src/island.c:120-215. Sleeping paths are outside this awake profile.",
+      "scope": "b2LinkContact",
+      "branch_or_assignment": "world.islands.at(rootB as i64).parentIsland = rootA;",
+      "witness": "N64 id 33",
+      "id": 33,
+      "classes": [
+        "M29"
+      ],
+      "guards": [],
+      "difference_after_removal": "world.islands.at(rootA as i64).parentIsland = rootB;; observe IS,IL",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m30-contactIslandRoot",
+      "port": "silnik/fizyka/swiat.dk:2294",
+      "original": "Box2D 8c661469, src/island.c:149-196. Path halving, same write order as the original.",
+      "scope": "contactIslandRoot",
+      "branch_or_assignment": "if (grand != -1i32) world.islands.at(id as i64).parentIsland = grand;",
+      "witness": "N64 id 33",
+      "id": 33,
+      "classes": [
+        "M30"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) world.islands.at(id as i64).parentIsland = grand;; observe IS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m31-b2UnlinkContact",
+      "port": "silnik/fizyka/swiat.dk:2325",
+      "original": "Box2D 8c661469, src/island.c:218-262.",
+      "scope": "b2UnlinkContact",
+      "branch_or_assignment": "island.constraintRemoveCount = island.constraintRemoveCount + 1i32;",
+      "witness": "N64 id 35",
+      "id": 35,
+      "classes": [
+        "M31"
+      ],
+      "guards": [],
+      "difference_after_removal": "island.constraintRemoveCount = island.constraintRemoveCount;; observe IS",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m32-b2MergeAwakeIslands",
+      "port": "silnik/fizyka/swiat.dk:2358",
+      "original": "Box2D 8c661469, src/island.c:547-598. Map every parent before any RemoveSwap.",
+      "scope": "b2MergeAwakeIslands",
+      "branch_or_assignment": "fun b2MergeAwakeIslands(world: ref World) -> () = {\n    let count: i32 = b2GetSolverSet(world, 2i32).islandCount;\n    var i: i32 = 0i32;\n    while (i < count) {\n        let id: i32 = b2GetSolverSet(world, 2i32).islandSims.at(i as i64);\n        let root: i32 = contactIslandRoot(world, id);\n        if (root != id) world.islands.at(id as i64).parentIsland = root;\n        i = i + 1i32;\n    }\n    var j: i32 = count - 1i32;\n    while (j >= 0i32) {\n        let child: i32 = b2GetSolverSet(world, 2i32).islandSims.at(j as i64);\n        if (world.islands.at(child as i64).parentIsland != -1i32) {\n            b2MergeIsland(world, child); b2DestroyIsland(world, child);\n        }\n        j = j - 1i32;\n    }\n}",
+      "witness": "N64 id 33",
+      "id": 33,
+      "classes": [
+        "M32"
+      ],
+      "guards": [],
+      "difference_after_removal": "fun b2MergeAwakeIslands(world: ref World) -> () = {\n    let count: i32 = b2GetSolverSet(world, 2i32).islandCount;\n    var i: i32 = 0i32;\n    while (i < count) {\n        let id: i32 = b2GetSolverSet(world, 2i32).islandSims.at(i as i64);\n        let root: i32 = contactIslandRoot(world, id);\n        if (root != id) world.islands.at(id as i64).parentIsland = root;\n        i = i + 1i32;\n    }\n    var j: i32 = 0i32;\n    while (j < b2GetSolverSet(world, 2i32).islandCount) {\n        let child: i32 = b2GetSolverSet(world, 2i32).islandSims.at(j as i64);\n        if (world.islands.at(child as i64).parentIsland != -1i32) {\n            b2MergeIsland(world, child); b2DestroyIsland(world, child);\n        }\n        j = j + 1i32;\n    }\n}; observe IS,IL,IF",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m33-b2MergeIsland-bodies",
+      "port": "silnik/fizyka/swiat.dk:2336",
+      "original": "Box2D 8c661469, src/island.c:429-453,462-501,529-535. No joints in this profile.",
+      "scope": "b2MergeIsland",
+      "branch_or_assignment": "world.bodies.at(body as i64).islandId = root;",
+      "witness": "N64 id 33",
+      "id": 33,
+      "classes": [
+        "M33"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { world.bodies.at(body as i64).islandId = root; }; observe BL9,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m33-b2MergeIsland-contacts",
+      "port": "silnik/fizyka/swiat.dk:2341",
+      "original": "Box2D 8c661469, src/island.c:429-453,462-501,529-535. No joints in this profile.",
+      "scope": "b2MergeIsland",
+      "branch_or_assignment": "world.contacts.at(contact as i64).islandId = root;",
+      "witness": "N64 id 33",
+      "id": 33,
+      "classes": [
+        "M33"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (false) { world.contacts.at(contact as i64).islandId = root; }; observe BL9,CT",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m34-b2DestroyIsland",
+      "port": "silnik/fizyka/swiat.dk:1307",
+      "original": "Box2D 8c661469, src/island.c:58; src/body.c:99. Remove empty/merged island, repair moved index.",
+      "scope": "b2DestroyIsland",
+      "branch_or_assignment": "world.islands.at(movedId as i64).localIndex = local;",
+      "witness": "N64 id 33 / checkIslands.localIndex boundary before fatal exit, healthy control equals validated C",
+      "id": 33,
+      "classes": [
+        "M34"
+      ],
+      "guards": [],
+      "difference_after_removal": "MERGE seq49: actual localIndex comparison fails; GUARD9 ISLAND names world/set/local/island/stored localIndex; code0, empty stderr, exact C prefix through seq48.",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m35-b2RemoveBodyFromIsland",
+      "port": "silnik/fizyka/swiat.dk:2388",
+      "original": "Box2D 8c661469, src/body.c:99-156.",
+      "scope": "b2RemoveBodyFromIsland",
+      "branch_or_assignment": "world.bodies.at(id as i64).islandId = -1i32;",
+      "witness": "N64 id 54",
+      "id": 54,
+      "classes": [
+        "M35"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (island.bodyCount > 0i32) b2DestroyIsland(world, body.islandId);\n    world.bodies.at(id as i64).islandId = -1i32;; observe IP,IS,IL",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m36-b2DestroyShapeContacts",
+      "port": "silnik/fizyka/swiat.dk:2452",
+      "original": "Box2D 8c661469, src/shape.c:257-271. Only this shape, not every shape on its body.",
+      "scope": "b2DestroyShapeContacts",
+      "branch_or_assignment": "if (record.shapeIdA == shapeId or record.shapeIdB == shapeId)",
+      "witness": "N64 id 53",
+      "id": 53,
+      "classes": [
+        "M36"
+      ],
+      "guards": [],
+      "difference_after_removal": "if (true); observe CP,CT,GE",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m37-b2GetContactEndEvents",
+      "port": "silnik/fizyka/swiat.dk:2467",
+      "original": "Box2D 8c661469, src/world.c:1529-1555. Getter observes the previous end side without mutation.",
+      "scope": "b2GetContactEndEvents",
+      "branch_or_assignment": "if (world.endEventArrayIndex == 0i32)",
+      "witness": "N64 id 61",
+      "id": 61,
+      "classes": [
+        "M37"
+      ],
+      "guards": [
+        "G-END-SIDE"
+      ],
+      "difference_after_removal": "if (world.endEventArrayIndex != 0i32); observe GE,GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m38-cloneContactEvents",
+      "port": "silnik/fizyka/gra.dk:952",
+      "original": "Box2D 8c661469, src/array.h:49-115; src/world.c:1529. Explicit deep copy of both lists.",
+      "scope": "cloneContactEvents",
+      "branch_or_assignment": "    return result;",
+      "witness": "N64 id 62",
+      "id": 62,
+      "classes": [
+        "M38"
+      ],
+      "guards": [
+        "G-COPY-EVENTS"
+      ],
+      "difference_after_removal": "    if (source.begin.length() > 0i64) source.begin.at(0i64).shapeA.birthTicket.low = source.begin.at(0i64).shapeA.birthTicket.low ^ 1u32;\n    return result;; observe GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m39-copyContactEvents",
+      "port": "silnik/fizyka/gra.dk:937",
+      "original": "Box2D 8c661469, src/world.c:1529-1555. Event metadata was stamped at emission, not looked up here.",
+      "scope": "copyContactEvents",
+      "branch_or_assignment": "ended.birthA, ended.ownerTicket",
+      "witness": "N64 id 61 / recreate-A (seq13 destroy shape0; seq14 create shape2 on body0)",
+      "id": 61,
+      "classes": [
+        "M39"
+      ],
+      "guards": [
+        "G-EVENT-NUMBER"
+      ],
+      "difference_after_removal": "world.shapes.at((ended.shapeA.index1 - 1i32) as i64).birthTicket, ended.ownerTicket; observe GE,GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "m40-cloneContactEvents",
+      "port": "silnik/fizyka/gra.dk:947",
+      "original": "Box2D 8c661469, src/array.h:49-115; src/world.c:1529. Explicit deep copy of both lists.",
+      "scope": "cloneContactEvents",
+      "branch_or_assignment": "result.begin.push(begin);",
+      "witness": "N64 id 63",
+      "id": 63,
+      "classes": [
+        "M40"
+      ],
+      "guards": [
+        "G-EVENT-MANIFOLD"
+      ],
+      "difference_after_removal": "var late: ContactBegin = begin; let now: ContactLookup = findContact(WorldNumber(0i32, begin.shapeA.ownerTicket), begin.shapeA, begin.shapeB); if (now.status == OK and now.has) late.manifold = now.value.manifold; result.begin.push(late);; observe GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-w47-contactStatus",
+      "port": "silnik/fizyka/gra.dk:856",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (worldStatus(owner) != OK) return STALE;",
+      "witness": "fixture guard-world",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-W47"
+      ],
+      "difference_after_removal": "if (false) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-owner47-contactStatus",
+      "port": "silnik/fizyka/gra.dk:857",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;",
+      "witness": "fixture guard-owner",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-OWNER47"
+      ],
+      "difference_after_removal": "if (false) return FOREIGN;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-range-contactStatus",
+      "port": "silnik/fizyka/gra.dk:859",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (number.slot < 0i32 or number.slot >= world.contactIdPool.nextIndex) return STALE;",
+      "witness": "fixture guard-range",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-RANGE"
+      ],
+      "difference_after_removal": "if (false) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-occupied-contactStatus",
+      "port": "silnik/fizyka/gra.dk:861",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (record.setIndex == -1i32 or record.contactId == -1i32) return STALE;",
+      "witness": "fixture guard-occupied",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-OCCUPIED"
+      ],
+      "difference_after_removal": "if (false) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-birth-low-contactStatus",
+      "port": "silnik/fizyka/gra.dk:862",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (not equalKey(record.birthTicket, number.birthTicket)) return STALE;",
+      "witness": "fixture guard-birth-low",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-BIRTH-LOW"
+      ],
+      "difference_after_removal": "if (record.birthTicket.high != number.birthTicket.high) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-birth-high-contactStatus",
+      "port": "silnik/fizyka/gra.dk:862",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (not equalKey(record.birthTicket, number.birthTicket)) return STALE;",
+      "witness": "fixture guard-birth-high",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-BIRTH-HIGH"
+      ],
+      "difference_after_removal": "if (record.birthTicket.low != number.birthTicket.low) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-contact-id-contactStatus",
+      "port": "silnik/fizyka/gra.dk:863",
+      "original": "Box2D 8c661469, src/contact.h:43-65. World -> owner -> bounds -> live -> ticket -> record id.",
+      "scope": "contactStatus",
+      "branch_or_assignment": "if (record.contactId != number.slot) return STALE;",
+      "witness": "fixture guard-contact-id",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-CONTACT-ID"
+      ],
+      "difference_after_removal": "if (false) return STALE;; observe ",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-w48-bodyStatus",
+      "port": "silnik/fizyka/gra.dk:84",
+      "original": "Box2D 8c661469, src/world.c:1576. Buffered contact order is part of the API.",
+      "scope": "bodyStatus",
+      "branch_or_assignment": "if (worldStatus(owner) != OK) return STALE;",
+      "witness": "N64 id 57",
+      "id": 57,
+      "classes": [],
+      "guards": [
+        "G-W48"
+      ],
+      "difference_after_removal": "if (false) return STALE;; observe R,GL",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-owner48-bodyStatus",
+      "port": "silnik/fizyka/gra.dk:85",
+      "original": "Box2D 8c661469, src/world.c:1576. Buffered contact order is part of the API.",
+      "scope": "bodyStatus",
+      "branch_or_assignment": "if (not targetOwnerValid17(owner.birthTicket,number.ownerTicket)) return FOREIGN;",
+      "witness": "N64 id 58",
+      "id": 58,
+      "classes": [],
+      "guards": [
+        "G-OWNER48"
+      ],
+      "difference_after_removal": "if (false) return FOREIGN;; observe R,GL",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-w49-copyContactEvents",
+      "port": "silnik/fizyka/gra.dk:915",
+      "original": "Box2D 8c661469, src/world.c:1529-1555. Event metadata was stamped at emission, not looked up here.",
+      "scope": "copyContactEvents",
+      "branch_or_assignment": "result.status = worldStatus(owner);",
+      "witness": "N64 id 57",
+      "id": 57,
+      "classes": [],
+      "guards": [
+        "G-W49"
+      ],
+      "difference_after_removal": "result.status = OK;; observe R,GE,GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-carry-nextTicket",
+      "port": "silnik/fizyka/gra.dk:68",
+      "original": "Box2D 8c661469, src/world.c:100 (game-only preallocation guard).",
+      "scope": "nextTicket",
+      "branch_or_assignment": "return Key64(0u32, last.high + 1u32);",
+      "witness": "fixture carry-low",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-CARRY"
+      ],
+      "difference_after_removal": "return Key64(0u32, last.high);; observe CT,Z9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-max-read-lookupContact",
+      "port": "silnik/fizyka/gra.dk:868",
+      "original": "Box2D 8c661469, src/contact.c:453-468. Copied numerical value, never an escaped sim reference.",
+      "scope": "lookupContact",
+      "branch_or_assignment": "result.status = contactStatus(owner, number);",
+      "witness": "fixture max-reads",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAX-READ"
+      ],
+      "difference_after_removal": "result.status = contactStatus(owner, number); if (ticketLimit(lastIssued)) result.status = LIMIT;; observe RC9,GV",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-max-read-contacts",
+      "port": "silnik/fizyka/gra.dk:881",
+      "original": "Box2D 8c661469, src/body.c:460-495. Public contact data order; non-touching numbers remain valid.",
+      "scope": "contacts",
+      "branch_or_assignment": "result.status = bodyStatus(owner, number);",
+      "witness": "fixture max-reads",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAX-READ"
+      ],
+      "difference_after_removal": "result.status = bodyStatus(owner, number); if (ticketLimit(lastIssued)) result.status = LIMIT;; observe R,GL",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-max-read-copyContactEvents",
+      "port": "silnik/fizyka/gra.dk:915",
+      "original": "Box2D 8c661469, src/world.c:1529-1555. Event metadata was stamped at emission, not looked up here.",
+      "scope": "copyContactEvents",
+      "branch_or_assignment": "result.status = worldStatus(owner);",
+      "witness": "fixture max-reads",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAX-READ"
+      ],
+      "difference_after_removal": "result.status = worldStatus(owner); if (ticketLimit(lastIssued)) result.status = LIMIT;; observe R,GE,GC",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-max-read-updateContactPairs",
+      "port": "silnik/fizyka/gra.dk:962",
+      "original": "Box2D 8c661469, src/broad_phase.c:376-474; src/contact.c:186.",
+      "scope": "updateContactPairs",
+      "branch_or_assignment": "result.status = worldMutationStatus(owner);",
+      "witness": "fixture max-empty-pairs",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAX-READ"
+      ],
+      "difference_after_removal": "result.status = worldMutationStatus(owner); if (ticketLimit(lastIssued)) result.status = LIMIT;; observe R,RQ,CP,Z9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-legacy-limit-createShapeRaw",
+      "port": "silnik/fizyka/gra.dk:446",
+      "original": "Box2D 8c661469, src/shape.c:163-227. Checked raw semantics, including optional mass update.",
+      "scope": "createShapeRaw",
+      "branch_or_assignment": "if (ticketLimit(lastIssued))",
+      "witness": "fixture shape-at-max",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-LIMIT"
+      ],
+      "difference_after_removal": "if (false); observe R,S,Z9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-copy-lookup-lookupContact",
+      "port": "silnik/fizyka/gra.dk:877",
+      "original": "Box2D 8c661469, src/contact.c:453-468. Copied numerical value, never an escaped sim reference.",
+      "scope": "lookupContact",
+      "branch_or_assignment": "    return result;",
+      "witness": "N64 id 32",
+      "id": 32,
+      "classes": [],
+      "guards": [
+        "G-COPY-LOOKUP"
+      ],
+      "difference_after_removal": "    raw.b2GetContactSim(world, world.contacts.at(number.slot as i64)).manifold.normal.x = -result.value.manifold.normal.x;\n    return result;; observe GV,CD",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-copy-list-contacts",
+      "port": "silnik/fizyka/gra.dk:891",
+      "original": "Box2D 8c661469, src/body.c:460-495. Public contact data order; non-touching numbers remain valid.",
+      "scope": "contacts",
+      "branch_or_assignment": "result.values.push(found.value);",
+      "witness": "N64 id 32",
+      "id": 32,
+      "classes": [],
+      "guards": [
+        "G-COPY-LIST"
+      ],
+      "difference_after_removal": "result.values.push(found.value); raw.b2GetContactSim(world, world.contacts.at(id as i64)).manifold.normal.x = -found.value.manifold.normal.x;; observe GL,CD",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-read-pure-copyContactEvents",
+      "port": "silnik/fizyka/gra.dk:941",
+      "original": "Box2D 8c661469, src/world.c:1529-1555. Event metadata was stamped at emission, not looked up here.",
+      "scope": "copyContactEvents",
+      "branch_or_assignment": "    return result;",
+      "witness": "N64 id 64",
+      "id": 64,
+      "classes": [],
+      "guards": [
+        "G-READ-PURE"
+      ],
+      "difference_after_removal": "    world.contactBeginEvents.clear();\n    return result;; observe GE,GC,EB",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-step-b2World_Step",
+      "port": "silnik/fizyka/swiat.dk:1973",
+      "original": "Box2D 8c661469, src/world.c:695-812; src/solver.c:991-1069,1735-1742,1842-1906.",
+      "scope": "b2World_StepPreparedCounter12",
+      "branch_or_assignment": "if (world.locked) return result;",
+      "witness": "GUARD10 G10-PUBLIC-STEP; retained legacy witness id 60",
+      "id": 60,
+      "classes": [],
+      "guards": [
+        "G-STEP"
+      ],
+      "difference_after_removal": "if (world.locked) return result; if (dt > 0.0f32 and world.contactIdPool.nextIndex > world.contactIdPool.freeCount) { result.status = 5i32; return result; }; observe R,K",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-step-b2World_Step-negative",
+      "port": "silnik/fizyka/swiat.dk:1973",
+      "original": "Box2D 8c661469, src/world.c:695-812; src/solver.c:991-1069,1735-1742,1842-1906.",
+      "scope": "b2World_StepPreparedCounter12",
+      "branch_or_assignment": "if (world.locked) return result;",
+      "witness": "GUARD10 G10-PUBLIC-STEP; retained legacy witness id 60",
+      "id": 60,
+      "classes": [],
+      "guards": [
+        "G-STEP"
+      ],
+      "difference_after_removal": "if (world.locked) return result; if (dt < 0.0f32 and world.contactIdPool.nextIndex > world.contactIdPool.freeCount) { result.status = 5i32; return result; }; observe R,K",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-f-fin-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:461",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "finite(shape.friction)",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-F-FIN"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-f-nonneg-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:461",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "shape.friction >= 0.0f32",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-F-NONNEG"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-r-fin-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:462",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "finite(shape.restitution)",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-R-FIN"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-r-nonneg-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:462",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "shape.restitution >= 0.0f32",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-R-NONNEG"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-roll-fin-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:463",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "finite(shape.rollingResistance)",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-ROLL-FIN"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-roll-nonneg-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:463",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "shape.rollingResistance >= 0.0f32",
+      "witness": "fixture material40-0",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-ROLL-NONNEG"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-mat-t-fin-validContactMaterial",
+      "port": "silnik/fizyka/gra.dk:464",
+      "original": "Box2D 8c661469, src/shape.c:166-170. Shared game guard, not a raw-profile change.",
+      "scope": "validContactMaterial",
+      "branch_or_assignment": "finite(shape.tangentSpeed)",
+      "witness": "fixture material40-1",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-T-FIN"
+      ],
+      "difference_after_removal": "true; observe R,S",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "g-batch-updateContactPairs",
+      "port": "silnik/fizyka/gra.dk:977",
+      "original": "Box2D 8c661469, src/broad_phase.c:376-474; src/contact.c:186.",
+      "scope": "updateContactPairs",
+      "branch_or_assignment": "if (ticketLimit(reserved))",
+      "witness": "fixture batch-one-left",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-BATCH"
+      ],
+      "difference_after_removal": "if (ticketLimit(lastIssued)); observe R,CP,CT,H,Z9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "route40-life",
+      "port": "silnik/fizyka/gra.dk:473",
+      "original": "Box2D 8c661469, src/shape.c:183-185. Game path always applies mass after preflight.",
+      "scope": "addPreparedShapeFlags12",
+      "branch_or_assignment": "if (result.status != OK) return result;",
+      "witness": "native helper route40-life",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-LIFE"
+      ],
+      "difference_after_removal": "if (false) return result;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "route40-owner",
+      "port": "silnik/fizyka/gra.dk:473",
+      "original": "Box2D 8c661469, src/shape.c:183-185. Game path always applies mass after preflight.",
+      "scope": "addPreparedShapeFlags12",
+      "branch_or_assignment": "if (result.status != OK) return result;",
+      "witness": "native helper route40-owner",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-OWNER"
+      ],
+      "difference_after_removal": "if (false) return result;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-density-finite",
+      "port": "silnik/fizyka/gra.dk:369",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (not finite(shape.density) or shape.density < 0.0f32) return false;",
+      "witness": "native helper geometry-density-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (not true or shape.density < 0.0f32) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-density-sign",
+      "port": "silnik/fizyka/gra.dk:369",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (not finite(shape.density) or shape.density < 0.0f32) return false;",
+      "witness": "native helper geometry-density-sign",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (not finite(shape.density) or false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-circle-center",
+      "port": "silnik/fizyka/gra.dk:370",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and finite(shape.circle.radius) and shape.circle.radius > 0.0f32;",
+      "witness": "native helper geometry-circle-center",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType == 0i32) return true and finite(shape.circle.radius) and shape.circle.radius > 0.0f32;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-circle-radius-finite",
+      "port": "silnik/fizyka/gra.dk:370",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and finite(shape.circle.radius) and shape.circle.radius > 0.0f32;",
+      "witness": "native helper geometry-circle-radius-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and true and shape.circle.radius > 0.0f32;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-circle-radius-positive",
+      "port": "silnik/fizyka/gra.dk:370",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and finite(shape.circle.radius) and shape.circle.radius > 0.0f32;",
+      "witness": "native helper geometry-circle-radius-positive",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType == 0i32) return finiteVector(shape.circle.center) and finite(shape.circle.radius) and true;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-capsule-end1",
+      "port": "silnik/fizyka/gra.dk:368",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and true;",
+      "witness": "native helper geometry-capsule-end1",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return true and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and true;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-capsule-end2",
+      "port": "silnik/fizyka/gra.dk:368",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and true;",
+      "witness": "native helper geometry-capsule-end2",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.capsule.center1) and true\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and true;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-capsule-radius-finite",
+      "port": "silnik/fizyka/gra.dk:373",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and finite(capsuleLength);",
+      "witness": "native helper geometry-capsule-radius-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and true and shape.capsule.radius > 0.0f32 and finite(capsuleLength);; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-capsule-radius-positive",
+      "port": "silnik/fizyka/gra.dk:373",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and finite(capsuleLength);",
+      "witness": "native helper geometry-capsule-radius-positive",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and true and finite(capsuleLength);; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-capsule-length",
+      "port": "silnik/fizyka/gra.dk:373",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and finite(capsuleLength);",
+      "witness": "native helper geometry-capsule-length",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.capsule.center1) and finiteVector(shape.capsule.center2)\n            and finite(shape.capsule.radius) and shape.capsule.radius > 0.0f32 and true;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-segment-end1",
+      "port": "silnik/fizyka/gra.dk:368",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and true and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;",
+      "witness": "native helper geometry-segment-end1",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return true and finiteVector(shape.segment.point2)\n            and true and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-segment-end2",
+      "port": "silnik/fizyka/gra.dk:368",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and true and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;",
+      "witness": "native helper geometry-segment-end2",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.segment.point1) and true\n            and true and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-segment-length-finite",
+      "port": "silnik/fizyka/gra.dk:378",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and finite(segmentLength) and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;",
+      "witness": "native helper geometry-segment-length-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and true and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-segment-length-min",
+      "port": "silnik/fizyka/gra.dk:378",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and finite(segmentLength) and segmentLength > B2_LINEAR_SLOP * B2_LINEAR_SLOP;",
+      "witness": "native helper geometry-segment-length-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "return finiteVector(shape.segment.point1) and finiteVector(shape.segment.point2)\n            and finite(segmentLength) and true;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-type",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-type",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (false or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-count-min",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-count-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType != 3i32 or false or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-count-max",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-count-max",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or false\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-radius-finite",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-radius-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not true or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-radius-sign",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-radius-sign",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or false or not finiteVector(shape.polygon.centroid)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-centroid",
+      "port": "silnik/fizyka/gra.dk:383",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not finiteVector(shape.polygon.centroid)) return false;",
+      "witness": "native helper geometry-polygon-centroid",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.shapeType != 3i32 or shape.polygon.count < 3i32 or shape.polygon.count > 8i32\n        or not finite(shape.polygon.radius) or shape.polygon.radius < 0.0f32 or not true) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-vertex",
+      "port": "silnik/fizyka/gra.dk:387",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (not finiteVector(shape.polygon.vertices[i]) or not finiteVector(shape.polygon.normals[i])) return false;",
+      "witness": "native helper geometry-polygon-vertex",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (not true or not finiteVector(shape.polygon.normals[i])) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-polygon-normal",
+      "port": "silnik/fizyka/gra.dk:387",
+      "original": "Box2D 8c661469, src/geometry.c:185-203,220-274,401-454. Geometry portion of S12 preflight.",
+      "scope": "validShapeGeometry",
+      "branch_or_assignment": "if (not finiteVector(shape.polygon.vertices[i]) or not finiteVector(shape.polygon.normals[i])) return false;",
+      "witness": "native helper geometry-polygon-normal",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (not finiteVector(shape.polygon.vertices[i]) or not true) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-vector-x",
+      "port": "silnik/fizyka/gra.dk:315",
+      "original": "Box2D 8c661469, src/math_functions.c:29-33.",
+      "scope": "finiteVector",
+      "branch_or_assignment": "finite(value.x)",
+      "witness": "native helper geometry-vector-x",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "geometry-vector-y",
+      "port": "silnik/fizyka/gra.dk:315",
+      "original": "Box2D 8c661469, src/math_functions.c:29-33.",
+      "scope": "finiteVector",
+      "branch_or_assignment": "finite(value.y)",
+      "witness": "native helper geometry-vector-y",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-mass",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-mass",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not true or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-inertia",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-inertia",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not true or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-originInertia",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-originInertia",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not true\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-invMass",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-invMass",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not true or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-invInertia",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-invInertia",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not true\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-localCenterx",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-localCenterx",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not true or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-localCentery",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-localCentery",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not true or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-centerx",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-centerx",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not true\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-centery",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-centery",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not true\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-state-linearVelocityx",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-state-linearVelocityx",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not true or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-state-linearVelocityy",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-state-linearVelocityy",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not true or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-state-angularVelocity",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-state-angularVelocity",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not true\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-minExtent",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-minExtent",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not true or not finite(computed.sim.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-sim-maxExtent",
+      "port": "silnik/fizyka/gra.dk:407",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not finite(computed.sim.maxExtent)) return false;",
+      "witness": "native helper mass-sim-maxExtent",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(computed.mass) or not finite(computed.inertia) or not finite(computed.originInertia)\n        or not finite(computed.sim.invMass) or not finite(computed.sim.invInertia)\n        or not finiteVector(computed.sim.localCenter) or not finiteVector(computed.sim.center)\n        or not finiteVector(computed.state.linearVelocity) or not finite(computed.state.angularVelocity)\n        or not finite(computed.sim.minExtent) or not true) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-inertia-positive",
+      "port": "silnik/fizyka/gra.dk:412",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (body.bodyType == 2i32 and computed.mass > 0.0f32 and not body.fixedRotation and computed.inertia <= 0.0f32) return false;",
+      "witness": "native helper mass-inertia-positive",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (body.bodyType == 2i32 and computed.mass > 0.0f32 and not body.fixedRotation and false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-shape-geometry",
+      "port": "silnik/fizyka/gra.dk:398",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not validShapeGeometry(&shape)) return false;",
+      "witness": "native helper mass-shape-geometry",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-bounds-lower",
+      "port": "silnik/fizyka/gra.dk:400",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finiteVector(bounds.lowerBound) or not finiteVector(bounds.upperBound)) return false;",
+      "witness": "native helper mass-bounds-lower",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (false or not finiteVector(bounds.upperBound)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-bounds-upper",
+      "port": "silnik/fizyka/gra.dk:400",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finiteVector(bounds.lowerBound) or not finiteVector(bounds.upperBound)) return false;",
+      "witness": "native helper mass-bounds-upper",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finiteVector(bounds.lowerBound) or false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-extent-min",
+      "port": "silnik/fizyka/gra.dk:403",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(extent.minExtent) or not finite(extent.maxExtent)) return false;",
+      "witness": "native helper mass-extent-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (false or not finite(extent.maxExtent)) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "mass-extent-max",
+      "port": "silnik/fizyka/gra.dk:403",
+      "original": "Box2D 8c661469, src/body.c:528-631. Pure shared mass calculation; no allocation in physics pools.",
+      "scope": "safeMass",
+      "branch_or_assignment": "if (not finite(extent.minExtent) or not finite(extent.maxExtent)) return false;",
+      "witness": "native helper mass-extent-max",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-S12"
+      ],
+      "difference_after_removal": "if (not finite(extent.minExtent) or false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "material-shared-preflight",
+      "port": "silnik/fizyka/gra.dk:811",
+      "original": "Box2D 8c661469, src/shape.c:183-185. Game path always applies mass after preflight.",
+      "scope": "creationPreflight17",
+      "branch_or_assignment": "if (not validContactMaterial(&shape)) { result.status = PARAM; return result; }",
+      "witness": "N64 id 1",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-MAT-ROUTES"
+      ],
+      "difference_after_removal": "if (false) { result.status = PARAM; return result; }; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-width-finite",
+      "port": "silnik/fizyka/gra.dk:625",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finite(geometry.halfWidth)",
+      "witness": "native helper box-width-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-width-positive",
+      "port": "silnik/fizyka/gra.dk:625",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "geometry.halfWidth > 0.0f32",
+      "witness": "native helper box-width-positive",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-height-finite",
+      "port": "silnik/fizyka/gra.dk:626",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finite(geometry.halfHeight)",
+      "witness": "native helper box-height-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-height-positive",
+      "port": "silnik/fizyka/gra.dk:626",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "geometry.halfHeight > 0.0f32",
+      "witness": "native helper box-height-positive",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-center",
+      "port": "silnik/fizyka/gra.dk:626",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finiteVector(geometry.center)",
+      "witness": "native helper box-center",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-radius-finite",
+      "port": "silnik/fizyka/gra.dk:627",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finite(geometry.radius)",
+      "witness": "native helper box-radius-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-radius-sign",
+      "port": "silnik/fizyka/gra.dk:627",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "geometry.radius >= 0.0f32",
+      "witness": "native helper box-radius-sign",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-rotation-c",
+      "port": "silnik/fizyka/gra.dk:627",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finite(geometry.rotation.c)",
+      "witness": "native helper box-rotation-c",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-rotation-s",
+      "port": "silnik/fizyka/gra.dk:627",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "finite(geometry.rotation.s)",
+      "witness": "native helper box-rotation-s",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-rotation-min",
+      "port": "silnik/fizyka/gra.dk:628",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "1.0f32 - 0.0006f32 < norm",
+      "witness": "native helper box-rotation-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "box-rotation-max",
+      "port": "silnik/fizyka/gra.dk:628",
+      "original": "Box2D 8c661469, src/geometry.c:185-203; include/box2d/math_functions.h:380.",
+      "scope": "validBox",
+      "branch_or_assignment": "norm < 1.0f32 + 0.0006f32",
+      "witness": "native helper box-rotation-max",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-count-min",
+      "port": "silnik/fizyka/gra.dk:332",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (shape.count < 3i32 or shape.count > 8i32 or not finite(shape.radius) or shape.radius < 0.0f32) return false;",
+      "witness": "native helper points-count-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (false or shape.count > 8i32 or not finite(shape.radius) or shape.radius < 0.0f32) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-count-max",
+      "port": "silnik/fizyka/gra.dk:332",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (shape.count < 3i32 or shape.count > 8i32 or not finite(shape.radius) or shape.radius < 0.0f32) return false;",
+      "witness": "native helper points-count-max",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (shape.count < 3i32 or false or not finite(shape.radius) or shape.radius < 0.0f32) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-radius-finite",
+      "port": "silnik/fizyka/gra.dk:332",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "finite(shape.radius)",
+      "witness": "native helper points-radius-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-radius-sign",
+      "port": "silnik/fizyka/gra.dk:332",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "shape.radius < 0.0f32",
+      "witness": "native helper points-radius-sign",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "false; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-vertex",
+      "port": "silnik/fizyka/gra.dk:335",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (not finiteVector(shape.vertices[i])) return false;",
+      "witness": "native helper points-vertex",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-edge-finite",
+      "port": "silnik/fizyka/gra.dk:338",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (not finite(edgeSqr) or edgeSqr <= FLT_EPSILON * FLT_EPSILON) return false;",
+      "witness": "native helper points-edge-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (false or edgeSqr <= FLT_EPSILON * FLT_EPSILON) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-edge-min",
+      "port": "silnik/fizyka/gra.dk:338",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (not finite(edgeSqr) or edgeSqr <= FLT_EPSILON * FLT_EPSILON) return false;",
+      "witness": "native helper points-edge-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (not finite(edgeSqr) or false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-convex",
+      "port": "silnik/fizyka/gra.dk:341",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "if (not raw.b2ValidateHull(shape)) return false;",
+      "witness": "native helper points-convex",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "if (false) return false;; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-area-finite",
+      "port": "silnik/fizyka/gra.dk:351",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "finite(area)",
+      "witness": "native helper points-area-finite",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "points-area-min",
+      "port": "silnik/fizyka/gra.dk:351",
+      "original": "Box2D 8c661469, src/hull.c:273-328; src/geometry.c:22-89. S12 preparation before MakePolygon.",
+      "scope": "validPolygonPoints",
+      "branch_or_assignment": "area > FLT_EPSILON",
+      "witness": "native helper points-area-min",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "true; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "prepare-centroid",
+      "port": "silnik/fizyka/gra.dk:358",
+      "original": "Box2D 8c661469, src/geometry.c:56-89. No replacement hull on rejection.",
+      "scope": "preparePolygon",
+      "branch_or_assignment": "not finiteVector(shape.centroid)",
+      "witness": "native helper prepare-centroid",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "false; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "prepare-normal",
+      "port": "silnik/fizyka/gra.dk:361",
+      "original": "Box2D 8c661469, src/geometry.c:56-89. No replacement hull on rejection.",
+      "scope": "preparePolygon",
+      "branch_or_assignment": "not finiteVector(shape.normals[i])",
+      "witness": "native helper prepare-normal",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "false; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "prepare-input",
+      "port": "silnik/fizyka/gra.dk:356",
+      "original": "Box2D 8c661469, src/geometry.c:56-89. No replacement hull on rejection.",
+      "scope": "preparePolygon",
+      "branch_or_assignment": "not validPolygonPoints(shape)",
+      "witness": "native helper prepare-input",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "G-LEGACY-GEOMETRY"
+      ],
+      "difference_after_removal": "false; observe R",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F01",
+      "port": "silnik/port/kontakty.dk:83",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readRow",
+      "branch_or_assignment": "c == 0i32 or c > 127i32",
+      "witness": "F input F01",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F01"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F02",
+      "port": "silnik/port/kontakty.dk:101",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readRow",
+      "branch_or_assignment": "i > 0i32 and rowBytes[i] == 32i32 and rowBytes[i - 1i32] == 32i32",
+      "witness": "F input F02",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F02"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F03",
+      "port": "silnik/port/kontakty.dk:95",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readRow",
+      "branch_or_assignment": "rowLength == 0i32",
+      "witness": "F input F03",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F03"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F04",
+      "port": "silnik/port/kontakty.dk:92",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readRow",
+      "branch_or_assignment": "rowBytes[i] == 13i32",
+      "witness": "F input F04",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F04"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F05",
+      "port": "silnik/port/kontakty.dk:81",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readRow",
+      "branch_or_assignment": "c < 0i32",
+      "witness": "F input F05",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F05"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F06",
+      "port": "silnik/port/kontakty.dk:1394",
+      "original": "Box2D 8c661469, src/world.c:100,263. KONTRAKT-8 framing; no global resets between cases.",
+      "scope": "main",
+      "branch_or_assignment": "rowLength < 6i32 or rowBytes[0] != 80i32 or rowBytes[1] != 79i32 or rowBytes[2] != 82i32\n        or rowBytes[3] != 84i32 or rowBytes[4] != 57i32 or rowBytes[5] != 66i32\n        or (rowLength > 6i32 and rowBytes[6] != 32i32)",
+      "witness": "F input F06",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F06"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F07",
+      "port": "silnik/port/kontakty.dk:1403",
+      "original": "Box2D 8c661469, src/world.c:100,263. KONTRAKT-8 framing; no global resets between cases.",
+      "scope": "main",
+      "branch_or_assignment": "count < 1u32 or count > 64u32",
+      "witness": "F input F07",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F07"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F08",
+      "port": "silnik/port/kontakty.dk:129",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readWord",
+      "branch_or_assignment": "value > 4294967295u64 or (leadingZero and digits > 1i32)",
+      "witness": "F input F08",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F08"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F09",
+      "port": "silnik/port/kontakty.dk:110",
+      "original": "Box2D 8c661469, src/world.c:100. Frozen row arity before numerical interpretation.",
+      "scope": "checkArity",
+      "branch_or_assignment": "count != expected",
+      "witness": "F input F09",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F09"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F10",
+      "port": "silnik/port/kontakty.dk:129",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "readWord",
+      "branch_or_assignment": "value > 4294967295u64 or (leadingZero and digits > 1i32)",
+      "witness": "F input F10",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F10"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F11",
+      "port": "silnik/port/kontakty.dk:1414",
+      "original": "Box2D 8c661469, src/world.c:100,263. KONTRAKT-8 framing; no global resets between cases.",
+      "scope": "main",
+      "branch_or_assignment": "id != caseIndex + 1u32",
+      "witness": "F input F11",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F11"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F12",
+      "port": "silnik/port/kontakty.dk:1415",
+      "original": "Box2D 8c661469, src/world.c:100,263. KONTRAKT-8 framing; no global resets between cases.",
+      "scope": "main",
+      "branch_or_assignment": "opCount < 1u32 or opCount > opMaximum(id)",
+      "witness": "F input F12",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F12"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F13",
+      "port": "silnik/port/kontakty.dk:328",
+      "original": "Box2D 8c661469, src/world.c:100; src/body.c:177; src/shape.c:163. KONTRAKT-8/1 decoder.",
+      "scope": "readOperation",
+      "branch_or_assignment": "seq != expectedSeq",
+      "witness": "F input F13",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F13"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F14",
+      "port": "silnik/port/kontakty.dk:329",
+      "original": "Box2D 8c661469, src/world.c:100; src/body.c:177; src/shape.c:163. KONTRAKT-8/1 decoder.",
+      "scope": "readOperation",
+      "branch_or_assignment": "opcode > 53u32 or opcode == 20u32 or (opcode >= 6u32 and opcode <= 9u32) or (opcode >= 22u32 and opcode <= 29u32)",
+      "witness": "F input F14",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F14"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F15",
+      "port": "silnik/port/kontakty.dk:2257",
+      "original": "Box2D 8c661469, src/world.c:100. Transport structure validation precedes float decoding.",
+      "scope": "prevalidateWords",
+      "branch_or_assignment": "w[field] >= bound as u32",
+      "witness": "F input F15",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F15"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F16",
+      "port": "silnik/port/kontakty.dk:1589",
+      "original": "Box2D 8c661469, src/contact.c:186. Initialized historical registers remain valid transport sources.",
+      "scope": "validOperation9",
+      "branch_or_assignment": "not sourceGood",
+      "witness": "F input F16",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F16"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F17",
+      "port": "silnik/port/kontakty.dk:1590",
+      "original": "Box2D 8c661469, src/contact.c:186. Initialized historical registers remain valid transport sources.",
+      "scope": "validOperation9",
+      "branch_or_assignment": "collision",
+      "witness": "F input F17",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F17"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F18",
+      "port": "silnik/port/kontakty.dk:2262",
+      "original": "Box2D 8c661469, src/world.c:100. Transport structure validation precedes float decoding.",
+      "scope": "prevalidateWords",
+      "branch_or_assignment": "w[flag] > 1u32",
+      "witness": "F input F18",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F18"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F19",
+      "port": "silnik/port/kontakty.dk:2265",
+      "original": "Box2D 8c661469, src/world.c:100. Transport structure validation precedes float decoding.",
+      "scope": "prevalidateWords",
+      "branch_or_assignment": "(tagIndex != -1i32 and w[tagIndex] > 4u32) or ((code == 2u32 or code == 30u32) and w[2] > 2u32)\n        or (code == 16u32 and w[3] > 2u32) or (code == 15u32 and w[1] != 2u32 and w[1] != 3u32)\n        or ((code == 33u32 or code == 34u32) and w[2] > 5u32)",
+      "witness": "F input F19",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F19"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F20",
+      "port": "silnik/port/kontakty.dk:2270",
+      "original": "Box2D 8c661469, src/world.c:100. Transport structure validation precedes float decoding.",
+      "scope": "prevalidateWords",
+      "branch_or_assignment": "w[i] != 0u32",
+      "witness": "F input F20",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F20"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F21",
+      "port": "silnik/port/kontakty.dk:171",
+      "original": "Box2D 8c661469, src/math_functions.c:40; include/box2d/math_functions.h:380.",
+      "scope": "decodeRot",
+      "branch_or_assignment": "not (1.0f32 - 0.0006f32 < lengthSquared and lengthSquared < 1.0f32 + 0.0006f32)",
+      "witness": "F input F21",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F21"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F22",
+      "port": "silnik/port/kontakty.dk:352",
+      "original": "Box2D 8c661469, src/world.c:100; src/body.c:177; src/shape.c:163. KONTRAKT-8/1 decoder.",
+      "scope": "readOperation",
+      "branch_or_assignment": "w[2] > 256u32",
+      "witness": "F input F22",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F22"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F23",
+      "port": "silnik/port/kontakty.dk:1442",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "decodeManifold",
+      "branch_or_assignment": "w[offset + 3i32] > 2u32",
+      "witness": "F input F23",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F23"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F24",
+      "port": "silnik/port/kontakty.dk:1544",
+      "original": "Box2D 8c661469, src/contact.c:186,472; src/world.c:487. Frozen opcode40-53 fields.",
+      "scope": "decodeContactOperation",
+      "branch_or_assignment": "w[32] > 3u32",
+      "witness": "F input F24",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F24"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F25",
+      "port": "silnik/port/kontakty.dk:1594",
+      "original": "Box2D 8c661469, src/contact.c:186. Initialized historical registers remain valid transport sources.",
+      "scope": "validOperation9",
+      "branch_or_assignment": "op.opcode != reg.phase + 41i32 or op.a != reg.phaseOwner",
+      "witness": "F input F25",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F25"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F26",
+      "port": "silnik/port/kontakty.dk:2268",
+      "original": "Box2D 8c661469, src/world.c:100. Transport structure validation precedes float decoding.",
+      "scope": "prevalidateWords",
+      "branch_or_assignment": "code == 40u32 and w[58] == 1u32 and w[57] != 0u32",
+      "witness": "F input F26",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F26"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F27",
+      "port": "silnik/port/kontakty.dk:2194",
+      "original": "Box2D 8c661469, src/world.c:100; src/array.h:49. No output for an operation outside the corpus.",
+      "scope": "checkPopulation",
+      "branch_or_assignment": "worlds > 2i32 or reg.totalBodySlots > maxB or reg.totalShapeSlots > maxS or reg.totalContactSlots > maxC\n        or savedBodies > 2i32 * maxB or savedShapes > 2i32 * maxS or rawEvents > 4i64 * maxC as i64 or copies > 8i64 * maxC as i64",
+      "witness": "F input F27",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F27"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F28",
+      "port": "silnik/port/kontakty.dk:157",
+      "original": "Box2D 8c661469, src/world.c:100. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "checkEnd",
+      "branch_or_assignment": "c >= 0i32",
+      "witness": "F input F28",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F28"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "reader-F29",
+      "port": "silnik/port/kontakty.dk:1425",
+      "original": "Box2D 8c661469, src/world.c:100,263. KONTRAKT-8 framing; no global resets between cases.",
+      "scope": "main",
+      "branch_or_assignment": "not capturesClosed(&reg)",
+      "witness": "F input F29",
+      "id": 1,
+      "classes": [],
+      "guards": [
+        "F29"
+      ],
+      "difference_after_removal": "guard -> false; observe GUARD9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-31",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 31i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-32",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 32i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-63",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 63i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-64",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 64i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-127",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 127i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-index-128",
+      "port": "silnik/fizyka/bitset.dk:76",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2SetBit",
+      "branch_or_assignment": "    let blk:",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "    if (index == 128i32) return;\n    let blk:; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-union-low",
+      "port": "silnik/fizyka/bitset.dk:109",
+      "original": "Box2D 8c661469, src/bitset.c:61.",
+      "scope": "b2InPlaceUnion",
+      "branch_or_assignment": "a.bits.at(i as i64).low = a.bits.at(i as i64).low | b.bits.at(i as i64).low;",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "if (false) { a.bits.at(i as i64).low = a.bits.at(i as i64).low | b.bits.at(i as i64).low; }; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-clear-low",
+      "port": "silnik/fizyka/bitset.dk:94",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2ClearBit",
+      "branch_or_assignment": "set.bits.at(blk).low & mask",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "set.bits.at(blk).low; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-union-high",
+      "port": "silnik/fizyka/bitset.dk:110",
+      "original": "Box2D 8c661469, src/bitset.c:61.",
+      "scope": "b2InPlaceUnion",
+      "branch_or_assignment": "a.bits.at(i as i64).high = a.bits.at(i as i64).high | b.bits.at(i as i64).high;",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "if (false) { a.bits.at(i as i64).high = a.bits.at(i as i64).high | b.bits.at(i as i64).high; }; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-clear-high",
+      "port": "silnik/fizyka/bitset.dk:95",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2ClearBit",
+      "branch_or_assignment": "set.bits.at(blk).high & mask",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "set.bits.at(blk).high; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-clear-bounds",
+      "port": "silnik/fizyka/bitset.dk:91",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2ClearBit",
+      "branch_or_assignment": "if (index / 64i32 >= set.blockCount) return;",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "if (false) { if (index / 64i32 >= set.blockCount) return; }; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-get-bounds",
+      "port": "silnik/fizyka/bitset.dk:100",
+      "original": "Box2D 8c661469, src/bitset.c:42. Adapter transportu / reprezentacji; nie separate algorytm C.",
+      "scope": "b2GetBit",
+      "branch_or_assignment": "if (index / 64i32 >= set.blockCount) return false;",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "if (false) { if (index / 64i32 >= set.blockCount) return false; }; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-clear-count",
+      "port": "silnik/fizyka/bitset.dk:61",
+      "original": "Box2D 8c661469, src/bitset.c:27.",
+      "scope": "b2SetBitCountAndClear",
+      "branch_or_assignment": "set.bits.at(i as i64) = Key64();",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "if (false) { set.bits.at(i as i64) = Key64(); }; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    },
+    {
+      "recipe": "bitset-grow-capacity",
+      "port": "silnik/fizyka/bitset.dk:66",
+      "original": "Box2D 8c661469, src/bitset.c:42.",
+      "scope": "b2GrowBitSet",
+      "branch_or_assignment": "let capacity: i32 = blockCount + blockCount / 2i32;",
+      "witness": "fixture bitset-branches",
+      "id": 1,
+      "classes": [],
+      "guards": [],
+      "difference_after_removal": "let capacity: i32 = blockCount + blockCount;; observe BIT9",
+      "native_status": "REQUIRES_NATIVE_RUN"
+    }
+  ],
+  "unresolved_classes": [],
+  "step11_classes": [
+    {
+      "class_id": "M12",
+      "status": "ZAMKNIETE_W_KROKU_11",
+      "decision": "D11-3",
+      "native_recipe": "M12-LINK-REF",
+      "native_receipt_required": true
+    }
+  ],
+  "fixture_injections": [
+    {
+      "port": "silnik/port/kontakty.dk:437",
+      "scope": "readOperation",
+      "anchor": "    return op;\n}",
+      "guards": [
+        "G-MAT-ROUTES"
+      ],
+      "fixtures": [
+        "material-route16-0-7fc00000",
+        "material-route16-0-7f800000",
+        "material-route16-0-ff800000",
+        "material-route16-0-bf800000",
+        "material-route16-1-7fc00000",
+        "material-route16-1-7f800000",
+        "material-route16-1-ff800000",
+        "material-route16-1-bf800000",
+        "material-route16-2-7fc00000",
+        "material-route16-2-7f800000",
+        "material-route16-2-ff800000",
+        "material-route16-2-bf800000",
+        "material-route16-3-7fc00000",
+        "material-route16-3-7f800000",
+        "material-route16-3-ff800000",
+        "material-route17-0-7fc00000",
+        "material-route17-0-7f800000",
+        "material-route17-0-ff800000",
+        "material-route17-0-bf800000",
+        "material-route17-1-7fc00000",
+        "material-route17-1-7f800000",
+        "material-route17-1-ff800000",
+        "material-route17-1-bf800000",
+        "material-route17-2-7fc00000",
+        "material-route17-2-7f800000",
+        "material-route17-2-ff800000",
+        "material-route17-2-bf800000",
+        "material-route17-3-7fc00000",
+        "material-route17-3-7f800000",
+        "material-route17-3-ff800000"
+      ],
+      "purpose": "Seed the same material field after successful decoding; preserve all early input refusals and the actual material guard."
+    }
+  ],
+  "historical_step9b_proofs": [
+    {
+      "class_id": "M12",
+      "status": "ODROCZONE_DO_KROKU_11",
+      "detected": false,
+      "decision": "DECYZJA-M12.md",
+      "original": "src/world.c:649-658; wake/awake-set growth in b2LinkContact",
+      "proof": [
+        {
+          "port": "silnik/fizyka/swiat.dk:2231",
+          "scope": "b2LinkContact",
+          "expression": "b2AddContactToIsland(world, target, id);",
+          "reason": "Link only links islands/records; no awake sim push or wake path."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2202",
+          "scope": "b2AddContactToIsland",
+          "expression": "world.contacts.at(id as i64).islandId = islandId;",
+          "reason": "Island membership only; no sim storage changes."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2451",
+          "scope": "b2CollideChanges",
+          "expression": "let transfer: ContactSim = fresh;",
+          "reason": "Value snapshot from non-touching owner before the graph destination grows."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2142",
+          "scope": "b2AddContactToGraph",
+          "expression": "source: ContactSim",
+          "reason": "Value parameter; graph storage is distinct from the awake non-touching array."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2176",
+          "scope": "b2AddContactToGraph",
+          "expression": "world.constraintGraph.colors[selected].contactSims.push(sim);",
+          "reason": "Only destination grows; no retained reference into this destination is read afterwards."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2460",
+          "scope": "b2CollideChanges",
+          "expression": "let stoppedCopy: ContactSim = stopped;",
+          "reason": "Reverse transfer snapshots graph sim before the distinct non-touching destination grows."
+        },
+        {
+          "port": "silnik/fizyka/swiat.dk:2010",
+          "scope": "b2AddNonTouchingContact",
+          "expression": "b2GetSolverSet(world, setIndex).contactSims.push(sim);",
+          "reason": "Reverse transfer grows only its destination; source was copied by value."
+        }
+      ]
+    }
+  ]
+}

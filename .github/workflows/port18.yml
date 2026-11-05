@@ -1,0 +1,35 @@
+name: native-18a
+on:
+  workflow_dispatch:
+    inputs:
+      compiler_url:
+        description: Public URL of the pinned Linux compiler archive
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPILER_URL: ${{ inputs.compiler_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Compiler
+        run: |
+          curl --fail --location --output "$RUNNER_TEMP/compiler.tar.gz" "$COMPILER_URL"
+          echo '806f8a182643c4913c86a20f525a359098dabe80380d777a37feefd288058805  '"$RUNNER_TEMP/compiler.tar.gz" | sha256sum --check
+      - name: Reference
+        run: |
+          mkdir reference
+          tar -xzf silnik/port/umowa-n/oryginal.tar.gz -C reference
+      - name: Compare
+        run: python3 -B silnik/port/18a-run.py --box2d "$PWD/reference" --archive "$RUNNER_TEMP/compiler.tar.gz" --build "$PWD/build18a" --out "$PWD/results18a"
+      - run: python3 tools/numbers.py results18a public-results.json
+        if: always()
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: native-numbers
+          path: public-results.json

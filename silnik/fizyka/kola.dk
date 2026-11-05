@@ -1,0 +1,166 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import std.math;
+
+# Box2D 8c661469, include/box2d/math_functions.h:184-193. MIT.
+fun b2LeftPerp(v: Vec2) -> Vec2 = { return Vec2(-v.y, v.x); }
+# Box2D 8c661469, include/box2d/math_functions.h:190-193. MIT.
+fun b2RightPerp(v: Vec2) -> Vec2 = { return Vec2(v.y, -v.x); }
+
+                                                                          
+                                                                            
+
+                                         
+class Vec2 { x: f32 = 0.0f32; y: f32 = 0.0f32; }
+                                         
+class Rot { c: f32 = 0.0f32; s: f32 = 0.0f32; }
+                                         
+class Transform { p: Vec2 = Vec2(); q: Rot = Rot(); }
+                                     
+class Circle { center: Vec2 = Vec2(); radius: f32 = 0.0f32; }
+
+                                                                        
+class ManifoldPoint {
+    point: Vec2 = Vec2();
+    anchorA: Vec2 = Vec2();
+    anchorB: Vec2 = Vec2();
+    separation: f32 = 0.0f32;
+    normalImpulse: f32 = 0.0f32;
+    tangentImpulse: f32 = 0.0f32;
+    totalNormalImpulse: f32 = 0.0f32;
+    normalVelocity: f32 = 0.0f32;
+    id: u16 = 0u16;
+    persisted: bool = false;
+}
+
+                                      
+                                                                                   
+class Manifold {
+    normal: Vec2 = Vec2();
+    rollingImpulse: f32 = 0.0f32;
+    point0: ManifoldPoint = ManifoldPoint();
+    point1: ManifoldPoint = ManifoldPoint();
+    pointCount: i32 = 0i32;
+}
+
+                                                                        
+const b2_lengthUnitsPerMeter: f32 = 1.0f32;
+                          
+const B2_LINEAR_SLOP: f32 = 0.005f32 * b2_lengthUnitsPerMeter;
+                          
+const B2_SPECULATIVE_DISTANCE: f32 = 4.0f32 * B2_LINEAR_SLOP;
+                                                                                
+const FLT_EPSILON: f32 = 0.00000011920928955078125f32;
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2Add(a: Vec2, b: Vec2) -> Vec2 = {
+    return Vec2(a.x + b.x, a.y + b.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2Sub(a: Vec2, b: Vec2) -> Vec2 = {
+    return Vec2(a.x - b.x, a.y - b.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2Lerp(a: Vec2, b: Vec2, t: f32) -> Vec2 = {
+    return Vec2((1.0f32 - t) * a.x + t * b.x,
+        (1.0f32 - t) * a.y + t * b.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2MulAdd(a: Vec2, s: f32, b: Vec2) -> Vec2 = {
+    return Vec2(a.x + s * b.x, a.y + s * b.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2GetLengthAndNormalize(length: ref f32, v: Vec2) -> Vec2 = {
+    length = math.sqrt(v.x * v.x + v.y * v.y);
+    if (length < FLT_EPSILON) return Vec2(0.0f32, 0.0f32);
+    let invLength: f32 = 1.0f32 / length;
+    return Vec2(invLength * v.x, invLength * v.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2InvMulRot(q: Rot, r: Rot) -> Rot = {
+    var qr = Rot();
+    qr.s = q.c * r.s - q.s * r.c;
+    qr.c = q.c * r.c + q.s * r.s;
+    return qr;
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2RotateVector(q: Rot, v: Vec2) -> Vec2 = {
+    return Vec2(q.c * v.x - q.s * v.y, q.s * v.x + q.c * v.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2InvRotateVector(q: Rot, v: Vec2) -> Vec2 = {
+    return Vec2(q.c * v.x + q.s * v.y, -q.s * v.x + q.c * v.y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2TransformPoint(t: Transform, p: Vec2) -> Vec2 = {
+    let x: f32 = (t.q.c * p.x - t.q.s * p.y) + t.p.x;
+    let y: f32 = (t.q.s * p.x + t.q.c * p.y) + t.p.y;
+    return Vec2(x, y);
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, include/box2d/math_functions.     
+fun b2InvMulTransforms(a: Transform, b: Transform) -> Transform = {
+    var result = Transform();
+    result.q = b2InvMulRot(a.q, b.q);
+    result.p = b2InvRotateVector(a.q, b2Sub(b.p, a.p));
+    return result;
+}
+
+# Box2D 8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3, src/manifold.    
+fun b2CollideCircles(circleA: Circle, xfA: Transform, circleB: Circle, xfB: Transform) -> Manifold = {
+    var manifold = Manifold();
+    let xf: Transform = b2InvMulTransforms(xfA, xfB);
+    let pointA: Vec2 = circleA.center;
+    let pointB: Vec2 = b2TransformPoint(xf, circleB.center);
+    var distance: f32 = 0.0f32;
+    let normal: Vec2 = b2GetLengthAndNormalize(&distance, b2Sub(pointB, pointA));
+    let radiusA: f32 = circleA.radius;
+    let radiusB: f32 = circleB.radius;
+    let separation: f32 = (distance - radiusA) - radiusB;
+    if (separation > B2_SPECULATIVE_DISTANCE) return manifold;
+
+    let cA: Vec2 = b2MulAdd(pointA, radiusA, normal);
+    let cB: Vec2 = b2MulAdd(pointB, -radiusB, normal);
+    let contactPointA: Vec2 = b2Lerp(cA, cB, 0.5f32);
+    manifold.normal = b2RotateVector(xfA.q, normal);
+    manifold.point0.anchorA = b2RotateVector(xfA.q, contactPointA);
+    manifold.point0.anchorB = b2Add(manifold.point0.anchorA, b2Sub(xfA.p, xfB.p));
+    manifold.point0.point = b2Add(manifold.point0.anchorA, xfA.p);
+    manifold.point0.separation = separation;
+    manifold.point0.id = 0u16;
+    manifold.pointCount = 1i32;
+    return manifold;
+}

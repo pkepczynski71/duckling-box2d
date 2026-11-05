@@ -1,0 +1,454 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import fizyka.drzewo as tree;
+import fizyka.zbior as table;
+
+# Box2D 8c661469, src/broad_phase.h:18-20.
+fun B2_PROXY_TYPE(key: i32) -> i32 = { return key & 3i32; }
+# Box2D 8c661469, src/broad_phase.h:19.
+fun B2_PROXY_ID(key: i32) -> i32 = { return key >> 2i32; }
+# Box2D 8c661469, src/broad_phase.h:20.
+fun B2_PROXY_KEY(id: i32, bodyType: i32) -> i32 = { return (id << 2i32) | bodyType; }
+
+# Box2D 8c661469, include/box2d/types.h:249-281.
+class ShapeFilter {
+    categoryBits: i64 = 1i64;
+    maskBits: i64 = -1i64;
+    groupIndex: i32 = 0i32;
+}
+
+# Box2D 8c661469, src/shape.h:15-16,19,31,33,46. Read-only collision view.
+class ShapeView {
+    id: i32 = 0i32;
+    bodyId: i32 = 0i32;
+    sensorIndex: i32 = -1i32;
+    proxyKey: i32 = -1i32;
+    filter: ShapeFilter = ShapeFilter();
+    generation: u16 = 1u16;
+}
+
+# Box2D 8c661469, src/body.h:39-40,60,62.
+class BodyView {
+    headJointKey: i32 = -1i32;
+    jointCount: i32 = 0i32;
+    id: i32 = 0i32;
+    bodyType: i32 = 0i32;
+}
+
+# Box2D 8c661469, src/joint.h:19-24,43,59. Named edges avoid a fixed array.
+class JointView {
+    bodyIdA: i32 = 0i32;
+    bodyIdB: i32 = 0i32;
+    nextKeyA: i32 = -1i32;
+    nextKeyB: i32 = -1i32;
+    collideConnected: bool = false;
+}
+
+# Box2D 8c661469, include/box2d/id.h:52-57.
+class ShapeId {
+    index1: i32 = 0i32;
+    world0: u16 = 0u16;
+    generation: u16 = 0u16;
+}
+
+# Box2D 8c661469, src/broad_phase.c:267-277. Explicit custom-filter context.
+class FilterRule {
+    shapeA: i32 = 0i32;
+    shapeB: i32 = 0i32;
+    decision: bool = true;
+}
+
+# Box2D 8c661469, src/broad_phase.                                               
+fun emptyBodies() -> List[BodyView] = { var values: List[BodyView]; return values; }
+# Box2D 8c661469, src/broad_phase.                
+fun emptyShapes() -> List[ShapeView] = { var values: List[ShapeView]; return values; }
+# Box2D 8c661469, src/body.                 
+fun emptyJoints() -> List[JointView] = { var values: List[JointView]; return values; }
+# Box2D 8c661469, src/broad_phase.                            
+fun emptyFilterRules() -> List[FilterRule] = { var values: List[FilterRule]; return values; }
+
+# Box2D 8c661469, src/broad_phase.                                
+                                                                  
+# Box2D 8c661469, src/broad_phase.                                               
+fun b2DefaultPairCallback12(a: ShapeId, b: ShapeId, context: table.Key64) -> bool = { return true; }
+class PairCallback12 {
+    callback: funptr(ShapeId, ShapeId, table.Key64) -> bool;
+    installed: bool = false;
+    context: table.Key64 = table.Key64();
+}
+class CollisionView {
+    callback12: PairCallback12 = PairCallback12(b2DefaultPairCallback12);
+    bodies: List[BodyView] = emptyBodies();
+    shapes: List[ShapeView] = emptyShapes();
+    joints: List[JointView] = emptyJoints();
+    worldId: u16 = 0u16;
+    customMode: i32 = 0i32;
+    customRules: List[FilterRule] = emptyFilterRules();
+}
+
+# Box2D 8c661469, src/broad_phase.h:30. Guide rule 22.
+fun zeroTrees() -> tree.DynamicTree[3] = {
+    var values: tree.DynamicTree[3];
+    return values;
+}
+
+# Box2D 8c661469, src/broad_phase.h:28-56.
+class BroadPhase {
+    trees: tree.DynamicTree[3] = zeroTrees();
+    moveSet: table.HashSet = table.HashSet();
+    moveArray: List[i32] = tree.emptyIndices();
+    movePairCapacity: i32 = 0i32;
+    movePairIndex: i32 = 0i32;
+    pairSet: table.HashSet = table.HashSet();
+}
+
+# Box2D 8c661469, src/broad_phase.c:137-150. Index replaces next pointer.
+class MovePair {
+    shapeIndexA: i32 = 0i32;
+    shapeIndexB: i32 = 0i32;
+    next: i32 = -1i32;
+}
+
+# Box2D 8c661469, src/broad_phase.c:418-435. Client consumes these requests.
+class ContactRequest {
+    moveIndex: i32 = 0i32;
+    shapeIndexA: i32 = 0i32;
+    shapeIndexB: i32 = 0i32;
+}
+
+# Box2D 8c661469, src/broad_phase.c:348-368. Transparent query observation.
+class QueryTrace {
+    moveIndex: i32 = -1i32;
+    queryProxyKey: i32 = -1i32;
+    treeType: i32 = 0i32;
+    result: tree.TreeQueryResult = tree.TreeQueryResult();
+}
+
+# Box2D 8c661469, src/broad_phase.c:271-277.
+class FilterTrace {
+    idA: ShapeId = ShapeId();
+    idB: ShapeId = ShapeId();
+    decision: bool = false;
+}
+
+# Box2D 8c661469, src/broad_phase.                          
+fun emptyMovePairs() -> List[MovePair] = { var values: List[MovePair]; return values; }
+# Box2D 8c661469, src/broad_phase.                       
+fun emptyRequests() -> List[ContactRequest] = { var values: List[ContactRequest]; return values; }
+# Box2D 8c661469, src/broad_phase.                            
+fun emptyQueries() -> List[QueryTrace] = { var values: List[QueryTrace]; return values; }
+# Box2D 8c661469, src/broad_phase.                            
+fun emptyFilterCalls() -> List[FilterTrace] = { var values: List[FilterTrace]; return values; }
+
+# Box2D 8c661469, src/broad_phase.c:376-474.
+                                                                                       
+class PairUpdateResult {
+    hadWork: bool = false;
+    moveCountAtEntry: i32 = 0i32;
+    heapPairCount: i32 = 0i32;
+    queries: List[QueryTrace] = emptyQueries();
+    filterCalls: List[FilterTrace] = emptyFilterCalls();
+    filterCalls12: List[FilterTrace] = emptyFilterCalls();
+    requests: List[ContactRequest] = emptyRequests();
+    pairs: List[MovePair] = emptyMovePairs();
+    heads: List[i32] = tree.emptyIndices();
+}
+
+# Box2D 8c661469, src/broad_phase.c:27.
+fun b2CreateBroadPhase(bp: ref BroadPhase) -> () = {
+    bp = BroadPhase();
+    bp.moveSet = table.b2CreateSet(16i32);
+    bp.moveArray.reserve(16i64);
+    bp.pairSet = table.b2CreateSet(32i32);
+    var i: i32 = 0i32;
+    while (i < 3i32) {
+        bp.trees[i] = tree.b2DynamicTree_Create();
+        i = i + 1i32;
+    }
+}
+
+# Box2D 8c661469, src/broad_phase.c:51.
+fun b2DestroyBroadPhase(bp: ref BroadPhase) -> () = {
+    var i: i32 = 0i32;
+    while (i < 3i32) {
+        tree.b2DynamicTree_Destroy(&bp.trees[i]);
+        i = i + 1i32;
+    }
+    table.b2DestroySet(&bp.moveSet);
+    bp.moveArray.clear();
+    table.b2DestroySet(&bp.pairSet);
+    bp = BroadPhase();
+}
+
+# Box2D 8c661469, src/broad_phase.h:74.
+fun b2BufferMove(bp: ref BroadPhase, queryProxy: i32) -> () = {
+    let alreadyAdded: bool = table.b2AddKey(&bp.moveSet, table.Key64((queryProxy + 1i32) as u32, 0u32));
+    if (not alreadyAdded) bp.moveArray.push(queryProxy);
+}
+
+# Box2D 8c661469, src/broad_phase.                         
+fun b2UnBufferMove(bp: ref BroadPhase, proxyKey: i32) -> () = {
+    let found: bool = table.b2RemoveKey(&bp.moveSet, table.Key64((proxyKey + 1i32) as u32, 0u32));
+    if (found) {
+        var i: i64 = 0i64;
+        var searching: bool = true;
+        while (i < bp.moveArray.length() and searching) {
+            let key: i32 = bp.moveArray.at(i);
+            if (key == proxyKey) {
+                let last: i32 = bp.moveArray.pop();
+                if (i < bp.moveArray.length()) bp.moveArray.at(i) = last;
+                searching = false;
+            }
+            i = i + 1i64;
+        }
+    }
+}
+
+# Box2D 8c661469, src/broad_phase.c:91.
+fun b2BroadPhase_CreateProxy(bp: ref BroadPhase, proxyType: i32, aabb: tree.AABB,
+    categoryBits: i64, shapeIndex: i32, forcePairCreation: bool) -> i32 = {
+    let proxyId: i32 = tree.b2DynamicTree_CreateProxy(&bp.trees[proxyType], aabb, categoryBits, shapeIndex as i64);
+    let proxyKey: i32 = B2_PROXY_KEY(proxyId, proxyType);
+    if (proxyType != 0i32 or forcePairCreation) b2BufferMove(bp, proxyKey);
+    return proxyKey;
+}
+
+# Box2D 8c661469, src/broad_phase.c:104.
+fun b2BroadPhase_DestroyProxy(bp: ref BroadPhase, proxyKey: i32) -> () = {
+    b2UnBufferMove(bp, proxyKey);
+    tree.b2DynamicTree_DestroyProxy(&bp.trees[B2_PROXY_TYPE(proxyKey)], B2_PROXY_ID(proxyKey));
+}
+
+# Box2D 8c661469, src/broad_phase.c:116.
+fun b2BroadPhase_MoveProxy(bp: ref BroadPhase, proxyKey: i32, aabb: tree.AABB) -> () = {
+    tree.b2DynamicTree_MoveProxy(&bp.trees[B2_PROXY_TYPE(proxyKey)], B2_PROXY_ID(proxyKey), aabb);
+    b2BufferMove(bp, proxyKey);
+}
+
+# Box2D 8c661469, src/broad_phase.c:125.
+fun b2BroadPhase_EnlargeProxy(bp: ref BroadPhase, proxyKey: i32, aabb: tree.AABB) -> () = {
+    tree.b2DynamicTree_EnlargeProxy(&bp.trees[B2_PROXY_TYPE(proxyKey)], B2_PROXY_ID(proxyKey), aabb);
+    b2BufferMove(bp, proxyKey);
+}
+
+# Box2D 8c661469, src/shape.h:122.
+fun b2ShouldShapesCollide(a: ShapeFilter, b: ShapeFilter) -> bool = {
+    if (a.groupIndex == b.groupIndex and a.groupIndex != 0i32) return a.groupIndex > 0i32;
+    return (a.maskBits & b.categoryBits) != 0i64 and (a.categoryBits & b.maskBits) != 0i64;
+}
+
+# Box2D 8c661469, src/body.c:1861.
+fun b2ShouldBodiesCollide(world: ref CollisionView, bodyA: BodyView, bodyB: BodyView) -> bool = {
+    if (bodyA.bodyType != 2i32 and bodyB.bodyType != 2i32) return false;
+    var jointKey: i32 = -1i32;
+    var otherBodyId: i32 = -1i32;
+    if (bodyA.jointCount < bodyB.jointCount) {
+        jointKey = bodyA.headJointKey;
+        otherBodyId = bodyB.id;
+    } else {
+        jointKey = bodyB.headJointKey;
+        otherBodyId = bodyA.id;
+    }
+    while (jointKey != -1i32) {
+        let jointId: i32 = jointKey >> 1i32;
+        let edgeIndex: i32 = jointKey & 1i32;
+        let otherEdgeIndex: i32 = edgeIndex ^ 1i32;
+        let joint: JointView = world.joints.at(jointId as i64);
+        let otherId: i32 = if otherEdgeIndex == 0i32 then joint.bodyIdA else joint.bodyIdB;
+        if (not joint.collideConnected and otherId == otherBodyId) return false;
+        jointKey = if edgeIndex == 0i32 then joint.nextKeyA else joint.nextKeyB;
+    }
+    return true;
+}
+
+# Box2D 8c661469, src/broad_phase.c:267-277.                                      
+                                                                                   
+fun b2InvokeCustomFilter(world: ref CollisionView, idA: ShapeId, idB: ShapeId) -> bool = {
+    if (world.customMode == 2i32) return false;
+    if (world.customMode == 3i32) {
+        var i: i64 = 0i64;
+        while (i < world.customRules.length()) {
+            let rule: FilterRule = world.customRules.at(i);
+            if (rule.shapeA == idA.index1 - 1i32 and rule.shapeB == idB.index1 - 1i32) return rule.decision;
+            i = i + 1i64;
+        }
+    }
+    return true;
+}
+
+# Box2D 8c661469, src/broad_phase.c:160. Callback always continues the tree query.
+fun b2PairQueryCallback(bp: ref BroadPhase, world: ref CollisionView, result: ref PairUpdateResult,
+    moveIndex: i32, queryProxyKey: i32, queryShapeIndex: i32, queryTreeType: i32,
+    proxyId: i32, shapeId: i32) -> bool = {
+    let proxyKey: i32 = B2_PROXY_KEY(proxyId, queryTreeType);
+    if (proxyKey == queryProxyKey) return true;
+    let queryProxyType: i32 = B2_PROXY_TYPE(queryProxyKey);
+    if (queryProxyType == 2i32) {
+        if (queryTreeType == 2i32 and proxyKey < queryProxyKey) {
+            let movedDynamic: bool = table.b2ContainsKey(&bp.moveSet, table.Key64((proxyKey + 1i32) as u32, 0u32));
+            if (movedDynamic) return true;
+        }
+    } else {
+        let movedOther: bool = table.b2ContainsKey(&bp.moveSet, table.Key64((proxyKey + 1i32) as u32, 0u32));
+        if (movedOther) return true;
+    }
+    let pairKey: table.Key64 = table.B2_SHAPE_PAIR_KEY(shapeId, queryShapeIndex);
+    if (table.b2ContainsKey(&bp.pairSet, pairKey)) return true;
+    let shapeIdA: i32 = if proxyKey < queryProxyKey then shapeId else queryShapeIndex;
+    let shapeIdB: i32 = if proxyKey < queryProxyKey then queryShapeIndex else shapeId;
+    let shapeA: ShapeView = world.shapes.at(shapeIdA as i64);
+    let shapeB: ShapeView = world.shapes.at(shapeIdB as i64);
+    let bodyIdA: i32 = shapeA.bodyId;
+    let bodyIdB: i32 = shapeB.bodyId;
+    if (bodyIdA == bodyIdB) return true;
+    if (shapeA.sensorIndex != -1i32 or shapeB.sensorIndex != -1i32) return true;
+    if (not b2ShouldShapesCollide(shapeA.filter, shapeB.filter)) return true;
+    let bodyA: BodyView = world.bodies.at(bodyIdA as i64);
+    let bodyB: BodyView = world.bodies.at(bodyIdB as i64);
+    if (not b2ShouldBodiesCollide(world, bodyA, bodyB)) return true;
+    if (world.customMode != 0i32) {
+        let idA: ShapeId = ShapeId(shapeIdA + 1i32, world.worldId, shapeA.generation);
+        let idB: ShapeId = ShapeId(shapeIdB + 1i32, world.worldId, shapeB.generation);
+        let shouldCollide: bool = b2InvokeCustomFilter(world, idA, idB);
+        result.filterCalls.push(FilterTrace(idA, idB, shouldCollide));
+        if (not shouldCollide) return true;
+    }
+    # Box2D 8c661469, src/broad_phase.c:267-277.                                                                   
+    if (world.callback12.installed) {
+        let rawA: ShapeId = ShapeId(shapeIdA + 1i32, world.worldId, shapeA.generation);
+        let rawB: ShapeId = ShapeId(shapeIdB + 1i32, world.worldId, shapeB.generation);
+        let allowed12: bool = world.callback12.callback(rawA, rawB, world.callback12.context);
+        result.filterCalls12.push(FilterTrace(rawA, rawB, allowed12));
+        if (not allowed12) return true;
+    }
+    let pairIndex: i32 = bp.movePairIndex;
+    bp.movePairIndex = bp.movePairIndex + 1i32;
+    if (pairIndex >= bp.movePairCapacity) result.heapPairCount = result.heapPairCount + 1i32;
+    let head: i32 = result.heads.at(moveIndex as i64);
+    result.pairs.push(MovePair(shapeIdA, shapeIdB, head));
+    result.heads.at(moveIndex as i64) = pairIndex;
+    return true;
+}
+
+# Box2D 8c661469, src/broad_phase.c:348-368. One original tree query, no requery.
+                                                                                   
+fun b2QueryPairs(bp: ref BroadPhase, world: ref CollisionView, result: ref PairUpdateResult,
+    moveIndex: i32, queryProxyKey: i32, queryShapeIndex: i32, queryTreeType: i32, fatAABB: tree.AABB) -> () = {
+    var trace = QueryTrace();
+    trace.moveIndex = moveIndex;
+    trace.queryProxyKey = queryProxyKey;
+    trace.treeType = queryTreeType;
+    trace.result = tree.b2DynamicTree_Query(&bp.trees[queryTreeType], fatAABB, -1i64);
+    var i: i64 = 0i64;
+    while (i < trace.result.hits.length()) {
+        let hit: tree.TreeHit = trace.result.hits.at(i);
+        b2PairQueryCallback(bp, world, result, moveIndex, queryProxyKey, queryShapeIndex,
+            queryTreeType, hit.proxyId, hit.userData as i32);
+        i = i + 1i64;
+    }
+    result.queries.push(move trace);
+}
+
+# Box2D 8c661469, src/broad_phase.c:311. Single-thread contracted task range.
+fun b2FindPairsTask(bp: ref BroadPhase, world: ref CollisionView, result: ref PairUpdateResult,
+    startIndex: i32, endIndex: i32) -> () = {
+    var i: i32 = startIndex;
+    while (i < endIndex) {
+        result.heads.push(-1i32);
+        let proxyKey: i32 = bp.moveArray.at(i as i64);
+        if (proxyKey != -1i32) {
+            let proxyType: i32 = B2_PROXY_TYPE(proxyKey);
+            let proxyId: i32 = B2_PROXY_ID(proxyKey);
+            let fatAABB: tree.AABB = tree.b2DynamicTree_GetAABB(&bp.trees[proxyType], proxyId);
+            let shapeIndex: i32 = tree.b2DynamicTree_GetUserData(&bp.trees[proxyType], proxyId) as i32;
+            if (proxyType == 2i32) {
+                b2QueryPairs(bp, world, result, i, proxyKey, shapeIndex, 1i32, fatAABB);
+                b2QueryPairs(bp, world, result, i, proxyKey, shapeIndex, 0i32, fatAABB);
+            }
+            b2QueryPairs(bp, world, result, i, proxyKey, shapeIndex, 2i32, fatAABB);
+        }
+        i = i + 1i32;
+    }
+}
+
+# Box2D 8c661469, src/broad_phase.c:376.
+                                                                                 
+fun b2PrepareBroadPhasePairs(bp: ref BroadPhase, world: ref CollisionView) -> PairUpdateResult = {
+    var result = PairUpdateResult();
+    let moveCount: i32 = bp.moveArray.length() as i32;
+    result.moveCountAtEntry = moveCount;
+    if (moveCount == 0i32) return result;
+    result.hadWork = true;
+    bp.movePairCapacity = 16i32 * moveCount;
+    bp.movePairIndex = 0i32;
+    b2FindPairsTask(bp, world, &result, 0i32, moveCount);
+    var i: i32 = 0i32;
+    while (i < moveCount) {
+        var pairIndex: i32 = result.heads.at(i as i64);
+        while (pairIndex != -1i32) {
+            let pair: MovePair = result.pairs.at(pairIndex as i64);
+            result.requests.push(ContactRequest(i, pair.shapeIndexA, pair.shapeIndexB));
+            pairIndex = pair.next;
+        }
+        i = i + 1i32;
+    }
+    result.pairs.clear();
+    result.heads.clear();
+    return result;
+}
+
+# Box2D 8c661469, src/broad_phase.c:457-462. Commit after accepting the profile.
+fun b2CommitBroadPhasePairs(bp: ref BroadPhase) -> () = {
+    bp.moveArray.clear();
+    table.b2ClearSet(&bp.moveSet);
+}
+
+# Box2D 8c661469, src/broad_phase.c:376-462. Preserve the previous entry point.
+fun b2UpdateBroadPhasePairs(bp: ref BroadPhase, world: ref CollisionView) -> PairUpdateResult = {
+    var result: PairUpdateResult = b2PrepareBroadPhasePairs(bp, world);
+    if (result.hadWork) b2CommitBroadPhasePairs(bp);
+    return result;
+}
+
+# Box2D 8c661469, src/broad_phase.c:476.
+fun b2BroadPhase_TestOverlap(bp: ref BroadPhase, proxyKeyA: i32, proxyKeyB: i32) -> bool = {
+    let a: tree.AABB = tree.b2DynamicTree_GetAABB(&bp.trees[B2_PROXY_TYPE(proxyKeyA)], B2_PROXY_ID(proxyKeyA));
+    let b: tree.AABB = tree.b2DynamicTree_GetAABB(&bp.trees[B2_PROXY_TYPE(proxyKeyB)], B2_PROXY_ID(proxyKeyB));
+    return tree.b2AABB_Overlaps(a, b);
+}
+
+# Box2D 8c661469, src/broad_phase.c:488.
+fun b2BroadPhase_RebuildTrees(bp: ref BroadPhase) -> () = {
+    tree.b2DynamicTree_Rebuild(&bp.trees[2], false);
+    tree.b2DynamicTree_Rebuild(&bp.trees[1], false);
+}
+
+# Box2D 8c661469, src/broad_phase.c:494.
+fun b2BroadPhase_GetShapeIndex(bp: ref BroadPhase, proxyKey: i32) -> i32 = {
+    return tree.b2DynamicTree_GetUserData(&bp.trees[B2_PROXY_TYPE(proxyKey)], B2_PROXY_ID(proxyKey)) as i32;
+}

@@ -1,0 +1,60 @@
+                                                                           
+import core.primitive_io as io;
+import core.builtins as builtins;
+extern("C") {
+    fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64;
+    fundecl exit(status: i32) -> ();
+}
+class Vec19 { x: f32 = 0.0f32; y: f32 = 0.0f32; }
+class Mask19 { low: u32 = 4294967295u32; high: u32 = 4294967295u32; }
+class Explosion19 {
+    maskBits: Mask19 = Mask19();
+    position: Vec19 = Vec19();
+    radius: f32 = 0.0f32;
+    falloff: f32 = 0.0f32;
+    impulsePerLength: f32 = 0.0f32;
+}
+fun bits19(value: f32) -> u32 = { var localValue: f32 = value; return (&localValue as cptr u32)[0]; }
+fun hex19(value: u32) -> () = {
+    io.writeChar(' '); var shift: i32 = 28i32;
+    while (shift >= 0i32) {
+        let digit: u32 = (value >> shift as u32)&15u32;
+        io.writeChar((if digit < 10u32 then 48u32+digit else 87u32+digit) as char);
+        shift = shift-4i32;
+    }
+}
+fun lf19() -> () = { io.writeChar('\n'); }
+fun defaultWords19(value: Explosion19) -> () = {
+    hex19(value.maskBits.low); hex19(value.maskBits.high);
+    hex19(bits19(value.position.x)); hex19(bits19(value.position.y));
+    hex19(bits19(value.radius)); hex19(bits19(value.falloff)); hex19(bits19(value.impulsePerLength));
+}
+let first19: i32 = io.readCharCode();
+if (first19 == 33i32) {
+    let msg19: str = "PORT19A: INPUT_N\n";
+    write(2i32,builtins.ptr_from_slice[char](msg19) as cptr char,msg19.length() as u64);
+    exit(2i32);
+}
+var description19 = Explosion19();
+var second19: Explosion19 = description19;
+second19.position.x = 123.0f32;
+io.writeStr("CASE 1 1\nE19 1 1 601 0\nA19 1 1 601 0 0\nR19 1 1 601 1 7"); defaultWords19(description19); lf19();
+io.writeStr("I19 1 1 0\nENDCASE 1\nEND 1\n");
+io.writeStr("E19 27 1 600 9");hex19(0u32);hex19(0u32);hex19(4294967295u32);hex19(4294967295u32);hex19(0u32);hex19(0u32);hex19(1082130432u32);hex19(1073741824u32);hex19(1065353216u32);lf19();
+io.writeStr("X19 27 1 0 0 0 2 10");
+hex19(1069547520u32);hex19(1069547520u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(1065353216u32);hex19(1065353216u32);hex19(1065353216u32);hex19(1065353216u32);hex19(0u32);lf19();
+io.writeStr("R19 27 1 600 0 0\nI19 27 1 7");
+hex19(4294967295u32);hex19(4294967295u32);hex19(0u32);hex19(0u32);hex19(1082130432u32);hex19(1073741824u32);hex19(1065353216u32);lf19();
+io.writeStr("S19 27 1 0 0 0 14");
+hex19(1067645315u32);hex19(0u32);hex19(0u32);hex19(1u32);hex19(1073741824u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(1073741824u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);lf19();
+io.writeStr("Z19 27 1 0 1 1 0 1\nV19 1 5 1 19");
+hex19(bits19(second19.position.x));hex19(0u32);hex19(0u32);hex19(1u32);hex19(1073741824u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(1073741824u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);hex19(0u32);hex19(2u32);hex19(0u32);hex19(1u32);hex19(0u32);lf19();
+io.writeStr("G19 8 0 600 9");
+hex19(1u32);hex19(0u32);hex19(4294967295u32);hex19(4294967295u32);hex19(2143289344u32);hex19(0u32);hex19(1082130432u32);hex19(1073741824u32);hex19(1065353216u32);lf19();
+io.writeStr("GA19 8 0 0 5 25\nGA19 8 1 1 0 0\nR19 2 1 602 2 4");hex19(1078530011u32);hex19(1065353216u32);hex19(0u32);hex19(0u32);lf19();
+io.writeStr("COPY19");hex19(bits19(description19.position.x));hex19(bits19(second19.position.x));lf19();
+                                                             
+io.writeStr("R19 23 1 609 4 30");hex19(1u32);hex19(1u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1u32);hex19(0u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1u32);hex19(0u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);lf19();
+io.writeStr("R19 24 1 609 5 19");hex19(0u32);hex19(0u32);hex19(0u32);hex19(1u32);hex19(0u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);lf19();
+io.writeStr("I19 2 1 39");hex19(0u32);hex19(1u32);hex19(1056964608u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);lf19();
+io.writeStr("R19 1 4 606 3 19");hex19(0u32);hex19(0u32);hex19(0u32);hex19(1u32);hex19(1073741824u32);hex19(0u32);hex19(1065353216u32);hex19(0u32);hex19(1073741824u32);hex19(0u32);hex19(1061752795u32);hex19(1036586971u32);hex19(1u32);hex19(2u32);hex19(0u32);hex19(2u32);hex19(0u32);hex19(1u32);hex19(0u32);lf19();

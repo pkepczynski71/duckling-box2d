@@ -1,0 +1,21 @@
+{
+  "source_sha256": "13a056ef2193b33bb088366e18716f984f523d3fe7e5ce4fcb46371892ba7b28",
+  "bindings_sha256": "99089f46c3aabf020660c2df487bf229bff49b36a90519731e0824cfdf650d53",
+  "equivalences": {
+    "localB-radius": {
+      "port": "silnik/fizyka/odleglosc.dk:232-234,74-82,250-251,264-267",
+      "C": "src/distance.c:437-446,148-204,537-541,589-599",
+      "counted_kill": false
+    },
+    "normal-initial-zero": {
+      "port": "silnik/fizyka/odleglosc.dk:236-258; overlapOutput:222-225",
+      "C": "src/distance.c:428,458,464-466,496-503,515-528,532,544-565,575-578",
+      "counted_kill": false
+    }
+  },
+  "Q-20": {
+    "status": "GAP_UNVERIFIED",
+    "reason": "missing E75ea2d3dbab3 swiadka20 Ede7d1b721a1e E574440889a40 Ebd2dc90fea6d. NOT_FOUND Ecf37c87714d0 E9372c470eead counter21 Ecd5b158f21b7 E994aea1cf512 Ed3e316ee919e. E2abc8f703210 E7065af89db6f Ecd6edd571098 odbioru12+13; E283ada7088c2 Ef6f2e94074d5 E3d9fc4bde7ce Ee6f3760a673d Ebc2e4bea2e33."
+  },
+  "authority": "PINNED_DATA"
+}

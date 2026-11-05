@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "evidence_kind": "inherited-PORT13A",
+  "source": {
+    "commit": "c4afba36ef8c451b56d822a3ff04f270f5a31c7c",
+    "path": "RESULT-PORT/41471685180_1/krok13/13a-negative_parsers.json",
+    "git_blob_sha1": "e4e8962f6fdc1b5e23eacf988fb6c56e4a31a1f8",
+    "sha256": "a244672bd5b91fc47cc3742304923a894baeec90686ff57ed07b642ec2073e75",
+    "bytes": 284548,
+    "entry_index": 35,
+    "run_id": "41471685180",
+    "attempt": 1
+  },
+  "observation": {
+    "name": "initial/cache-u8",
+    "error": "INPUT_CACHE",
+    "sides": {
+      "C": {
+        "ok": true,
+        "run": {
+          "code": 2,
+          "seconds": 0.0009094669999996086,
+          "argv": [
+            "artifacts/kontrola-lancuchy-R",
+            "artifacts/input.csv"
+          ],
+          "input_sha256": "dc7b740ed3f1dc4b048b0dd0c2e2fcfbe699d368291608bf115ab999564aa52d",
+          "binary_sha256": "17fa24330e0502139efb8246f819ba85e2b306519f23b0d804cc5c886df72cf9",
+          "attempts": []
+        },
+        "stdout_bytes": 21,
+        "stderr": "PORT13A: INPUT_CACHE\n",
+        "difference": null
+      },
+      "D": {
+        "ok": true,
+        "run": {
+          "code": 2,
+          "seconds": 0.001956542999991484,
+          "argv": [
+            "artifacts/duckling-lancuchy-bin"
+          ],
+          "input_sha256": "28a2e33178291e5516720f46ea91e763a1a5b1756b25e05ec5b5ba7c846c8e43",
+          "binary_sha256": "1581eaaddefb6233fe374bd5724647eed9bbecb4cf45951edce3b69f1b6de24a",
+          "attempts": []
+        },
+        "stdout_bytes": 21,
+        "stderr": "PORT13A: INPUT_CACHE\n",
+        "difference": null
+      }
+    },
+    "ok": true
+  },
+  "inputs": {
+    "C": "PORT13A R 1\nC 1 1\nO 1 0 00000000 00000001 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 3f800000 00000000 00000001 00000000 40000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 3f800000 00000000 00000000 00000000 00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000\n",
+    "D": "PORT13A R 1\nC 1 1\nO 1 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1065353216 0 1 0 1073741824 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1065353216 0 0 0 256 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
+  },
+  "expected_stdout": "PORT13A R 1\nCASE 1 1\n",
+  "prefix_basis": "K13 PORT13A framing; negative_stage exact byte equality + ok=true + difference=null in pinned source. Not independently archived raw stdout.",
+  "full_acceptance": false
+}

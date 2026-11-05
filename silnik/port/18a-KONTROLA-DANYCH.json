@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "directIds": 96,
+    "publicIds": 96,
+    "guardsIds": 821,
+    "parsersIds": 24,
+    "rawFunctions": 13,
+    "publicOperations": 768,
+    "differentQueryXYX": 96,
+    "guardPairs": 821,
+    "guardFirstPhaseAccepted": 35,
+    "literalDIRECTCases": 96,
+    "literalPUBLICCases": 96,
+    "literalGUARDCases": 821,
+    "parsersWithPositiveNeighbors": 24,
+    "nativeCReplayCalls": 192,
+    "nativeCDifferences": 0,
+    "sourceMatchedBeforeAfter": 63,
+    "utf8Files": 3
+  },
+  "result": "OK",
+  "scope": "Data and specification integrity checks."
+}

@@ -1,0 +1,273 @@
+                                                                          
+import fizyka.kola as geo;
+import fizyka.odleglosc as distance;
+import fizyka.zapytania as query;
+import core.builtins as builtins;
+import core.primitive_io as io;
+extern("C") { fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64; }
+
+var inputOk: bool = true;
+var rowBytes: i32[2049]; var rowLength: i32 = 0i32;
+var starts: i32[80]; var lengths: i32[80]; var tokens: i32 = 0i32;
+var payload: u32[66];
+fun fail(kind: str) -> () = {
+    if (not inputOk) return; inputOk = false;
+    let errorPrefix: str = "PORT18A: INPUT_"; let lf: str = "\n";
+    write(2i32,builtins.ptr_from_slice[char](errorPrefix) as cptr char,errorPrefix.length() as u64);
+    write(2i32,builtins.ptr_from_slice[char](kind) as cptr char,kind.length() as u64);
+    write(2i32,builtins.ptr_from_slice[char](lf) as cptr char,1u64);
+}
+fun tokenEquals(index: i32, expected: str) -> bool = {
+    if (index >= tokens or lengths[index] as i64 != expected.length()) return false;
+    let p: cptr char = builtins.ptr_from_slice[char](expected) as cptr char; var i: i32 = 0i32;
+    while (i < lengths[index]) { if (rowBytes[starts[index]+i] != p[i] as i32) return false; i = i+1i32; } return true;
+}
+fun readRow(first: bool) -> () = {
+    rowLength = 0i32; tokens = 0i32; if (not inputOk) return;
+    var c: i32 = io.readCharCode(); if (c < 0i32) { fail(if first then "HEADER" else "EOF"); return; }
+    var pendingCR: bool = false;
+    while (c >= 0i32 and c != 10i32) {
+        if (c == 13i32) {
+            if (pendingCR) { fail("ASCII"); return; } pendingCR = true;
+        }
+        else {
+            if (pendingCR) { fail("ASCII"); return; }
+            if (first and rowLength == 0i32 and c == 239i32) {
+                fail("ASCII"); return;
+            }
+            if (c < 32i32 or c >= 127i32) { fail("ASCII"); return; }
+            if (rowLength == 2048i32) { fail("LINE_LENGTH"); return; }
+            rowBytes[rowLength] = c; rowLength = rowLength+1i32;
+        }
+        c = io.readCharCode();
+    }
+    if (pendingCR and c < 0i32) { fail("ASCII"); return; }
+    if (rowLength == 0i32) { fail(if first then "HEADER" else "ARITY"); return; }
+    var pos: i32 = 0i32; var spacing: bool = false;
+    while (pos < rowLength and inputOk) {
+        if (rowBytes[pos] == 32i32) { spacing = true; pos = pos+1i32; }
+        else {
+            if (tokens >= 80i32) { fail(if first then "HEADER" else "ARITY"); return; }
+            starts[tokens] = pos; var size: i32 = 0i32;
+            while (pos < rowLength and rowBytes[pos] != 32i32) { if (rowBytes[pos] == 13i32) { fail("ASCII"); return; } size = size+1i32; pos = pos+1i32; }
+            lengths[tokens] = size; tokens = tokens+1i32;
+            if (pos < rowLength) { pos = pos+1i32; if (pos == rowLength or rowBytes[pos] == 32i32) spacing = true; }
+        }
+    }
+    if (spacing) fail(if first then "HEADER" else "ARITY");
+}
+fun number(index: i32, word: bool) -> u32 = {
+    let errorKind: str = if word then "WORD" else "NUMBER";
+    if (index >= tokens or lengths[index] == 0i32) { fail(errorKind); return 0u32; }
+    if (lengths[index] > 1i32 and rowBytes[starts[index]] == 48i32) { fail(errorKind); return 0u32; }
+    var value: u64 = 0u64; var i: i32 = 0i32;
+    while (i < lengths[index] and inputOk) {
+        let digit: i32 = rowBytes[starts[index]+i]-48i32;
+        if (digit < 0i32 or digit > 9i32 or value > 429496729u64) { fail(errorKind); return 0u32; }
+        value = value*10u64+digit as u64; if (value > 4294967295u64) { fail(errorKind); return 0u32; } i = i+1i32;
+    } return value as u32;
+}
+fun readPayload(offset: i32, count: i32) -> () = { var i: i32 = 0i32; while (i < count and inputOk) { payload[i] = number(offset+i,true); i = i+1i32; } }
+fun fromBits(word: u32) -> f32 = { var value: u32 = word; return (&value as cptr f32)[0]; }
+fun outUnsigned(value: u64) -> () = { if (value >= 10u64) outUnsigned(value/10u64); io.writeChar((48u64+value%10u64) as char); }
+fun outDec(value: i32) -> () = { io.writeChar(' '); outUnsigned(value as u64); }
+fun newline() -> () = { io.writeChar('\n'); }
+fun outHex(value: u32) -> () = {
+    io.writeChar(' '); var shift: i32 = 28i32;
+    while (shift >= 0i32) { let digit: u32 = (value >> shift as u32) & 15u32; io.writeChar((if digit < 10u32 then 48u32+digit else 87u32+digit) as char); shift = shift-4i32; }
+}
+fun outFloat(value: f32) -> () = { outHex(toBits(value)); }
+fun prefix(tag: str, id: i32, seq: i32) -> () = { io.writeStr(tag); outDec(id); outDec(seq); }
+fun toBits(value: f32) -> u32 = { var rawValue: f32 = value; let result: u32 = (&rawValue as cptr u32)[0]; return result; }
+
+fun readVector(offset: i32) -> geo.Vec2 = { return geo.Vec2(fromBits(payload[offset]), fromBits(payload[offset+1i32])); }
+fun readProxy(offset: i32) -> distance.ShapeProxy = {
+    var p = distance.ShapeProxy(); p.count = payload[offset] as i32; p.radius = fromBits(payload[offset+1i32]); var i: i32 = 0i32;
+    while (i < 8i32) { p.points[i] = readVector(offset+2i32+2i32*i); i = i+1i32; } return p;
+}
+fun readTransform(offset: i32) -> geo.Transform = { return geo.Transform(readVector(offset), geo.Rot(fromBits(payload[offset+2i32]), fromBits(payload[offset+3i32]))); }
+fun readQuery() -> query.QueryInput = {
+    var q = query.QueryInput(); q.kind = payload[1i32] as i32;
+    if (q.kind == 0i32 or q.kind >= 4i32 and q.kind <= 7i32) {
+        q.ray = query.RayCastInput(readVector(2i32), readVector(4i32), fromBits(payload[6i32]));
+        if (q.kind != 0i32) { q.target = readProxy(7i32); q.oneSided = payload[25i32] != 0u32; }
+    } else if (q.kind <= 3i32) { q.point = readVector(2i32); q.target = readProxy(4i32); }
+    else if (q.kind <= 11i32) {
+        q.shape = query.ShapeCastInput(readProxy(2i32), readVector(20i32), fromBits(payload[22i32]), payload[23i32] != 0u32); q.target = readProxy(24i32);
+    } else {
+        q.pair = query.ShapeCastPairInput(readProxy(2i32), readProxy(20i32), readTransform(38i32), readTransform(42i32), readVector(46i32), fromBits(payload[48i32]), payload[49i32] != 0u32);
+    }
+    return q;
+}
+fun queryArity(kind: i32) -> i32 = {
+    if (kind == 0i32) return 7i32; if (kind <= 3i32) return 22i32; if (kind <= 7i32) return 26i32; if (kind <= 11i32) return 42i32; return 50i32;
+}
+fun rawUnusedProxy(offset: i32) -> () = {
+    let count: u32 = payload[offset]; var i: i32 = 0i32;
+    while (i < 8i32 and inputOk) { if (i as u32 >= count and (payload[offset+2i32+2i32*i] != 0u32 or payload[offset+3i32+2i32*i] != 0u32)) fail("UNUSED"); i = i+1i32; }
+}
+fun structuralQuery(n: i32, guard: bool, profile: i32) -> () = {
+    if (n < 2i32) { fail("ARITY"); return; }
+    if (payload[0i32] > 1u32 or guard and payload[0i32] != 1u32 or not guard and profile == 0i32 and payload[0i32] != 0u32 or profile == 1i32 and payload[0i32] != 1u32) { fail("MODE"); return; }
+    if (payload[1i32] > 12u32 or guard and payload[1i32] == 0u32) { fail("KIND"); return; }
+    let kind: i32 = payload[1i32] as i32; if (n != queryArity(kind)) { fail("ARITY"); return; }
+    if (kind >= 4i32 and kind <= 7i32) {
+        if (payload[25i32] > 1u32) { fail("VALUE"); return; }
+        if (kind != 6i32 and payload[25i32] != 0u32) { fail("UNUSED"); return; }
+    }
+    if (kind >= 8i32 and kind <= 11i32 and payload[23i32] > 1u32 or kind == 12i32 and payload[49i32] > 1u32) { fail("VALUE"); return; }
+    if (kind == 6i32 and payload[8i32] != 0u32 or kind == 10i32 and payload[25i32] != 0u32) { fail("UNUSED"); return; }
+    if (payload[0i32] == 0u32) {
+        if (kind >= 1i32 and kind <= 3i32) rawUnusedProxy(4i32);
+        else if (kind >= 4i32 and kind <= 7i32) rawUnusedProxy(7i32);
+        else if (kind >= 8i32 and kind <= 11i32) { rawUnusedProxy(2i32); rawUnusedProxy(24i32); }
+        else if (kind == 12i32) { rawUnusedProxy(2i32); rawUnusedProxy(20i32); }
+        if (not inputOk) return;
+        var q: query.QueryInput = readQuery(); if (query.validateQuery(&q).status != 0i32) fail("DOMAIN");
+    }
+}
+class SavedResult {
+    kind: i32 = 0i32;
+    boolean: query.BoolQueryResult = query.BoolQueryResult(); cast: query.CastQueryResult = query.CastQueryResult();
+}
+fun emptyBanks() -> SavedResult[4] = { var values: SavedResult[4]; return values; }
+class Registers { current: SavedResult = SavedResult(); banks: SavedResult[4] = emptyBanks(); }
+fun resultWords(value: ref SavedResult) -> () = {
+    if (value.kind == 1i32) outHex(if value.boolean.value then 1u32 else 0u32);
+    else {
+        outHex(if value.cast.value.hit then 1u32 else 0u32); outFloat(value.cast.value.point.x); outFloat(value.cast.value.point.y);
+        outFloat(value.cast.value.normal.x); outFloat(value.cast.value.normal.y); outFloat(value.cast.value.fraction); outHex(value.cast.value.iterations as u32);
+    }
+}
+fun resultLength(value: ref SavedResult) -> i32 = { if (value.kind == 1i32) return 1i32; return 7i32; }
+fun bankWord(value: ref SavedResult, field: i32) -> u32 = {
+    if (value.kind == 1i32) { if (value.boolean.value) return 1u32; return 0u32; }
+    if (field == 0i32) { if (value.cast.value.hit) return 1u32; return 0u32; }
+    if (field == 1i32) return toBits(value.cast.value.point.x); if (field == 2i32) return toBits(value.cast.value.point.y);
+    if (field == 3i32) return toBits(value.cast.value.normal.x); if (field == 4i32) return toBits(value.cast.value.normal.y);
+    if (field == 5i32) return toBits(value.cast.value.fraction); return value.cast.value.iterations as u32;
+}
+fun validateBank(reg: ref Registers, opcode: i32, n: i32) -> () = {
+    if (n != (if opcode == 518i32 then 3i32 else 1i32)) { fail("ARITY"); return; }
+    if (payload[0i32] > 3u32) { fail("BANK"); return; }
+    if (opcode == 518i32) {
+        if (payload[1i32] > 6u32) { fail("FIELD"); return; }
+        if (payload[1i32] == 0u32 and payload[2i32] > 1u32 or payload[1i32] == 6u32 and payload[2i32] > 2147483647u32) { fail("VALUE"); return; }
+    }
+    if (opcode == 516i32) { if (reg.current.kind == 0i32) fail("BANK"); return; }
+    var value: SavedResult = reg.banks[payload[0i32] as i32]; if (value.kind == 0i32) { fail("BANK"); return; }
+    if (opcode == 518i32) {
+        if (value.kind == 1i32 and payload[1i32] != 0u32) { fail("FIELD"); return; }
+        if (bankWord(&value, payload[1i32] as i32) == payload[2i32]) fail("VALUE");
+    }
+}
+fun mutateBank(value: ref SavedResult, field: i32, word: u32) -> () = {
+    if (value.kind == 1i32) value.boolean.value = word != 0u32;
+    else if (field == 0i32) value.cast.value.hit = word != 0u32;
+    else if (field == 1i32) value.cast.value.point.x = fromBits(word);
+    else if (field == 2i32) value.cast.value.point.y = fromBits(word);
+    else if (field == 3i32) value.cast.value.normal.x = fromBits(word);
+    else if (field == 4i32) value.cast.value.normal.y = fromBits(word);
+    else if (field == 5i32) value.cast.value.fraction = fromBits(word);
+    else value.cast.value.iterations = word as i32;
+}
+fun echo(tag: str, id: i32, seq: i32, opcode: i32, n: i32) -> () = {
+    prefix(tag, id, seq); outDec(opcode); outDec(n); var i: i32 = 0i32; while (i < n) { outHex(payload[i]); i = i+1i32; } newline();
+}
+fun outVector(value: geo.Vec2) -> () = { outFloat(value.x); outFloat(value.y); }
+fun outProxy(value: ref distance.ShapeProxy) -> () = {
+    outHex(value.count as u32); outFloat(value.radius); var i: i32 = 0i32; while (i < 8i32) { outVector(value.points[i]); i = i+1i32; }
+}
+fun outTransform(value: geo.Transform) -> () = { outVector(value.p); outFloat(value.q.c); outFloat(value.q.s); }
+                                                                                     
+fun observeInput(id: i32, seq: i32, input: ref query.QueryInput) -> () = {
+    prefix("I18", id, seq); outDec(queryArity(input.kind)-2i32);
+    if (input.kind == 0i32 or input.kind >= 4i32 and input.kind <= 7i32) {
+        outVector(input.ray.origin); outVector(input.ray.translation); outFloat(input.ray.maxFraction);
+        if (input.kind != 0i32) { outProxy(&input.target); outHex(if input.oneSided then 1u32 else 0u32); }
+    } else if (input.kind <= 3i32) { outVector(input.point); outProxy(&input.target); }
+    else if (input.kind <= 11i32) {
+        outProxy(&input.shape.proxy); outVector(input.shape.translation); outFloat(input.shape.maxFraction); outHex(if input.shape.canEncroach then 1u32 else 0u32); outProxy(&input.target);
+    } else {
+        outProxy(&input.pair.proxyA); outProxy(&input.pair.proxyB); outTransform(input.pair.transformA); outTransform(input.pair.transformB);
+        outVector(input.pair.translationB); outFloat(input.pair.maxFraction); outHex(if input.pair.canEncroach then 1u32 else 0u32);
+    }
+    newline();
+}
+fun execute(reg: ref Registers, id: i32, seq: i32, opcode: i32, n: i32) -> () = {
+    echo("E18", id, seq, opcode, n);
+    if (opcode == 500i32) {
+        var input: query.QueryInput = readQuery(); reg.current = SavedResult();
+        if (input.kind <= 3i32) {
+            reg.current.kind = 1i32;
+            if (payload[0i32] == 1u32) reg.current.boolean = query.checkedBoolQuery(&input);
+            else reg.current.boolean = query.BoolQueryResult(0i32, 0i32, query.rawBoolQuery(&input));
+        } else {
+            reg.current.kind = 2i32;
+            if (payload[0i32] == 1u32) reg.current.cast = query.checkedCastQuery(&input);
+            else reg.current.cast = query.CastQueryResult(0i32, 0i32, query.rawCastQuery(&input));
+        }
+        prefix("R18", id, seq); outDec(opcode);
+        outDec(if reg.current.kind == 1i32 then reg.current.boolean.status else reg.current.cast.status);
+        outDec(if reg.current.kind == 1i32 then reg.current.boolean.reason else reg.current.cast.reason);
+        outDec(reg.current.kind); outDec(resultLength(&reg.current)); resultWords(&reg.current); newline(); observeInput(id, seq, &input);
+    } else {
+        let bank: i32 = payload[0i32] as i32;
+        if (opcode == 516i32) reg.banks[bank] = reg.current;
+        else if (opcode == 518i32) mutateBank(&reg.banks[bank], payload[1i32] as i32, payload[2i32]);
+        prefix("R18", id, seq); outDec(opcode); outDec(0i32); outDec(0i32); outDec(0i32); outDec(0i32); newline();
+    }
+    var i: i32 = 0i32; while (i < 4i32) {
+        if (reg.banks[i].kind != 0i32) { prefix("V18", id, seq); outDec(i); outDec(reg.banks[i].kind); outDec(resultLength(&reg.banks[i])); resultWords(&reg.banks[i]); newline(); }
+        i = i+1i32;
+    }
+}
+fun run(diagnostic: bool) -> i64 = {
+    readRow(true); if (not inputOk) return 2i64;
+    if (tokens != 4i32 or not tokenEquals(0i32, "PORT18")) { fail("HEADER"); return 2i64; }
+    if (not tokenEquals(1i32, "A")) { fail("PART"); return 2i64; }
+    var profile: i32 = -1i32; if (tokenEquals(2i32, "DIRECT")) profile = 0i32; else if (tokenEquals(2i32, "PUBLIC")) profile = 1i32; else if (tokenEquals(2i32, "GUARD")) profile = 2i32;
+    if (profile < 0i32) { fail("PROFILE"); return 2i64; }
+    let n: u32 = number(3i32, false); let full: u32 = if profile == 2i32 then 821u32 else 96u32;
+    if (not inputOk) return 2i64;
+    if (n == 0u32 or n > full or not diagnostic and n != full) { fail("N"); return 2i64; }
+    var caseIndex: u32 = 0u32; var previous: u32 = 0u32;
+    while (caseIndex < n and inputOk) {
+        readRow(false); if (not inputOk) return 2i64;
+        if (tokens != 3i32 or not tokenEquals(0i32, "C")) { fail("CASE"); return 2i64; }
+        let id: u32 = number(1i32, false); let count: u32 = number(2i32, false); if (not inputOk) return 2i64;
+        if (id <= previous or id > full or not diagnostic and id != caseIndex+1u32) { fail("ID"); return 2i64; }
+        if (profile == 0i32 and count != 1u32 or profile == 2i32 and count != 0u32 or profile == 1i32 and (count < 1u32 or count > 32u32 or not diagnostic and count != 8u32)) { fail("COUNT"); return 2i64; }
+        previous = id; prefix("CASE", id as i32, count as i32); newline(); var reg = Registers();
+        var seq: i32 = 1i32; let calls: i32 = if profile == 2i32 then 2i32 else count as i32;
+        while (seq <= calls and inputOk) {
+            readRow(false); if (not inputOk) return 2i64;
+            let guard: bool = profile == 2i32; let offset: i32 = if guard then 1i32 else 0i32;
+            if (not tokenEquals(0i32, if guard then "G" else "O")) { fail(if guard then "GUARD" else "OPCODE"); return 2i64; }
+            if (tokens < 4i32+offset) { fail("ARITY"); return 2i64; }
+            if (guard) { let guardId: u32 = number(1i32, false); let phase: u32 = number(2i32, false); if (not inputOk) return 2i64; if (guardId != id or phase != (seq-1i32) as u32) { fail("GUARD"); return 2i64; } }
+            else { let actualSeq: u32 = number(1i32, false); if (not inputOk) return 2i64; if (actualSeq != seq as u32) { fail("SEQ"); return 2i64; } }
+            let opcode: u32 = number(2i32+offset, false); if (not inputOk) return 2i64;
+            if (opcode != 500u32 and (guard or opcode < 516u32 or opcode > 518u32)) { fail("OPCODE"); return 2i64; }
+            let words: u32 = number(3i32+offset, false); if (not inputOk) return 2i64;
+            if (words > 50u32 or tokens != 4i32+offset+words as i32) { fail("ARITY"); return 2i64; }
+            readPayload(4i32+offset, words as i32); if (not inputOk) return 2i64;
+            if (opcode == 500u32) structuralQuery(words as i32, guard, profile);
+            else validateBank(&reg, opcode as i32, words as i32);
+            if (not inputOk) return 2i64;
+            if (guard) {
+                echo("G18", id as i32, seq-1i32, opcode as i32, words as i32); var input: query.QueryInput = readQuery(); let check: distance.Validation = query.validateQuery(&input);
+                prefix("GA18", id as i32, seq-1i32); outDec(if check.status == 0i32 then 1i32 else 0i32); outDec(check.status); outDec(check.reason); newline();
+            } else execute(&reg, id as i32, seq, opcode as i32, words as i32);
+            seq = seq+1i32;
+        }
+        io.writeStr("ENDCASE"); outDec(id as i32); newline(); caseIndex = caseIndex+1u32;
+    }
+    if (io.readCharCode() >= 0i32) { fail("TRAILING_DATA"); return 2i64; }
+    io.writeStr("END"); outDec(n as i32); newline(); return 0i64;
+}
+fun main(argc: i32, argv: cptr cptr char) -> i64 = {
+    var diagnostic: bool = false;
+    if (argc == 2i32) { let arg: cptr char = argv[1]; let text: str = "--diagnostic"; let expected: cptr char = builtins.ptr_from_slice[char](text) as cptr char; var i: i32 = 0i32; diagnostic = true; while (i < 12i32 and diagnostic) { if (arg[i] != expected[i]) diagnostic = false; i = i+1i32; } if (diagnostic and arg[12] != 0 as char) diagnostic = false; }
+    return run(diagnostic);
+}

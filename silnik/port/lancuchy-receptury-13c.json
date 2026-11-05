@@ -1,0 +1,605 @@
+{
+  "owner": "T-13c-2b",
+  "binding_owner": "T-13c-2a",
+  "proposals": [
+    {
+      "id": "13c/circle-side-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "offset < 0.0f32",
+      "replacement": "offset <= 0.0f32",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 337,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/8"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-v-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "if (v <= 0.0f32)",
+      "replacement": "if (v < 0.0f32)",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 341,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/12",
+        "13c/b2CollideChainSegmentAndCircle/13"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-u-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "u <= 0.0f32",
+      "replacement": "u < 0.0f32",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 346,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/17",
+        "13c/b2CollideChainSegmentAndCircle/18"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-prev-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "uPrev <= 0.0f32",
+      "replacement": "uPrev < 0.0f32",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 344,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/15"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-next-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "vNext > 0.0f32",
+      "replacement": "vNext >= 0.0f32",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 349,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/20"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-speculative-equality",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "separation > B2_SPECULATIVE_DISTANCE",
+      "replacement": "separation >= B2_SPECULATIVE_DISTANCE",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 360,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/31"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-ghost1-swap",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "segmentA.ghost1",
+      "replacement": "segmentA.ghost2",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 342,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/12",
+        "13c/b2CollideChainSegmentAndCircle/13"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/circle-anchorB",
+      "function": "b2CollideChainSegmentAndCircle",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "manifold.point0.anchorB = b2Add(manifold.point0.anchorA, b2Sub(xfA.p, xfB.p));",
+      "replacement": "manifold.point0.anchorB = manifold.point0.anchorA;",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 366,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndCircle/37"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-disjoint-upper2",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "upper2 < lower1",
+      "replacement": "upper2 <= lower1",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 388,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/7",
+        "13c/b2ClipSegments/8"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-disjoint-upper1",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "upper1 < lower2",
+      "replacement": "upper1 <= lower2",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 388,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/7",
+        "13c/b2ClipSegments/8"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-lower-equality",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "lower2 < lower1",
+      "replacement": "lower2 <= lower1",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 390,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/10",
+        "13c/b2ClipSegments/11",
+        "13c/b2ClipSegments/12"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-upper-equality",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "upper2 > upper1",
+      "replacement": "upper2 >= upper1",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 393,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/15",
+        "13c/b2ClipSegments/16",
+        "13c/b2ClipSegments/17"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-ID2",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "manifold.point1.id = id2;",
+      "replacement": "manifold.point1.id = id1;",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 406,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/30"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/clip-two-points",
+      "function": "b2ClipSegments",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "manifold.pointCount = 2i32;",
+      "replacement": "manifold.pointCount = 1i32;",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 407,
+      "requirement_candidates": [
+        "13c/b2ClipSegments/31"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/classify-tail-equality",
+      "function": "b2ClassifyNormal",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "poly.b2Dot(normal, params.edge1) <= 0.0f32",
+      "replacement": "poly.b2Dot(normal, params.edge1) < 0.0f32",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 420,
+      "requirement_candidates": [
+        "13c/b2ClassifyNormal/2",
+        "13c/b2ClassifyNormal/3"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/classify-sin-tail-equality",
+      "function": "b2ClassifyNormal",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "mass2.b2Cross(normal, params.normal0) > sinTol",
+      "replacement": "mass2.b2Cross(normal, params.normal0) >= sinTol",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 422,
+      "requirement_candidates": [
+        "13c/b2ClassifyNormal/2",
+        "13c/b2ClassifyNormal/3"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/classify-sin-head-equality",
+      "function": "b2ClassifyNormal",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "mass2.b2Cross(params.normal2, normal) > sinTol",
+      "replacement": "mass2.b2Cross(params.normal2, normal) >= sinTol",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 427,
+      "requirement_candidates": [
+        "13c/b2ClassifyNormal/6"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/convex-tail-equality",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "mass2.b2Cross(edge0, edge1) >= convexTol",
+      "replacement": "mass2.b2Cross(edge0, edge1) > convexTol",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 446,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/13",
+        "13c/b2CollideChainSegmentAndPolygon/14"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/convex-head-equality",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "mass2.b2Cross(edge1, edge2) >= convexTol",
+      "replacement": "mass2.b2Cross(edge1, edge2) > convexTol",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 449,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/17",
+        "13c/b2CollideChainSegmentAndPolygon/18"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/behind-all",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "behind1 and behind0 and behind2",
+      "replacement": "behind1",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 455,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/28",
+        "13c/b2CollideChainSegmentAndPolygon/29",
+        "13c/b2CollideChainSegmentAndPolygon/30"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/distance-speculative-equality",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "output.distance > radiusB + B2_SPECULATIVE_DISTANCE",
+      "replacement": "output.distance >= radiusB + B2_SPECULATIVE_DISTANCE",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 468,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/47"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/distance-slop-equality",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "output.distance > 0.1f32 * B2_LINEAR_SLOP",
+      "replacement": "output.distance >= 0.1f32 * B2_LINEAR_SLOP",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 472,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/52",
+        "13c/b2CollideChainSegmentAndPolygon/53",
+        "13c/b2CollideChainSegmentAndPolygon/54"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/feature-dot-tie",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "dot1 > dot2 then ib1 else ib2",
+      "replacement": "dot1 >= dot2 then ib1 else ib2",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 495,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/77",
+        "13c/b2CollideChainSegmentAndPolygon/78"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/incident-normal",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "incidentNormal = ib;",
+      "replacement": "incidentNormal = -1i32;",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 518,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/104"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/incident-index",
+      "function": "b2CollideChainSegmentAndPolygon",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "incidentIndex = cache.indexB[0];",
+      "replacement": "incidentIndex = 0i32;",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 487,
+      "requirement_candidates": [
+        "13c/b2CollideChainSegmentAndPolygon/68"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    },
+    {
+      "id": "13c/cache-zero-every-update",
+      "function": "b2UpdateContact",
+      "path": "silnik/fizyka/swiat.dk",
+      "needle": "sim.manifold = contactManifold(entry.kind, a, xfA, b, xfB, &sim.cache);",
+      "replacement": "sim.cache = distance.SimplexCache(); sim.manifold = contactManifold(entry.kind, a, xfA, b, xfB, &sim.cache);",
+      "target_source_sha256": "c3e0d590efb7c09725393484e18a5440627ca7bcc2191e42960141bd28b428d7",
+      "matched_source_line": 2489,
+      "requirement_candidates": [
+        "13c/integration/cache-inout/count",
+        "13c/integration/cache-inout/indexA0",
+        "13c/integration/cache-inout/indexA1",
+        "13c/integration/cache-inout/indexA2",
+        "13c/integration/cache-inout/indexB0",
+        "13c/integration/cache-inout/indexB1",
+        "13c/integration/cache-inout/indexB2"
+      ],
+      "witness": null,
+      "anchor_owner": "T-13c-2a",
+      "status": "PROPOSAL_UNBOUND_UNEXECUTED"
+    }
+  ],
+  "witnesses13c": {
+    "13c/circle-side-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-v-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-u-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-prev-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-next-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-speculative-equality": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-ghost1-swap": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/circle-anchorB": {
+      "case": 128,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-disjoint-upper2": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-disjoint-upper1": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-lower-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-upper-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-ID2": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/clip-two-points": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/classify-tail-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/classify-sin-tail-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/classify-sin-head-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/convex-tail-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/convex-head-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/behind-all": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/distance-speculative-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/distance-slop-equality": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/feature-dot-tie": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/incident-normal": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/incident-index": {
+      "case": 384,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    },
+    "13c/cache-zero-every-update": {
+      "case": 391,
+      "seq": null,
+      "scope": "full frozen legal prefix; precise first divergent id/seq measured by runner",
+      "status": "INPUT_FOR_EXISTING_ONCE_BOUND_SOURCE",
+      "binding_reference": "87d8ac550; source anchor/replacement/SHA unchanged"
+    }
+  },
+  "witness_inputs_only_not_an_anchor_refresh": true
+}

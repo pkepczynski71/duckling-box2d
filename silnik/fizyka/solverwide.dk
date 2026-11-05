@@ -1,0 +1,396 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import fizyka.kola.*;
+import fizyka.wielokaty as poly;
+
+# Box2D 8c661469, src/contact_solver.c:535-551. Normative BOX2D_DISABLE_SIMD width 4.
+class FloatW { x: f32 = 0.0f32; y: f32 = 0.0f32; z: f32 = 0.0f32; w: f32 = 0.0f32; }
+class Vec2W { X: FloatW = FloatW(); Y: FloatW = FloatW(); }
+class RotW { C: FloatW = FloatW(); S: FloatW = FloatW(); }
+# Box2D 8c661469, src/contact_solver.c:1079-1088. flags/padding are never numerical inputs.
+class BodyStateW { v: Vec2W = Vec2W(); w: FloatW = FloatW(); dp: Vec2W = Vec2W(); dq: RotW = RotW(); }
+# Box2D 8c661469, src/contact_solver.c:1455-1663.                                                          
+fun laneValue(value: FloatW, lane: i32) -> f32 = {
+    if (lane == 0i32) return value.x;
+    if (lane == 1i32) return value.y;
+    if (lane == 2i32) return value.z;
+    return value.w;
+}
+# Box2D 8c661469, src/contact_solver.c:1455-1663.
+fun setLane(value: ref FloatW, lane: i32, scalar: f32) -> () = {
+    if (lane == 0i32) value.x = scalar;
+    else if (lane == 1i32) value.y = scalar;
+    else if (lane == 2i32) value.z = scalar;
+    else value.w = scalar;
+}
+# Box2D 8c661469, src/contact_solver.c:900.
+fun b2ZeroW() -> FloatW = {
+    return FloatW( 0.0f32, 0.0f32, 0.0f32, 0.0f32 );
+}
+# Box2D 8c661469, src/contact_solver.c:905.
+fun b2SplatW(scalar: f32) -> FloatW = {
+    return FloatW( scalar, scalar, scalar, scalar );
+}
+# Box2D 8c661469, src/contact_solver.c:910.
+fun b2AddW(a: FloatW, b: FloatW) -> FloatW = {
+    return FloatW( a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w );
+}
+# Box2D 8c661469, src/contact_solver.c:915.
+fun b2SubW(a: FloatW, b: FloatW) -> FloatW = {
+    return FloatW( a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w );
+}
+# Box2D 8c661469, src/contact_solver.c:920.
+fun b2MulW(a: FloatW, b: FloatW) -> FloatW = {
+    return FloatW( a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w );
+}
+# Box2D 8c661469, src/contact_solver.c:925.
+fun b2MulAddW(a: FloatW, b: FloatW, c: FloatW) -> FloatW = {
+    return FloatW( a.x + b.x * c.x, a.y + b.y * c.y, a.z + b.z * c.z, a.w + b.w * c.w );
+}
+# Box2D 8c661469, src/contact_solver.c:930.
+fun b2MulSubW(a: FloatW, b: FloatW, c: FloatW) -> FloatW = {
+    return FloatW( a.x - b.x * c.x, a.y - b.y * c.y, a.z - b.z * c.z, a.w - b.w * c.w );
+}
+# Box2D 8c661469, src/contact_solver.c:935.
+fun b2MinW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if a.x <= b.x then a.x else b.x;
+    r.y = if a.y <= b.y then a.y else b.y;
+    r.z = if a.z <= b.z then a.z else b.z;
+    r.w = if a.w <= b.w then a.w else b.w;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:945.
+fun b2MaxW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if a.x >= b.x then a.x else b.x;
+    r.y = if a.y >= b.y then a.y else b.y;
+    r.z = if a.z >= b.z then a.z else b.z;
+    r.w = if a.w >= b.w then a.w else b.w;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:956.
+fun b2SymClampW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = poly.b2ClampFloat( a.x, -b.x, b.x );
+    r.y = poly.b2ClampFloat( a.y, -b.y, b.y );
+    r.z = poly.b2ClampFloat( a.z, -b.z, b.z );
+    r.w = poly.b2ClampFloat( a.w, -b.w, b.w );
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:966.
+fun b2OrW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if a.x != 0.0f32 or b.x != 0.0f32 then 1.0f32 else 0.0f32;
+    r.y = if a.y != 0.0f32 or b.y != 0.0f32 then 1.0f32 else 0.0f32;
+    r.z = if a.z != 0.0f32 or b.z != 0.0f32 then 1.0f32 else 0.0f32;
+    r.w = if a.w != 0.0f32 or b.w != 0.0f32 then 1.0f32 else 0.0f32;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:976.
+fun b2GreaterThanW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if a.x > b.x then 1.0f32 else 0.0f32;
+    r.y = if a.y > b.y then 1.0f32 else 0.0f32;
+    r.z = if a.z > b.z then 1.0f32 else 0.0f32;
+    r.w = if a.w > b.w then 1.0f32 else 0.0f32;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:986.
+fun b2EqualsW(a: FloatW, b: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if a.x == b.x then 1.0f32 else 0.0f32;
+    r.y = if a.y == b.y then 1.0f32 else 0.0f32;
+    r.z = if a.z == b.z then 1.0f32 else 0.0f32;
+    r.w = if a.w == b.w then 1.0f32 else 0.0f32;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:996.
+fun b2AllZeroW(a: FloatW) -> bool = {
+    return a.x == 0.0f32 and a.y == 0.0f32 and a.z == 0.0f32 and a.w == 0.0f32;
+}
+# Box2D 8c661469, src/contact_solver.c:1002.
+fun b2BlendW(a: FloatW, b: FloatW, mask: FloatW) -> FloatW = {
+    var r: FloatW = FloatW();
+    r.x = if mask.x != 0.0f32 then b.x else a.x;
+    r.y = if mask.y != 0.0f32 then b.y else a.y;
+    r.z = if mask.z != 0.0f32 then b.z else a.z;
+    r.w = if mask.w != 0.0f32 then b.w else a.w;
+    return r;
+}
+# Box2D 8c661469, src/contact_solver.c:1014.
+fun b2DotW(a: Vec2W, b: Vec2W) -> FloatW = {
+    return b2AddW( b2MulW( a.X, b.X ), b2MulW( a.Y, b.Y ) );
+}
+# Box2D 8c661469, src/contact_solver.c:1019.
+fun b2CrossW(a: Vec2W, b: Vec2W) -> FloatW = {
+    return b2SubW( b2MulW( a.X, b.Y ), b2MulW( a.Y, b.X ) );
+}
+# Box2D 8c661469, src/contact_solver.c:1024.
+fun b2RotateVectorW(q: RotW, v: Vec2W) -> Vec2W = {
+    return Vec2W( b2SubW( b2MulW( q.C, v.X ), b2MulW( q.S, v.Y ) ), b2AddW( b2MulW( q.S, v.X ), b2MulW( q.C, v.Y ) ) );
+}
+# Box2D 8c661469, src/contact_solver.c:1049-1075. Numerical SOA packet, four scalar lanes.
+class ContactConstraintSIMD {
+    invMassA: FloatW = FloatW();
+    invMassB: FloatW = FloatW();
+    invIA: FloatW = FloatW();
+    invIB: FloatW = FloatW();
+    normal: Vec2W = Vec2W();
+    friction: FloatW = FloatW();
+    tangentSpeed: FloatW = FloatW();
+    rollingResistance: FloatW = FloatW();
+    rollingMass: FloatW = FloatW();
+    rollingImpulse: FloatW = FloatW();
+    biasRate: FloatW = FloatW();
+    massScale: FloatW = FloatW();
+    impulseScale: FloatW = FloatW();
+    anchorA1: Vec2W = Vec2W();
+    anchorB1: Vec2W = Vec2W();
+    normalMass1: FloatW = FloatW();
+    tangentMass1: FloatW = FloatW();
+    baseSeparation1: FloatW = FloatW();
+    normalImpulse1: FloatW = FloatW();
+    totalNormalImpulse1: FloatW = FloatW();
+    tangentImpulse1: FloatW = FloatW();
+    anchorA2: Vec2W = Vec2W();
+    anchorB2: Vec2W = Vec2W();
+    baseSeparation2: FloatW = FloatW();
+    normalImpulse2: FloatW = FloatW();
+    totalNormalImpulse2: FloatW = FloatW();
+    tangentImpulse2: FloatW = FloatW();
+    normalMass2: FloatW = FloatW();
+    tangentMass2: FloatW = FloatW();
+    restitution: FloatW = FloatW();
+    relativeVelocity1: FloatW = FloatW();
+    relativeVelocity2: FloatW = FloatW();
+}
+# Box2D 8c661469, src/contact_solver.c:1671.
+fun b2WarmStartContactsTask(c: ref ContactConstraintSIMD, bA: ref BodyStateW, bB: ref BodyStateW) -> () = {
+    var tangentX: FloatW = c.normal.Y;
+    var tangentY: FloatW = b2SubW( b2ZeroW(), c.normal.X );
+    var rA: Vec2W = c.anchorA1;
+    var rB: Vec2W = c.anchorB1;
+    var P: Vec2W = Vec2W();
+    P.X = b2AddW( b2MulW( c.normalImpulse1, c.normal.X ), b2MulW( c.tangentImpulse1, tangentX ) );
+    P.Y = b2AddW( b2MulW( c.normalImpulse1, c.normal.Y ), b2MulW( c.tangentImpulse1, tangentY ) );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2CrossW( rA, P ) );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, P.X );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, P.Y );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2CrossW( rB, P ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, P.X );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, P.Y );
+    var rA_scope1: Vec2W = c.anchorA2;
+    var rB_scope1: Vec2W = c.anchorB2;
+    var P_scope1: Vec2W = Vec2W();
+    P_scope1.X = b2AddW( b2MulW( c.normalImpulse2, c.normal.X ), b2MulW( c.tangentImpulse2, tangentX ) );
+    P_scope1.Y = b2AddW( b2MulW( c.normalImpulse2, c.normal.Y ), b2MulW( c.tangentImpulse2, tangentY ) );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2CrossW( rA_scope1, P_scope1 ) );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, P_scope1.X );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, P_scope1.Y );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2CrossW( rB_scope1, P_scope1 ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, P_scope1.X );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, P_scope1.Y );
+    bA.w = b2MulSubW( bA.w, c.invIA, c.rollingImpulse );
+    bB.w = b2MulAddW( bB.w, c.invIB, c.rollingImpulse );
+}
+# Box2D 8c661469, src/contact_solver.c:1729.
+fun b2SolveContactsTask(c: ref ContactConstraintSIMD, bA: ref BodyStateW, bB: ref BodyStateW, inv_h: FloatW, minBiasVel: FloatW, oneW: FloatW, useBias: bool) -> () = {
+    var biasRate: FloatW = FloatW();
+    var massScale: FloatW = FloatW();
+    var impulseScale: FloatW = FloatW();
+    if ( useBias ) {
+        biasRate = c.biasRate;
+        massScale = c.massScale;
+        impulseScale = c.impulseScale;
+    }
+    else {
+        biasRate = b2ZeroW();
+        massScale = oneW;
+        impulseScale = b2ZeroW();
+    }
+    var totalNormalImpulse: FloatW = b2ZeroW();
+    var dp: Vec2W = Vec2W( b2SubW( bB.dp.X, bA.dp.X ), b2SubW( bB.dp.Y, bA.dp.Y ) );
+    var rA: Vec2W = c.anchorA1;
+    var rB: Vec2W = c.anchorB1;
+    var rsA: Vec2W = b2RotateVectorW( bA.dq, rA );
+    var rsB: Vec2W = b2RotateVectorW( bB.dq, rB );
+    var ds: Vec2W = Vec2W( b2AddW( dp.X, b2SubW( rsB.X, rsA.X ) ), b2AddW( dp.Y, b2SubW( rsB.Y, rsA.Y ) ) );
+    var s: FloatW = b2AddW( b2DotW( c.normal, ds ), c.baseSeparation1 );
+    var mask: FloatW = b2GreaterThanW( s, b2ZeroW() );
+    var specBias: FloatW = b2MulW( s, inv_h );
+    var softBias: FloatW = b2MaxW( b2MulW( biasRate, s ), minBiasVel );
+    var bias: FloatW = b2BlendW( softBias, specBias, mask );
+    var pointMassScale: FloatW = b2BlendW( massScale, oneW, mask );
+    var pointImpulseScale: FloatW = b2BlendW( impulseScale, b2ZeroW(), mask );
+    var dvx: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA.Y ) ) );
+    var dvy: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA.X ) ) );
+    var vn: FloatW = b2AddW( b2MulW( dvx, c.normal.X ), b2MulW( dvy, c.normal.Y ) );
+    var negImpulse: FloatW = b2AddW( b2MulW( c.normalMass1, b2MulW( pointMassScale, b2AddW( vn, bias ) ) ),
+										  b2MulW( pointImpulseScale, c.normalImpulse1 ) );
+    var newImpulse: FloatW = b2MaxW( b2SubW( c.normalImpulse1, negImpulse ), b2ZeroW() );
+    var impulse: FloatW = b2SubW( newImpulse, c.normalImpulse1 );
+    c.normalImpulse1 = newImpulse;
+    c.totalNormalImpulse1 = b2AddW( c.totalNormalImpulse1, impulse );
+    totalNormalImpulse = b2AddW( totalNormalImpulse, newImpulse );
+    var Px: FloatW = b2MulW( impulse, c.normal.X );
+    var Py: FloatW = b2MulW( impulse, c.normal.Y );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA.X, Py ), b2MulW( rA.Y, Px ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB.X, Py ), b2MulW( rB.Y, Px ) ) );
+    var rsA_scope1: Vec2W = b2RotateVectorW( bA.dq, c.anchorA2 );
+    var rsB_scope1: Vec2W = b2RotateVectorW( bB.dq, c.anchorB2 );
+    var ds_scope1: Vec2W = Vec2W( b2AddW( dp.X, b2SubW( rsB_scope1.X, rsA_scope1.X ) ), b2AddW( dp.Y, b2SubW( rsB_scope1.Y, rsA_scope1.Y ) ) );
+    var s_scope1: FloatW = b2AddW( b2DotW( c.normal, ds_scope1 ), c.baseSeparation2 );
+    var mask_scope1: FloatW = b2GreaterThanW( s_scope1, b2ZeroW() );
+    var specBias_scope1: FloatW = b2MulW( s_scope1, inv_h );
+    var softBias_scope1: FloatW = b2MaxW( b2MulW( biasRate, s_scope1 ), minBiasVel );
+    var bias_scope1: FloatW = b2BlendW( softBias_scope1, specBias_scope1, mask_scope1 );
+    var pointMassScale_scope1: FloatW = b2BlendW( massScale, oneW, mask_scope1 );
+    var pointImpulseScale_scope1: FloatW = b2BlendW( impulseScale, b2ZeroW(), mask_scope1 );
+    var rA_scope1: Vec2W = c.anchorA2;
+    var rB_scope1: Vec2W = c.anchorB2;
+    var dvx_scope1: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB_scope1.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA_scope1.Y ) ) );
+    var dvy_scope1: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB_scope1.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA_scope1.X ) ) );
+    var vn_scope1: FloatW = b2AddW( b2MulW( dvx_scope1, c.normal.X ), b2MulW( dvy_scope1, c.normal.Y ) );
+    var negImpulse_scope1: FloatW = b2AddW( b2MulW( c.normalMass2, b2MulW( pointMassScale_scope1, b2AddW( vn_scope1, bias_scope1 ) ) ),
+										  b2MulW( pointImpulseScale_scope1, c.normalImpulse2 ) );
+    var newImpulse_scope1: FloatW = b2MaxW( b2SubW( c.normalImpulse2, negImpulse_scope1 ), b2ZeroW() );
+    var impulse_scope1: FloatW = b2SubW( newImpulse_scope1, c.normalImpulse2 );
+    c.normalImpulse2 = newImpulse_scope1;
+    c.totalNormalImpulse2 = b2AddW( c.totalNormalImpulse2, impulse_scope1 );
+    totalNormalImpulse = b2AddW( totalNormalImpulse, newImpulse_scope1 );
+    var Px_scope1: FloatW = b2MulW( impulse_scope1, c.normal.X );
+    var Py_scope1: FloatW = b2MulW( impulse_scope1, c.normal.Y );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px_scope1 );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py_scope1 );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA_scope1.X, Py_scope1 ), b2MulW( rA_scope1.Y, Px_scope1 ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px_scope1 );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py_scope1 );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB_scope1.X, Py_scope1 ), b2MulW( rB_scope1.Y, Px_scope1 ) ) );
+    var tangentX: FloatW = c.normal.Y;
+    var tangentY: FloatW = b2SubW( b2ZeroW(), c.normal.X );
+    var rA_scope2: Vec2W = c.anchorA1;
+    var rB_scope2: Vec2W = c.anchorB1;
+    var dvx_scope2: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB_scope2.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA_scope2.Y ) ) );
+    var dvy_scope2: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB_scope2.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA_scope2.X ) ) );
+    var vt: FloatW = b2AddW( b2MulW( dvx_scope2, tangentX ), b2MulW( dvy_scope2, tangentY ) );
+    vt = b2SubW( vt, c.tangentSpeed );
+    var negImpulse_scope2: FloatW = b2MulW( c.tangentMass1, vt );
+    var maxFriction: FloatW = b2MulW( c.friction, c.normalImpulse1 );
+    var newImpulse_scope2: FloatW = b2SubW( c.tangentImpulse1, negImpulse_scope2 );
+    newImpulse_scope2 = b2MaxW( b2SubW( b2ZeroW(), maxFriction ), b2MinW( newImpulse_scope2, maxFriction ) );
+    var impulse_scope2: FloatW = b2SubW( newImpulse_scope2, c.tangentImpulse1 );
+    c.tangentImpulse1 = newImpulse_scope2;
+    var Px_scope2: FloatW = b2MulW( impulse_scope2, tangentX );
+    var Py_scope2: FloatW = b2MulW( impulse_scope2, tangentY );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px_scope2 );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py_scope2 );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA_scope2.X, Py_scope2 ), b2MulW( rA_scope2.Y, Px_scope2 ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px_scope2 );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py_scope2 );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB_scope2.X, Py_scope2 ), b2MulW( rB_scope2.Y, Px_scope2 ) ) );
+    var rA_scope3: Vec2W = c.anchorA2;
+    var rB_scope3: Vec2W = c.anchorB2;
+    var dvx_scope3: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB_scope3.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA_scope3.Y ) ) );
+    var dvy_scope3: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB_scope3.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA_scope3.X ) ) );
+    var vt_scope1: FloatW = b2AddW( b2MulW( dvx_scope3, tangentX ), b2MulW( dvy_scope3, tangentY ) );
+    vt_scope1 = b2SubW( vt_scope1, c.tangentSpeed );
+    var negImpulse_scope3: FloatW = b2MulW( c.tangentMass2, vt_scope1 );
+    var maxFriction_scope1: FloatW = b2MulW( c.friction, c.normalImpulse2 );
+    var newImpulse_scope3: FloatW = b2SubW( c.tangentImpulse2, negImpulse_scope3 );
+    newImpulse_scope3 = b2MaxW( b2SubW( b2ZeroW(), maxFriction_scope1 ), b2MinW( newImpulse_scope3, maxFriction_scope1 ) );
+    var impulse_scope3: FloatW = b2SubW( newImpulse_scope3, c.tangentImpulse2 );
+    c.tangentImpulse2 = newImpulse_scope3;
+    var Px_scope3: FloatW = b2MulW( impulse_scope3, tangentX );
+    var Py_scope3: FloatW = b2MulW( impulse_scope3, tangentY );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px_scope3 );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py_scope3 );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA_scope3.X, Py_scope3 ), b2MulW( rA_scope3.Y, Px_scope3 ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px_scope3 );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py_scope3 );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB_scope3.X, Py_scope3 ), b2MulW( rB_scope3.Y, Px_scope3 ) ) );
+    var deltaLambda: FloatW = b2MulW( c.rollingMass, b2SubW( bA.w, bB.w ) );
+    var lambdaR: FloatW = c.rollingImpulse;
+    var maxLambda: FloatW = b2MulW( c.rollingResistance, totalNormalImpulse );
+    c.rollingImpulse = b2SymClampW( b2AddW( lambdaR, deltaLambda ), maxLambda );
+    deltaLambda = b2SubW( c.rollingImpulse, lambdaR );
+    bA.w = b2MulSubW( bA.w, c.invIA, deltaLambda );
+    bB.w = b2MulAddW( bB.w, c.invIB, deltaLambda );
+}
+# Box2D 8c661469, src/contact_solver.c:1969.
+fun b2ApplyRestitutionTask(c: ref ContactConstraintSIMD, bA: ref BodyStateW, bB: ref BodyStateW, threshold: FloatW, zero: FloatW) -> () = {
+    var restitutionMask: FloatW = b2EqualsW( c.restitution, zero );
+    var mask1: FloatW = b2GreaterThanW( b2AddW( c.relativeVelocity1, threshold ), zero );
+    var mask2: FloatW = b2EqualsW( c.totalNormalImpulse1, zero );
+    var mask: FloatW = b2OrW( b2OrW( mask1, mask2 ), restitutionMask );
+    var mass: FloatW = b2BlendW( c.normalMass1, zero, mask );
+    var rA: Vec2W = c.anchorA1;
+    var rB: Vec2W = c.anchorB1;
+    var dvx: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA.Y ) ) );
+    var dvy: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA.X ) ) );
+    var vn: FloatW = b2AddW( b2MulW( dvx, c.normal.X ), b2MulW( dvy, c.normal.Y ) );
+    var negImpulse: FloatW = b2MulW( mass, b2AddW( vn, b2MulW( c.restitution, c.relativeVelocity1 ) ) );
+    var newImpulse: FloatW = b2MaxW( b2SubW( c.normalImpulse1, negImpulse ), b2ZeroW() );
+    var impulse: FloatW = b2SubW( newImpulse, c.normalImpulse1 );
+    c.normalImpulse1 = newImpulse;
+    c.totalNormalImpulse1 = b2AddW( c.totalNormalImpulse1, impulse );
+    var Px: FloatW = b2MulW( impulse, c.normal.X );
+    var Py: FloatW = b2MulW( impulse, c.normal.Y );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA.X, Py ), b2MulW( rA.Y, Px ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB.X, Py ), b2MulW( rB.Y, Px ) ) );
+    var mask1_scope1: FloatW = b2GreaterThanW( b2AddW( c.relativeVelocity2, threshold ), zero );
+    var mask2_scope1: FloatW = b2EqualsW( c.totalNormalImpulse2, zero );
+    var mask_scope1: FloatW = b2OrW( b2OrW( mask1_scope1, mask2_scope1 ), restitutionMask );
+    var mass_scope1: FloatW = b2BlendW( c.normalMass2, zero, mask_scope1 );
+    var rA_scope1: Vec2W = c.anchorA2;
+    var rB_scope1: Vec2W = c.anchorB2;
+    var dvx_scope1: FloatW = b2SubW( b2SubW( bB.v.X, b2MulW( bB.w, rB_scope1.Y ) ), b2SubW( bA.v.X, b2MulW( bA.w, rA_scope1.Y ) ) );
+    var dvy_scope1: FloatW = b2SubW( b2AddW( bB.v.Y, b2MulW( bB.w, rB_scope1.X ) ), b2AddW( bA.v.Y, b2MulW( bA.w, rA_scope1.X ) ) );
+    var vn_scope1: FloatW = b2AddW( b2MulW( dvx_scope1, c.normal.X ), b2MulW( dvy_scope1, c.normal.Y ) );
+    var negImpulse_scope1: FloatW = b2MulW( mass_scope1, b2AddW( vn_scope1, b2MulW( c.restitution, c.relativeVelocity2 ) ) );
+    var newImpulse_scope1: FloatW = b2MaxW( b2SubW( c.normalImpulse2, negImpulse_scope1 ), b2ZeroW() );
+    var impulse_scope1: FloatW = b2SubW( newImpulse_scope1, c.normalImpulse2 );
+    c.normalImpulse2 = newImpulse_scope1;
+    c.totalNormalImpulse2 = b2AddW( c.totalNormalImpulse2, impulse_scope1 );
+    var Px_scope1: FloatW = b2MulW( impulse_scope1, c.normal.X );
+    var Py_scope1: FloatW = b2MulW( impulse_scope1, c.normal.Y );
+    bA.v.X = b2MulSubW( bA.v.X, c.invMassA, Px_scope1 );
+    bA.v.Y = b2MulSubW( bA.v.Y, c.invMassA, Py_scope1 );
+    bA.w = b2MulSubW( bA.w, c.invIA, b2SubW( b2MulW( rA_scope1.X, Py_scope1 ), b2MulW( rA_scope1.Y, Px_scope1 ) ) );
+    bB.v.X = b2MulAddW( bB.v.X, c.invMassB, Px_scope1 );
+    bB.v.Y = b2MulAddW( bB.v.Y, c.invMassB, Py_scope1 );
+    bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB_scope1.X, Py_scope1 ), b2MulW( rB_scope1.Y, Px_scope1 ) ) );
+}

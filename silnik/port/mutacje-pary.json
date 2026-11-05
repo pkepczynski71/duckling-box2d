@@ -1,0 +1,808 @@
+{
+  "protocol": "9a/1",
+  "recipe_count": 48,
+  "native_mutations": [
+    {
+      "name": "kc-speculation",
+      "scope": "b2CollideCapsuleAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (separation > B2_SPECULATIVE_DISTANCE) return manifold;",
+      "replacement": "if (false) return manifold;",
+      "witness_ids": [
+        4
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "Far legal circle must stay separated.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kc-equality",
+      "scope": "b2CollideCapsuleAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "separation > B2_SPECULATIVE_DISTANCE",
+      "replacement": "separation >= B2_SPECULATIVE_DISTANCE",
+      "witness_ids": [
+        2
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "Exactly speculativeDistance, fixed binary32 equality.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kc-end-region",
+      "scope": "b2CollideCapsuleAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "pA = p1;",
+      "replacement": "pA = p2;",
+      "witness_ids": [
+        6
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "p1 closest region must use the first endpoint.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "pc-edge-tie",
+      "scope": "b2CollidePolygonAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (s > separation)",
+      "replacement": "if (s >= separation)",
+      "witness_ids": [
+        68
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y"
+      ],
+      "reason": "Equal edge separation keeps the first edge.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "pc-epsilon-equality",
+      "scope": "b2CollidePolygonAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (u1 < 0.0f32 and separation > FLT_EPSILON)",
+      "replacement": "if (u1 < 0.0f32 and separation >= FLT_EPSILON)",
+      "witness_ids": [
+        73
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "At epsilon the vertex branch must remain closed.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "pc-vertex-region",
+      "scope": "b2CollidePolygonAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "let cA1: Vec2 = b2MulAdd(v1, radiusA, normal1);",
+      "replacement": "let cA1: Vec2 = b2MulAdd(v2, radiusA, normal1);",
+      "witness_ids": [
+        71
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "The first vertex contact may not use the other endpoint.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-f1-negative",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "f1 = poly.b2ClampFloat(-rd1 / dd1, 0.0f32, 1.0f32);",
+      "replacement": "f1 = f1;",
+      "witness_ids": [
+        131
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "f2<0 requires recomputing f1; outside projections force the one-point path.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-f1-over",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "f1 = poly.b2ClampFloat((d12 - rd1) / dd1, 0.0f32, 1.0f32);",
+      "replacement": "f1 = f1;",
+      "witness_ids": [
+        132
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "f2>1 requires recomputing f1; outside projections force the one-point path.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-denom",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "let denom: f32 = dd1 * dd2 - d12 * d12;",
+      "replacement": "let denom: f32 = dd1 * dd2 - d12 * d12 + 1.0f32;",
+      "witness_ids": [
+        154
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Forcing a nonzero denominator perturbs the closest fractions, with finite arithmetic.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-bias",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "separationA + 0.1f32 * B2_LINEAR_SLOP >= separationB",
+      "replacement": "separationA - 0.1f32 * B2_LINEAR_SLOP >= separationB",
+      "witness_ids": [
+        135
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Frozen narrow SAT-bias interval selects reference A.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-id-A",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "manifold.point1.id = poly.B2_MAKE_ID(0i32, 1i32);",
+      "replacement": "manifold.point1.id = poly.B2_MAKE_ID(1i32, 0i32);",
+      "witness_ids": [
+        129
+      ],
+      "fields": [
+        "p1.id"
+      ],
+      "reason": "A-reference second point id is (0,1).",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-id-B",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "manifold.point1.id = poly.B2_MAKE_ID(1i32, 0i32);",
+      "replacement": "manifold.point1.id = poly.B2_MAKE_ID(0i32, 1i32);",
+      "witness_ids": [
+        133
+      ],
+      "fields": [
+        "p1.id"
+      ],
+      "reason": "B-reference second point id is (1,0).",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-fallback",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (manifold.pointCount == 0i32) {",
+      "replacement": "if (false) {",
+      "witness_ids": [
+        134
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "SAT/clipping fails on this overlapping-projection witness, requiring the fallback.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-origin",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "b2RotateVector(xfA.q, b2Add(manifold.point0.anchorA, origin))",
+      "replacement": "b2RotateVector(xfA.q, manifold.point0.anchorA)",
+      "witness_ids": [
+        142
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Local origin must be restored when anchors return to world coordinates.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-normal",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "manifold.normal = b2RotateVector(xfA.q, manifold.normal);",
+      "replacement": "manifold.normal = manifold.normal;",
+      "witness_ids": [
+        144
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y"
+      ],
+      "reason": "A common nonidentity rotation rotates the returned normal.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-anchorB",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "manifold.point0.anchorB = b2Add(manifold.point0.anchorA, b2Sub(xfA.p, xfB.p));",
+      "replacement": "manifold.point0.anchorB = manifold.point0.anchorA;",
+      "witness_ids": [
+        157
+      ],
+      "fields": [
+        "p0.anchorB.x",
+        "p0.anchorB.y"
+      ],
+      "reason": "Touching capsules with different transforms: anchorB.x differs from anchorA.x by -0.2; the former -0.4 translation separated them.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "oc-radius",
+      "scope": "b2CollideSegmentAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "Capsule(segmentA.point1, segmentA.point2, 0.0f32)",
+      "replacement": "Capsule(segmentA.point1, segmentA.point2, 0.125f32)",
+      "witness_ids": [
+        194
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "The segment adapter contributes zero radius.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "ok-radius",
+      "scope": "b2CollideSegmentAndCapsule",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "Capsule(segmentA.point1, segmentA.point2, 0.0f32)",
+      "replacement": "Capsule(segmentA.point1, segmentA.point2, 0.125f32)",
+      "witness_ids": [
+        257
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "The segment-capsule adapter contributes zero radius.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "constructor-radius",
+      "scope": "b2MakeCapsule",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "shape.radius = radius;",
+      "replacement": "shape.radius = 0.0f32;",
+      "witness_ids": [
+        321
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "The two-vertex polygon must retain capsule radius.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "constructor-count",
+      "scope": "b2MakeCapsule",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "shape.count = 2i32;",
+      "replacement": "shape.count = 3i32;",
+      "witness_ids": [
+        321,
+        322,
+        324,
+        349
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Clipping must see exactly two vertices; arrays remain in bounds with mutant count=3.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "pk-side",
+      "scope": "b2CollidePolygonAndCapsule",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "return poly.b2CollidePolygons(polygonA, xfA, &polyB, xfB);",
+      "replacement": "return poly.b2CollidePolygons(&polyB, xfB, polygonA, xfA);",
+      "witness_ids": [
+        321
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Adapter must preserve polygon A and capsule B.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "op-radius",
+      "scope": "b2CollideSegmentAndPolygon",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "b2MakeCapsule(segmentA.point1, segmentA.point2, 0.0f32)",
+      "replacement": "b2MakeCapsule(segmentA.point1, segmentA.point2, 0.125f32)",
+      "witness_ids": [
+        385
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "pointCount",
+        "p0.anchorA.x",
+        "p0.anchorA.y",
+        "p0.anchorB.x",
+        "p0.anchorB.y",
+        "p0.separation",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "The segment-polygon constructor radius is zero.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "op-side",
+      "scope": "b2CollideSegmentAndPolygon",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "return poly.b2CollidePolygons(&polyA, xfA, polygonB, xfB);",
+      "replacement": "return poly.b2CollidePolygons(polygonB, xfB, &polyA, xfA);",
+      "witness_ids": [
+        385
+      ],
+      "fields": [
+        "normal.x",
+        "normal.y",
+        "p0.id",
+        "p1.id"
+      ],
+      "reason": "Adapter must preserve segment A and polygon B.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "parser-N-lower",
+      "scope": "main",
+      "source": "silnik/port/pary.dk",
+      "expression": "count < 1u32 or count > 448u32",
+      "replacement": "count > 448u32",
+      "probe": "negative",
+      "variant": "N-zero",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-id",
+      "scope": "main",
+      "source": "silnik/port/pary.dk",
+      "expression": "id != caseIndex + 1u32 or kind > 6u32",
+      "replacement": "kind > 6u32",
+      "probe": "negative",
+      "variant": "id-zero",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-canonical-u32",
+      "scope": "readWord",
+      "source": "silnik/port/pary.dk",
+      "expression": "(leadingZero and digits > 1i32)",
+      "replacement": "false",
+      "probe": "negative",
+      "variant": "short-word",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-unused",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (side.geometry[padding] != 0u32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "unused",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-rotation",
+      "scope": "decodeRot",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (not (1.0f32 - 0.0006f32 < lengthSquared and lengthSquared < 1.0f32 + 0.0006f32))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "rotation",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-circle-radius",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (side.circle.radius < 0.0f32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "circle-radius",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-capsule-radius",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (side.capsule.radius < 0.0f32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "capsule-radius",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-length-A",
+      "scope": "validatePair",
+      "source": "silnik/port/pary.dk",
+      "expression": "if ((kind == 0u32 or kind == 2u32 or kind == 3u32 or kind == 4u32) and not (lengthA > epsSqr))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "length-A-equality",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-length-B",
+      "scope": "validatePair",
+      "source": "silnik/port/pary.dk",
+      "expression": "if ((kind == 2u32 or kind == 4u32) and not (lengthB > epsSqr))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "length-B-equality",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-constructor-length",
+      "scope": "validatePair",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (kind == 5u32 and not (lengthB > math2.FLT_EPSILON))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "constructor-length-B",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-hull",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (not raw.b2ValidateHull(&side.polygon))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "polygon-clockwise",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-box",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (halfWidth <= 0.0f32 or halfHeight <= 0.0f32 or radius < 0.0f32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "box-width",
+      "expected_code": 0,
+      "reason": "Removing this parser guard wrongly accepts its finite, bounded witness."
+    },
+    {
+      "name": "parser-N-upper",
+      "scope": "main",
+      "source": "silnik/port/pary.dk",
+      "expression": "count < 1u32 or count > 448u32",
+      "replacement": "count < 1u32",
+      "probe": "negative",
+      "variant": "N-over",
+      "expected_code": 0,
+      "reason": "Bounded finite-output witness isolates this parser guard; acceptance is the clean wrong result."
+    },
+    {
+      "name": "parser-finite",
+      "scope": "decodeFloat",
+      "source": "silnik/port/pary.dk",
+      "expression": "if ((word & 2139095040u32) == 2139095040u32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "Inf-circle",
+      "expected_code": 0,
+      "reason": "Missing required refusal (code 3 -> 0); complete output may contain nonfinite geometry only at the exact Inf-circle witness."
+    },
+    {
+      "name": "parser-pair-types",
+      "scope": "validatePair",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (typeA != expectedA or typeB != expectedB)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "pair-types",
+      "expected_code": 0,
+      "reason": "Bounded finite-output witness isolates this parser guard; acceptance is the clean wrong result."
+    },
+    {
+      "name": "parser-constructor-length-A",
+      "scope": "validatePair",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (kind == 6u32 and not (lengthA > math2.FLT_EPSILON))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "constructor-length-A",
+      "expected_code": 0,
+      "reason": "Bounded finite-output witness isolates this parser guard; acceptance is the clean wrong result."
+    },
+    {
+      "name": "pc-vertex1-refusal",
+      "scope": "b2CollidePolygonAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "separation = poly.b2Dot(b2Sub(center, v1), normal1);\n        if (separation > radius + speculativeDistance) return manifold;",
+      "replacement": "separation = poly.b2Dot(b2Sub(center, v1), normal1);\n        if (false) return manifold;",
+      "witness_ids": [
+        100
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "R-9a B1: face distance passes, vertex1 distance exceeds radius + speculation; deletion creates one point instead of zero.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "pc-vertex2-refusal",
+      "scope": "b2CollidePolygonAndCircle",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "separation = poly.b2Dot(b2Sub(center, v2), normal2);\n        if (separation > radius + speculativeDistance) return manifold;",
+      "replacement": "separation = poly.b2Dot(b2Sub(center, v2), normal2);\n        if (false) return manifold;",
+      "witness_ids": [
+        101
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "R-9a B1: face distance passes, vertex2 distance exceeds radius + speculation; deletion creates one point instead of zero.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-clip-cqA-lower",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "cqA = b2Lerp(q2, p2, (0.0f32 - fq2) / (fp2 - fq2));",
+      "replacement": "cqA = cqA;",
+      "witness_ids": [
+        166
+      ],
+      "fields": [
+        "p1.anchorA.x"
+      ],
+      "reason": "R-9a B1: reversed endpoints reach this precise clipping assignment. Omission changes p1.anchorA.x without a crash.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-clip-cpA-upper",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "cpA = b2Lerp(p2, q2, (fp2 - length1) / (fp2 - fq2));",
+      "replacement": "cpA = cpA;",
+      "witness_ids": [
+        166
+      ],
+      "fields": [
+        "p0.anchorA.x"
+      ],
+      "reason": "R-9a B1: reversed endpoints reach this precise clipping assignment. Omission changes p0.anchorA.x without a crash.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-clip-cpB-lower",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "cpB = b2Lerp(p1, q1, (0.0f32 - fp1) / (fq1 - fp1));",
+      "replacement": "cpB = cpB;",
+      "witness_ids": [
+        167
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "R-9a B1: reversed endpoints reach this precise clipping assignment. Omission changes pointCount without a crash.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "kk-clip-cqB-upper",
+      "scope": "b2CollideCapsules",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "cqB = b2Lerp(q1, p1, (fq1 - length2) / (fq1 - fp1));",
+      "replacement": "cqB = cqB;",
+      "witness_ids": [
+        172
+      ],
+      "fields": [
+        "pointCount"
+      ],
+      "reason": "R-9a B1: reversed endpoints reach this precise clipping assignment. Omission changes pointCount without a crash.",
+      "probe": "physics",
+      "expected_code": 0
+    },
+    {
+      "name": "parser-polygon-radius",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (side.polygon.radius < 0.0f32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "polygon-radius",
+      "expected_code": 0,
+      "reason": "Required refusal code 3 -> clean complete acceptance code 0, empty stderr."
+    },
+    {
+      "name": "parser-unused-point",
+      "scope": "readSide",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (point >= side.polygon.count and (side.geometry[2i32+2i32*point] != 0u32 or side.geometry[3i32+2i32*point] != 0u32))",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "polygon-unused-point",
+      "expected_code": 0,
+      "reason": "Required refusal code 3 -> clean complete acceptance code 0, empty stderr."
+    },
+    {
+      "name": "parser-end",
+      "scope": "checkEnd",
+      "source": "silnik/port/pary.dk",
+      "expression": "if (c >= 0i32)",
+      "replacement": "if (false)",
+      "probe": "negative",
+      "variant": "trailing-data",
+      "expected_code": 0,
+      "reason": "Required refusal code 3 -> clean complete acceptance code 0, empty stderr."
+    }
+  ]
+}

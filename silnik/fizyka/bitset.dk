@@ -1,0 +1,113 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+
+import fizyka.zbior.*;
+
+# Box2D 8c661469, src/bitset.h:12-17. Logical capacity is independent of List storage.
+# Box2D 8c661469, src/bitset.c:42.                                                           
+fun emptyBlocks() -> List[Key64] = { var values: List[Key64]; return values; }
+class BitSet {
+    bits: List[Key64] = emptyBlocks();
+    blockCapacity: i32 = 0i32;
+    blockCount: i32 = 0i32;
+}
+# Box2D 8c661469, src/bitset.c:8.
+fun b2CreateBitSet(bitCapacity: i32) -> BitSet = {
+    var result = BitSet();
+    result.blockCapacity = (bitCapacity + 63i32) / 64i32;
+    var i: i32 = 0i32;
+    while (i < result.blockCapacity) { result.bits.push(Key64()); i = i + 1i32; }
+    return result;
+}
+# Box2D 8c661469, src/bitset.c:19.
+fun b2DestroyBitSet(set: ref BitSet) -> () = {
+    set.bits.clear(); set.blockCapacity = 0i32; set.blockCount = 0i32;
+}
+# Box2D 8c661469, src/bitset.c:27.
+fun b2SetBitCountAndClear(set: ref BitSet, bitCount: i32) -> () = {
+    let count: i32 = (bitCount + 63i32) / 64i32;
+    if (set.blockCapacity < count) {
+        b2DestroyBitSet(set);
+        var grown: BitSet = b2CreateBitSet(bitCount + (bitCount >> 1i32));
+        set = move grown;
+    }
+    set.blockCount = count;
+    var i: i32 = 0i32;
+    while (i < count) { set.bits.at(i as i64) = Key64(); i = i + 1i32; }
+}
+# Box2D 8c661469, src/bitset.c:42.
+fun b2GrowBitSet(set: ref BitSet, blockCount: i32) -> () = {
+    if (blockCount > set.blockCapacity) {
+        let capacity: i32 = blockCount + blockCount / 2i32;
+        var i: i32 = set.blockCapacity;
+        while (i < capacity) { set.bits.push(Key64()); i = i + 1i32; }
+        set.blockCapacity = capacity;
+    }
+    set.blockCount = blockCount;
+}
+# Box2D 8c661469, src/bitset.h:25.
+# Box2D 8c661469, src/bitset.c:42.                                                           
+fun b2SetBit(set: ref BitSet, index: i32) -> () = {
+    let blk: i64 = (index / 64i32) as i64;
+    let shift: u32 = (index % 32i32) as u32;
+    if (index % 64i32 < 32i32) set.bits.at(blk).low = set.bits.at(blk).low | (1u32 << shift);
+    else set.bits.at(blk).high = set.bits.at(blk).high | (1u32 << shift);
+}
+# Box2D 8c661469, src/bitset.h:32.
+# Box2D 8c661469, src/bitset.c:42.                                                           
+fun b2SetBitGrow(set: ref BitSet, index: i32) -> () = {
+    let count: i32 = index / 64i32 + 1i32;
+    if (count > set.blockCount) b2GrowBitSet(set, count);
+    b2SetBit(set, index);
+}
+# Box2D 8c661469, src/bitset.h:42.
+# Box2D 8c661469, src/bitset.c:42.                                                           
+fun b2ClearBit(set: ref BitSet, index: i32) -> () = {
+    if (index / 64i32 >= set.blockCount) return;
+    let blk: i64 = (index / 64i32) as i64;
+    let mask: u32 = 4294967295u32 ^ (1u32 << (index % 32i32) as u32);
+    if (index % 64i32 < 32i32) set.bits.at(blk).low = set.bits.at(blk).low & mask;
+    else set.bits.at(blk).high = set.bits.at(blk).high & mask;
+}
+# Box2D 8c661469, src/bitset.h:52.
+# Box2D 8c661469, src/bitset.c:42.                                                           
+fun b2GetBit(set: ref BitSet, index: i32) -> bool = {
+    if (index / 64i32 >= set.blockCount) return false;
+    let blk: Key64 = set.bits.at((index / 64i32) as i64);
+    let word: u32 = if index % 64i32 < 32i32 then blk.low else blk.high;
+    return (word & (1u32 << (index % 32i32) as u32)) != 0u32;
+}
+# Box2D 8c661469, src/bitset.c:61.
+fun b2InPlaceUnion(a: ref BitSet, b: ref BitSet) -> () = {
+    var i: i32 = 0i32;
+    while (i < a.blockCount) {
+        a.bits.at(i as i64).low = a.bits.at(i as i64).low | b.bits.at(i as i64).low;
+        a.bits.at(i as i64).high = a.bits.at(i as i64).high | b.bits.at(i as i64).high;
+        i = i + 1i32;
+    }
+}

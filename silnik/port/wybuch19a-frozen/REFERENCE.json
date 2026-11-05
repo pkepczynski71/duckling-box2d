@@ -1,0 +1,16 @@
+{
+  "frozen": {
+    "PUBLIC-C1.out.csv.gz": {
+      "sha256": "fda8a6542e7c8d3897fbb1b31868df2fb4fbfeeceeda148fc446efd5e8c56fe2",
+      "bytes": 2118285
+    },
+    "GUARD-C1.out.csv.gz": {
+      "sha256": "5e44edea46f4340b0a58dfd66bb0e529706ffcaff802e64e777e998cab8c8e00",
+      "bytes": 1060
+    },
+    "DIRECT-C1.out.csv.gz": {
+      "sha256": "5335368ba0b5437b19192c7f6e580c1e8426ae3c4bc012e066153f28cd9025ee",
+      "bytes": 26120
+    }
+  }
+}

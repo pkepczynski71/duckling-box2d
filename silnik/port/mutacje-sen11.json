@@ -1,0 +1,2329 @@
+{
+  "native_mutations": [
+    {
+      "name": "M11-01-ANGULAR",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "mass2.b2AbsFloat(state.angularVelocity) * sim.maxExtent",
+      "replacement": "0.0f32",
+      "fixture": "ANGULAR",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "M11-01-DELTAS",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "0.5f32 * world.finalizeInvDt * maxDeltaPosition",
+      "replacement": "0.0f32",
+      "fixture": "DELTAS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "M11-02-GE",
+      "class_id": "M11-02",
+      "scope": "b2FinalizeBody",
+      "expression": "sleepVelocity > body.sleepThreshold",
+      "replacement": "sleepVelocity >= body.sleepThreshold",
+      "fixture": "ZERO-THRESHOLD",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-02"
+    },
+    {
+      "name": "M11-02-HALF",
+      "class_id": "M11-02",
+      "scope": "b2FinalizeBody",
+      "expression": "sleepTime < 0.5f32",
+      "replacement": "sleepTime <= 0.5f32",
+      "fixture": "SLEEP4",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-02"
+    },
+    {
+      "name": "M11-02-SUBSTEP",
+      "class_id": "M11-02",
+      "scope": "b2Solve",
+      "expression": "world.finalizeDt = context.dt;",
+      "replacement": "world.finalizeDt = context.h;",
+      "fixture": "SLEEP4-N4",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-02"
+    },
+    {
+      "name": "M11-03-WORLD",
+      "class_id": "M11-03",
+      "scope": "b2FinalizeBody",
+      "expression": "not world.enableSleep or ",
+      "replacement": "",
+      "fixture": "WORLD-NOSLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-03"
+    },
+    {
+      "name": "M11-03-BODY",
+      "class_id": "M11-03",
+      "scope": "b2FinalizeBody",
+      "expression": "not body.enableSleep or ",
+      "replacement": "",
+      "fixture": "BODY-NOSLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-03"
+    },
+    {
+      "name": "M11-03-WAKE-SETS",
+      "class_id": "M11-03",
+      "scope": "b2World_EnableSleeping",
+      "expression": "if (not flag)",
+      "replacement": "if (false)",
+      "fixture": "WORLD-DISABLE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-03"
+    },
+    {
+      "name": "M11-04-LOCAL",
+      "class_id": "M11-04",
+      "scope": "b2FinalizeBody",
+      "expression": "world.islands.at(body.islandId as i64).localIndex",
+      "replacement": "body.id",
+      "fixture": "DELTAS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-04"
+    },
+    {
+      "name": "M11-05-FORWARD",
+      "class_id": "M11-05",
+      "scope": "b2World_StepPreparedCounter12",
+      "expression": "var sleepIndex: i32 = b2GetSolverSet(world, 2i32).islandCount - 1i32;\n            while (sleepIndex >= 0i32) {\n                if (not bits.b2GetBit(&world.awakeIslandBitSet, sleepIndex)) {\n                    let sleepIslandId: i32 = b2GetSolverSet(world, 2i32).islandSims.at(sleepIndex as i64);\n                    b2TrySleepIsland(world, sleepIslandId);\n                }\n                sleepIndex = sleepIndex - 1i32;\n            }",
+      "replacement": "var sleepIndex: i32 = 0i32;\n            while (sleepIndex < b2GetSolverSet(world, 2i32).islandCount) {\n                if (not bits.b2GetBit(&world.awakeIslandBitSet, sleepIndex)) {\n                    let sleepIslandId: i32 = b2GetSolverSet(world, 2i32).islandSims.at(sleepIndex as i64);\n                    b2TrySleepIsland(world, sleepIslandId);\n                }\n                sleepIndex = sleepIndex + 1i32;\n            }",
+      "fixture": "MANY-SLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-05"
+    },
+    {
+      "name": "M11-06-A",
+      "class_id": "M11-06",
+      "scope": "b2LinkContact",
+      "expression": "setA == 2i32 and setB >= 3i32",
+      "replacement": "false",
+      "fixture": "LINK-A",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-06"
+    },
+    {
+      "name": "M11-06-B",
+      "class_id": "M11-06",
+      "scope": "b2LinkContact",
+      "expression": "setB == 2i32 and setA >= 3i32",
+      "replacement": "false",
+      "fixture": "LINK-B",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-06"
+    },
+    {
+      "name": "M11-07-DISABLED",
+      "class_id": "M11-07",
+      "scope": "b2CreateContact",
+      "expression": "record.contactId = id; record.setIndex = 1i32;",
+      "replacement": "record.contactId = id; record.setIndex = 2i32;",
+      "fixture": "C04",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-07"
+    },
+    {
+      "name": "M11-08-TIMER",
+      "class_id": "M11-08",
+      "scope": "b2WakeSolverSet",
+      "expression": "world.bodies.at(bodyId as i64).sleepTime = 0.0f32;",
+      "replacement": "",
+      "fixture": "WAKE-TIMER",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-08"
+    },
+    {
+      "name": "M11-08-IDENTITY",
+      "class_id": "M11-08",
+      "scope": "b2WakeSolverSet",
+      "expression": "b2GetSolverSet(world, 2i32).bodyCount = target + 1i32;",
+      "replacement": "b2GetSolverSet(world, 2i32).bodyCount = target + 1i32; b2GetSolverSet(world, 2i32).bodyStates.at(target as i64).deltaRotation = Rot(0.0f32, 0.0f32);",
+      "fixture": "C01",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-08"
+    },
+    {
+      "name": "M11-09-TRANSFER",
+      "class_id": "M11-09",
+      "scope": "b2WakeSolverSet",
+      "expression": "record.setIndex == 1i32",
+      "replacement": "false",
+      "fixture": "C04",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-09"
+    },
+    {
+      "name": "M11-09-MOVED",
+      "class_id": "M11-09",
+      "scope": "b2RemoveNonTouchingContact",
+      "expression": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "replacement": "",
+      "fixture": "C05-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-09"
+    },
+    {
+      "name": "M11-10-STATE",
+      "class_id": "M11-10",
+      "scope": "b2TrySleepIsland",
+      "expression": "b2GetSolverSet(world, 2i32).bodyStates.at(body.localIndex as i64) = movedState;",
+      "replacement": "",
+      "fixture": "SWAP-STATES",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-10"
+    },
+    {
+      "name": "M11-10-LOCAL",
+      "class_id": "M11-10",
+      "scope": "b2TrySleepIsland",
+      "expression": "world.bodies.at(moved.bodyId as i64).localIndex = body.localIndex;",
+      "replacement": "",
+      "fixture": "LOCAL-PROBE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-10"
+    },
+    {
+      "name": "M11-10-FORCE",
+      "class_id": "M11-10",
+      "scope": "b2TrySleepIsland",
+      "expression": "let sim: BodySim = b2GetSolverSet(world, 2i32).bodySims.at(body.localIndex as i64);",
+      "replacement": "var sim: BodySim = b2GetSolverSet(world, 2i32).bodySims.at(body.localIndex as i64); sim.force = Vec2();",
+      "fixture": "FORCE-SLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-10"
+    },
+    {
+      "name": "M11-11-OTHER",
+      "class_id": "M11-11",
+      "scope": "b2TrySleepIsland",
+      "expression": "world.bodies.at(otherBodyId as i64).setIndex != 2i32",
+      "replacement": "world.bodies.at(otherBodyId as i64).setIndex == 2i32",
+      "fixture": "C06-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-11"
+    },
+    {
+      "name": "M11-12-MASK",
+      "class_id": "M11-12",
+      "scope": "b2TrySleepIsland",
+      "expression": "let source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64);",
+      "replacement": "var source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64); source.rollingDefined = false;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "M11-12-BITSET",
+      "class_id": "M11-12",
+      "scope": "b2RemoveContactFromGraph",
+      "expression": "bits.b2ClearBit(&color.bodySet, a);",
+      "replacement": "",
+      "fixture": "C08",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "M11-12-LOCAL",
+      "class_id": "M11-12",
+      "scope": "b2RemoveContactFromGraph",
+      "expression": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "replacement": "",
+      "fixture": "C08",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "M11-13-MASK",
+      "class_id": "M11-13",
+      "scope": "b2WakeSolverSet",
+      "expression": "let contactSim: ContactSim = b2GetSolverSet(world, setIndex).contactSims.at(ci as i64);",
+      "replacement": "var contactSim: ContactSim = b2GetSolverSet(world, setIndex).contactSims.at(ci as i64); contactSim.rollingDefined = false;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-13"
+    },
+    {
+      "name": "M11-14-POOL",
+      "class_id": "M11-14",
+      "scope": "b2DestroySolverSet",
+      "expression": "b2FreeId(&world.solverSetIdPool, setIndex);",
+      "replacement": "",
+      "fixture": "C01",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-14"
+    },
+    {
+      "name": "M11-14-LOCAL",
+      "class_id": "M11-14",
+      "scope": "b2TrySleepIsland",
+      "expression": "world.islands.at(movedIsland as i64).localIndex = island.localIndex;",
+      "replacement": "",
+      "fixture": "LOCAL-PROBE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-14"
+    },
+    {
+      "name": "M11-15-FELL",
+      "class_id": "M11-15",
+      "scope": "b2TrySleepIsland",
+      "expression": ".fellAsleep = true;",
+      "replacement": ".fellAsleep = false;",
+      "fixture": "SLEEP4",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-15"
+    },
+    {
+      "name": "M11-15-INDEX",
+      "class_id": "M11-15",
+      "scope": "b2TrySleepIsland",
+      "expression": "world.bodies.at(bodyId as i64).bodyMoveIndex = -1i32;",
+      "replacement": "",
+      "fixture": "C03",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-15"
+    },
+    {
+      "name": "M11-15-OLD-MOVE",
+      "class_id": "M11-15",
+      "scope": "b2TrySleepIsland",
+      "expression": "world.bodyMoveEvents.at(body.bodyMoveIndex as i64).fellAsleep",
+      "replacement": "world.bodyMoveEvents.at(body.localIndex as i64).fellAsleep",
+      "fixture": "TOUCH-SLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-15"
+    },
+    {
+      "name": "M11-16-NOWAKE",
+      "class_id": "M11-16",
+      "scope": "b2DestroyContact",
+      "expression": "wakeBodies and (record.flags & 1u32) != 0u32",
+      "replacement": "(record.flags & 1u32) != 0u32",
+      "fixture": "DESTROY-TOUCH-NOWAKE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-16"
+    },
+    {
+      "name": "M11-16-TOUCH",
+      "class_id": "M11-16",
+      "scope": "b2DestroyContact",
+      "expression": "wakeBodies and (record.flags & 1u32) != 0u32",
+      "replacement": "false",
+      "fixture": "DESTROY-TOUCH-WAKE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-16"
+    },
+    {
+      "name": "M11-16-NONTOUCH",
+      "class_id": "M11-16",
+      "scope": "b2DestroyContact",
+      "expression": "wakeBodies and (record.flags & 1u32) != 0u32",
+      "replacement": "wakeBodies",
+      "fixture": "DESTROY-NONTOUCH",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-16"
+    },
+    {
+      "name": "M11-17-ZERO",
+      "class_id": "M11-17",
+      "scope": "b2Body_SetLinearVelocity",
+      "expression": "mass2.b2LengthSquared(velocity) > 0.0f32",
+      "replacement": "true",
+      "fixture": "LINEAR-ZERO",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-17"
+    },
+    {
+      "name": "M11-17-REACQUIRE",
+      "class_id": "M11-17",
+      "scope": "b2Body_SetLinearVelocity",
+      "expression": "let current: BodyRecord = world.bodies.at(body.id as i64);",
+      "replacement": "let current: BodyRecord = body;",
+      "fixture": "LINEAR-WAKE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-17"
+    },
+    {
+      "name": "M11-17-WAKE",
+      "class_id": "M11-17",
+      "scope": "b2Body_ApplyAction",
+      "expression": "if (wake)",
+      "replacement": "if (false)",
+      "fixture": "FORCE-WAKE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-17"
+    },
+    {
+      "name": "M11-17-FIXED",
+      "class_id": "M11-17",
+      "scope": "b2Body_SetAngularVelocity",
+      "expression": " or body.fixedRotation",
+      "replacement": "",
+      "fixture": "ANGULAR-FIXED",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-17"
+    },
+    {
+      "name": "M11-24-CHILD",
+      "class_id": "M11-24",
+      "scope": "b2MergeIsland",
+      "expression": "target.constraintRemoveCount = target.constraintRemoveCount + child.constraintRemoveCount;",
+      "replacement": "target.constraintRemoveCount = target.constraintRemoveCount;",
+      "fixture": "MERGE-CHILD",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-24"
+    },
+    {
+      "name": "M11-24-PARENT",
+      "class_id": "M11-24",
+      "scope": "b2MergeIsland",
+      "expression": "target.constraintRemoveCount = target.constraintRemoveCount + child.constraintRemoveCount;",
+      "replacement": "target.constraintRemoveCount = child.constraintRemoveCount;",
+      "fixture": "MERGE-PARENT",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-24"
+    },
+    {
+      "name": "TH-FIN-0",
+      "class_id": "TH-FIN-0",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-0-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-0"
+    },
+    {
+      "name": "TH-SIGN-0",
+      "class_id": "TH-SIGN-0",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-0-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-0"
+    },
+    {
+      "name": "TH-ZERO-0",
+      "class_id": "TH-ZERO-0",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-0-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-0"
+    },
+    {
+      "name": "TH-FIN-1",
+      "class_id": "TH-FIN-1",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-1-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-1"
+    },
+    {
+      "name": "TH-SIGN-1",
+      "class_id": "TH-SIGN-1",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-1-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-1"
+    },
+    {
+      "name": "TH-ZERO-1",
+      "class_id": "TH-ZERO-1",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-1-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-1"
+    },
+    {
+      "name": "TH-FIN-2",
+      "class_id": "TH-FIN-2",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-2-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-2"
+    },
+    {
+      "name": "TH-SIGN-2",
+      "class_id": "TH-SIGN-2",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-2-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-2"
+    },
+    {
+      "name": "TH-ZERO-2",
+      "class_id": "TH-ZERO-2",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-2-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-2"
+    },
+    {
+      "name": "TH-FIN-3",
+      "class_id": "TH-FIN-3",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-3-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-3"
+    },
+    {
+      "name": "TH-SIGN-3",
+      "class_id": "TH-SIGN-3",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-3-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-3"
+    },
+    {
+      "name": "TH-ZERO-3",
+      "class_id": "TH-ZERO-3",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-3-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-3"
+    },
+    {
+      "name": "TH-FIN-4",
+      "class_id": "TH-FIN-4",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-4-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-4"
+    },
+    {
+      "name": "TH-SIGN-4",
+      "class_id": "TH-SIGN-4",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-4-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-4"
+    },
+    {
+      "name": "TH-ZERO-4",
+      "class_id": "TH-ZERO-4",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-4-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-4"
+    },
+    {
+      "name": "TH-FIN-5",
+      "class_id": "TH-FIN-5",
+      "scope": "validSleepThreshold",
+      "expression": "finite(threshold)",
+      "replacement": "true",
+      "fixture": "GUARD:TH-5-inf",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-FIN-5"
+    },
+    {
+      "name": "TH-SIGN-5",
+      "class_id": "TH-SIGN-5",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "GUARD:TH-5-negative",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-SIGN-5"
+    },
+    {
+      "name": "TH-ZERO-5",
+      "class_id": "TH-ZERO-5",
+      "scope": "validSleepThreshold",
+      "expression": "threshold >= 0.0f32",
+      "replacement": "threshold > 0.0f32",
+      "fixture": "GUARD:TH-5-plus-zero",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ZERO-5"
+    },
+    {
+      "name": "CALL-58",
+      "class_id": "CALL-58",
+      "scope": "setAwake",
+      "expression": "let status: i32 = bodyMutationStatus(owner, number);",
+      "replacement": "let status: i32 = OK;",
+      "fixture": "GUARD:FOREIGN-CALL-58",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CALL-58"
+    },
+    {
+      "name": "CALL-59",
+      "class_id": "CALL-59",
+      "scope": "setSleepEnabled",
+      "expression": "let status: i32 = bodyMutationStatus(owner, number);",
+      "replacement": "let status: i32 = OK;",
+      "fixture": "GUARD:FOREIGN-CALL-59",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CALL-59"
+    },
+    {
+      "name": "CALL-60",
+      "class_id": "CALL-60",
+      "scope": "setSleepThreshold",
+      "expression": "let status: i32 = bodyMutationStatus(owner, number);",
+      "replacement": "let status: i32 = OK;",
+      "fixture": "GUARD:FOREIGN-CALL-60",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CALL-60"
+    },
+    {
+      "name": "CALL-62",
+      "class_id": "CALL-62",
+      "scope": "getSleepState",
+      "expression": "result.status = bodyStatus(owner, number);",
+      "replacement": "result.status = OK;",
+      "fixture": "GUARD:FOREIGN-CALL-62",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CALL-62"
+    },
+    {
+      "name": "BUPPER-REMAINDER",
+      "class_id": "BREMAINDER",
+      "scope": "sleepBodyUpperBlocksFit",
+      "expression": "count / 4i64 + 3i64",
+      "replacement": "count / 4i64",
+      "fixture": "GUARD:BUPPER-131060",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BREMAINDER"
+    },
+    {
+      "name": "BUPPER-AWAKE",
+      "class_id": "BUPPER",
+      "scope": "sleepBodyUpperFit",
+      "expression": "while (setIndex < world.solverSetIdPool.nextIndex)",
+      "replacement": "while (setIndex < 3i32)",
+      "fixture": "GUARD:BUPPER-SUM-1-131059",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BUPPER"
+    },
+    {
+      "name": "BUPPER-ARITH",
+      "class_id": "BARITH",
+      "scope": "checkedSleepBodySum",
+      "expression": "count > 9223372036854775807i64 - added",
+      "replacement": "false",
+      "fixture": "GUARD:BUPPER-SUM-9223372036854775807-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BARITH"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-2",
+      "class_id": "WORLD-FIN-2",
+      "scope": "finiteVector",
+      "expression": "finite(value.x)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-2",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-2"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-3",
+      "class_id": "WORLD-FIN-3",
+      "scope": "finiteVector",
+      "expression": "finite(value.y)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-3",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-3"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-4",
+      "class_id": "WORLD-FIN-4",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.maximumLinearSpeed)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-4"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-5",
+      "class_id": "WORLD-FIN-5",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.contactHertz)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-5",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-5"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-6",
+      "class_id": "WORLD-FIN-6",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.contactDampingRatio)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-6"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-7",
+      "class_id": "WORLD-FIN-7",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.maxContactPushSpeed)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-7",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-7"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-8",
+      "class_id": "WORLD-FIN-8",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.restitutionThreshold)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-8",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-8"
+    },
+    {
+      "name": "ROUTE56-WORLD-FIN-9",
+      "class_id": "WORLD-FIN-9",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.hitEventThreshold)",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-FIN-9",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-FIN-9"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-4",
+      "class_id": "WORLD-SIGN-4",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.maximumLinearSpeed > 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-4"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-5",
+      "class_id": "WORLD-SIGN-5",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.contactHertz >= 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-5",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-5"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-6",
+      "class_id": "WORLD-SIGN-6",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.contactDampingRatio >= 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-6"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-7",
+      "class_id": "WORLD-SIGN-7",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.maxContactPushSpeed >= 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-7",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-7"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-8",
+      "class_id": "WORLD-SIGN-8",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.restitutionThreshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-8",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-8"
+    },
+    {
+      "name": "ROUTE56-WORLD-SIGN-9",
+      "class_id": "WORLD-SIGN-9",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.hitEventThreshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "ROUTE56-WORLD-SIGN-9",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-SIGN-9"
+    },
+    {
+      "name": "WORLD-ROUTE",
+      "class_id": "WORLD-ROUTE",
+      "scope": "createSolverWorld",
+      "expression": "not validSolverWorldParameters(parameters)",
+      "replacement": "false",
+      "fixture": "WORLD-ROUTE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / WORLD-ROUTE"
+    },
+    {
+      "name": "STEP-CALL",
+      "class_id": "STEP-CALL",
+      "scope": "step",
+      "expression": "not validStepParameters(parameters)",
+      "replacement": "false",
+      "fixture": "STEP-INVALID",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / STEP-CALL"
+    },
+    {
+      "name": "M12-LINK-REF",
+      "scope": "b2CollideChanges",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "b2LinkContact(world, id);\n                # Reacquire from the owning array after Link, before graph growth.\n                var fresh: ref ContactSim = b2GetSolverSet(world, 2i32).contactSims.at(record.localIndex as i64);",
+      "replacement": "var fresh: ref ContactSim = b2GetSolverSet(world, 2i32).contactSims.at(record.localIndex as i64);\n                b2LinkContact(world, id);",
+      "fixture": "LINK-B",
+      "class_id": "M12",
+      "original_anchor": "world.c:649–658",
+      "proof_scope": "new11 actual Link wake/growth",
+      "counted_as_killed": false
+    },
+    {
+      "name": "W-58",
+      "class_id": "W-58",
+      "scope": "bodyStatus",
+      "expression": "worldStatus(owner) != OK",
+      "replacement": "false",
+      "fixture": "GUARD:WORLD-PRIORITY-58",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-58"
+    },
+    {
+      "name": "OWNER-58-low",
+      "class_id": "OWNER-58-low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.high != number.ownerTicket.high",
+      "fixture": "GUARD:BODY-STATUS-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-58-low"
+    },
+    {
+      "name": "OWNER-58-high",
+      "class_id": "OWNER-58-high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.low != number.ownerTicket.low",
+      "fixture": "GUARD:BODY-STATUS-2",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-58-high"
+    },
+    {
+      "name": "BODY-58-id",
+      "class_id": "BODY-58-id",
+      "scope": "bodyStatus",
+      "expression": "body.id == -1i32",
+      "replacement": "false",
+      "fixture": "GUARD:BODY-STATUS-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-58-id"
+    },
+    {
+      "name": "BODY-58-birth.low",
+      "class_id": "BODY-58-birth.low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.high != number.birthTicket.high",
+      "fixture": "GUARD:BODY-STATUS-3",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-58-birth.low"
+    },
+    {
+      "name": "BODY-58-birth.high",
+      "class_id": "BODY-58-birth.high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.low != number.birthTicket.low",
+      "fixture": "GUARD:BODY-STATUS-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-58-birth.high"
+    },
+    {
+      "name": "W-59",
+      "class_id": "W-59",
+      "scope": "bodyStatus",
+      "expression": "worldStatus(owner) != OK",
+      "replacement": "false",
+      "fixture": "GUARD:WORLD-PRIORITY-59",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-59"
+    },
+    {
+      "name": "OWNER-59-low",
+      "class_id": "OWNER-59-low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.high != number.ownerTicket.high",
+      "fixture": "GUARD:BODY-STATUS-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-59-low"
+    },
+    {
+      "name": "OWNER-59-high",
+      "class_id": "OWNER-59-high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.low != number.ownerTicket.low",
+      "fixture": "GUARD:BODY-STATUS-2",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-59-high"
+    },
+    {
+      "name": "BODY-59-id",
+      "class_id": "BODY-59-id",
+      "scope": "bodyStatus",
+      "expression": "body.id == -1i32",
+      "replacement": "false",
+      "fixture": "GUARD:BODY-STATUS-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-59-id"
+    },
+    {
+      "name": "BODY-59-birth.low",
+      "class_id": "BODY-59-birth.low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.high != number.birthTicket.high",
+      "fixture": "GUARD:BODY-STATUS-3",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-59-birth.low"
+    },
+    {
+      "name": "BODY-59-birth.high",
+      "class_id": "BODY-59-birth.high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.low != number.birthTicket.low",
+      "fixture": "GUARD:BODY-STATUS-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-59-birth.high"
+    },
+    {
+      "name": "W-60",
+      "class_id": "W-60",
+      "scope": "bodyStatus",
+      "expression": "worldStatus(owner) != OK",
+      "replacement": "false",
+      "fixture": "GUARD:WORLD-PRIORITY-60",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-60"
+    },
+    {
+      "name": "OWNER-60-low",
+      "class_id": "OWNER-60-low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.high != number.ownerTicket.high",
+      "fixture": "GUARD:BODY-STATUS-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-60-low"
+    },
+    {
+      "name": "OWNER-60-high",
+      "class_id": "OWNER-60-high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.low != number.ownerTicket.low",
+      "fixture": "GUARD:BODY-STATUS-2",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-60-high"
+    },
+    {
+      "name": "BODY-60-id",
+      "class_id": "BODY-60-id",
+      "scope": "bodyStatus",
+      "expression": "body.id == -1i32",
+      "replacement": "false",
+      "fixture": "GUARD:BODY-STATUS-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-60-id"
+    },
+    {
+      "name": "BODY-60-birth.low",
+      "class_id": "BODY-60-birth.low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.high != number.birthTicket.high",
+      "fixture": "GUARD:BODY-STATUS-3",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-60-birth.low"
+    },
+    {
+      "name": "BODY-60-birth.high",
+      "class_id": "BODY-60-birth.high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.low != number.birthTicket.low",
+      "fixture": "GUARD:BODY-STATUS-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-60-birth.high"
+    },
+    {
+      "name": "W-62",
+      "class_id": "W-62",
+      "scope": "bodyStatus",
+      "expression": "worldStatus(owner) != OK",
+      "replacement": "false",
+      "fixture": "GUARD:WORLD-PRIORITY-62",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-62"
+    },
+    {
+      "name": "OWNER-62-low",
+      "class_id": "OWNER-62-low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.high != number.ownerTicket.high",
+      "fixture": "GUARD:BODY-STATUS-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-62-low"
+    },
+    {
+      "name": "OWNER-62-high",
+      "class_id": "OWNER-62-high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(owner.birthTicket, number.ownerTicket)",
+      "replacement": "owner.birthTicket.low != number.ownerTicket.low",
+      "fixture": "GUARD:BODY-STATUS-2",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / OWNER-62-high"
+    },
+    {
+      "name": "BODY-62-id",
+      "class_id": "BODY-62-id",
+      "scope": "bodyStatus",
+      "expression": "body.id == -1i32",
+      "replacement": "false",
+      "fixture": "GUARD:BODY-STATUS-6",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-62-id"
+    },
+    {
+      "name": "BODY-62-birth.low",
+      "class_id": "BODY-62-birth.low",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.high != number.birthTicket.high",
+      "fixture": "GUARD:BODY-STATUS-3",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-62-birth.low"
+    },
+    {
+      "name": "BODY-62-birth.high",
+      "class_id": "BODY-62-birth.high",
+      "scope": "bodyStatus",
+      "expression": "not equalKey(body.birthTicket, number.birthTicket)",
+      "replacement": "body.birthTicket.low != number.birthTicket.low",
+      "fixture": "GUARD:BODY-STATUS-4",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BODY-62-birth.high"
+    },
+    {
+      "name": "W-57",
+      "class_id": "W-57",
+      "scope": "worldStatus",
+      "expression": "not equalKey(world.birthTicket, number.birthTicket)",
+      "replacement": "false",
+      "fixture": "GUARD:WORLD-57-MAX",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-57"
+    },
+    {
+      "name": "W-61",
+      "class_id": "W-61",
+      "scope": "setSleepingEnabled",
+      "expression": "let status: i32 = worldMutationStatus(owner);",
+      "replacement": "let status: i32 = OK;",
+      "fixture": "GUARD:WORLD-STALE-61",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / W-61"
+    },
+    {
+      "name": "SETINDEX-NE",
+      "class_id": "SETINDEX-NE",
+      "scope": "bodyStatus",
+      "expression": "body.setIndex == -1i32",
+      "replacement": "body.setIndex != -1i32",
+      "fixture": "GUARD:BODY-STATUS-0",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / SETINDEX-NE"
+    },
+    {
+      "name": "RAW-NOT",
+      "class_id": "RAW-NOT",
+      "scope": "bodyStatus",
+      "expression": "not raw.b2Body_IsValid(raw.b2MakeBodyId(world, number.slot))",
+      "replacement": "raw.b2Body_IsValid(raw.b2MakeBodyId(world, number.slot))",
+      "fixture": "GUARD:BODY-STATUS-0",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / RAW-NOT"
+    },
+    {
+      "name": "STEP-N",
+      "class_id": "STEP-N",
+      "scope": "validStepParameters",
+      "expression": "parameters.subStepCount <= 0i32",
+      "replacement": "false",
+      "fixture": "GUARD:STEP-n0",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / STEP-N"
+    },
+    {
+      "name": "STEP-INVH",
+      "class_id": "STEP-INVH",
+      "scope": "validStepParameters",
+      "expression": "finite(inv_h)",
+      "replacement": "true",
+      "fixture": "GUARD:STEP-inv-h",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / STEP-INVH"
+    },
+    {
+      "name": "CCOUNT",
+      "class_id": "CCOUNT",
+      "scope": "contactBlocksFit",
+      "expression": "upper / 4i64 + 3i64 <= 32767i64",
+      "replacement": "true",
+      "fixture": "GUARD:COUNT-1-131060-0",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CCOUNT"
+    },
+    {
+      "name": "CREQUEST",
+      "class_id": "CREQUEST",
+      "scope": "checkedContactSum",
+      "expression": "value = count + added;",
+      "replacement": "value = count;",
+      "fixture": "GUARD:COUNT-2-131059-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CREQUEST"
+    },
+    {
+      "name": "CARITH",
+      "class_id": "CARITH",
+      "scope": "checkedContactSum",
+      "expression": "count > 9223372036854775807i64 - added",
+      "replacement": "false",
+      "fixture": "GUARD:COUNT-2-9223372036854775807-1",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CARITH"
+    },
+    {
+      "name": "BATCH",
+      "class_id": "BATCH",
+      "scope": "solverStep",
+      "expression": "ticketLimit(reserved)",
+      "replacement": "i == 0i64 and ticketLimit(reserved)",
+      "fixture": "GUARD:MAX-BATCH",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / BATCH"
+    },
+    {
+      "name": "MAX-WAKE",
+      "class_id": "MAX-WAKE",
+      "scope": "setAwake",
+      "expression": "raw.b2Body_SetAwake(raw.b2MakeBodyId(world, number.slot), awake);",
+      "replacement": "if (ticketLimit(lastIssued)) return LIMIT; raw.b2Body_SetAwake(raw.b2MakeBodyId(world, number.slot), awake);",
+      "fixture": "GUARD:MAX-WAKE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / MAX-WAKE"
+    },
+    {
+      "name": "M11-18-SLEEP",
+      "class_id": "M11-18",
+      "scope": "b2SplitIsland",
+      "expression": "setIndex != 2i32",
+      "replacement": "false",
+      "fixture": "SPLIT-SLEEP-DIRTY",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-18"
+    },
+    {
+      "name": "M11-18-CLEAN",
+      "class_id": "M11-18",
+      "scope": "b2SplitIsland",
+      "expression": "base.constraintRemoveCount == 0i32",
+      "replacement": "false",
+      "fixture": "C12",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-18"
+    },
+    {
+      "name": "M11-19-SEEDS",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "let seedId: i32 = bodyIds.at(seedOrdinal);",
+      "replacement": "let seedId: i32 = bodyIds.at(bodyIds.length() - 1i64 - seedOrdinal);",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "M11-20-KINEMATIC",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.bodies.at(otherId as i64).setIndex != 0i32",
+      "replacement": "world.bodies.at(otherId as i64).bodyType == 2i32",
+      "fixture": "SPLIT-KINEMATIC",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "M11-21-RECYCLE",
+      "class_id": "M11-21",
+      "scope": "b2CreateIsland",
+      "expression": "var island = Island();",
+      "replacement": "var island = Island(); if (id as i64 < world.islands.length()) island.constraintRemoveCount = world.islands.at(id as i64).constraintRemoveCount;",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-21"
+    },
+    {
+      "name": "M11-22-TIE",
+      "class_id": "M11-22",
+      "scope": "b2FinalizeBody",
+      "expression": "sleepTime > world.taskSplitSleepTime",
+      "replacement": "sleepTime >= world.taskSplitSleepTime",
+      "fixture": "SPLIT-TIE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-22"
+    },
+    {
+      "name": "M11-22-NEXT",
+      "class_id": "M11-22",
+      "scope": "b2Solve",
+      "expression": "if (world.splitIslandId != -1i32) b2SplitIsland(world, world.splitIslandId);",
+      "replacement": "",
+      "fixture": "SPLIT-NEXT",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-22"
+    },
+    {
+      "name": "M11-23-OLD",
+      "class_id": "M11-23",
+      "scope": "b2Body_SetAwake",
+      "expression": "b2TrySleepIsland(world, world.bodies.at(body.id as i64).islandId);",
+      "replacement": "b2TrySleepIsland(world, body.islandId);",
+      "fixture": "C16",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-23"
+    },
+    {
+      "name": "W2-M01-ABS-W",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "mass2.b2AbsFloat(state.angularVelocity)",
+      "replacement": "state.angularVelocity",
+      "fixture": "ANGULAR-NEGATIVE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M02-RESET",
+      "class_id": "M11-02",
+      "scope": "b2FinalizeBody",
+      "expression": "body.sleepTime + world.finalizeDt",
+      "replacement": "world.finalizeDt",
+      "fixture": "SLEEP4",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-02"
+    },
+    {
+      "name": "W2-M03-REPEAT",
+      "class_id": "M11-03",
+      "scope": "b2World_EnableSleeping",
+      "expression": "world.enableSleep == flag",
+      "replacement": "false",
+      "fixture": "WORLD-REPEAT-FALSE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-03"
+    },
+    {
+      "name": "W2-M04-ID",
+      "class_id": "M11-04",
+      "scope": "b2FinalizeBody",
+      "expression": "world.islands.at(body.islandId as i64).localIndex",
+      "replacement": "body.islandId",
+      "fixture": "ISLAND-SPARSE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-04"
+    },
+    {
+      "name": "W2-M05-ORDER",
+      "class_id": "M11-05",
+      "scope": "b2World_StepPreparedCounter12",
+      "expression": "var sleepIndex: i32 = b2GetSolverSet(world, 2i32).islandCount - 1i32;\n            while (sleepIndex >= 0i32) {\n                if (not bits.b2GetBit(&world.awakeIslandBitSet, sleepIndex)) {\n                    let sleepIslandId: i32 = b2GetSolverSet(world, 2i32).islandSims.at(sleepIndex as i64);\n                    b2TrySleepIsland(world, sleepIslandId);\n                }\n                sleepIndex = sleepIndex - 1i32;\n            }",
+      "replacement": "",
+      "fixture": "MOVING-SLEEP",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-05",
+      "edits": [
+        {
+          "expression": "var sleepIndex: i32 = b2GetSolverSet(world, 2i32).islandCount - 1i32;\n            while (sleepIndex >= 0i32) {\n                if (not bits.b2GetBit(&world.awakeIslandBitSet, sleepIndex)) {\n                    let sleepIslandId: i32 = b2GetSolverSet(world, 2i32).islandSims.at(sleepIndex as i64);\n                    b2TrySleepIsland(world, sleepIslandId);\n                }\n                sleepIndex = sleepIndex - 1i32;\n            }",
+          "replacement": ""
+        },
+        {
+          "expression": "var ei: i32 = 0i32;",
+          "replacement": "if (world.enableSleep) { var sleepIndex: i32 = b2GetSolverSet(world, 2i32).islandCount - 1i32;\n            while (sleepIndex >= 0i32) {\n                if (not bits.b2GetBit(&world.awakeIslandBitSet, sleepIndex)) {\n                    let sleepIslandId: i32 = b2GetSolverSet(world, 2i32).islandSims.at(sleepIndex as i64);\n                    b2TrySleepIsland(world, sleepIslandId);\n                }\n                sleepIndex = sleepIndex - 1i32;\n            } }\n        var ei: i32 = 0i32;"
+        }
+      ]
+    },
+    {
+      "name": "W2-M07-SLEEPING",
+      "class_id": "M11-07",
+      "scope": "b2CreateContact",
+      "expression": "record.contactId = id; record.setIndex = 1i32;",
+      "replacement": "record.contactId = id; record.setIndex = world.bodies.at(shapeA.bodyId as i64).setIndex;",
+      "fixture": "C04",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-07"
+    },
+    {
+      "name": "W2-M08-REUSE",
+      "class_id": "M11-08",
+      "scope": "b2WakeSolverSet",
+      "expression": "else b2GetSolverSet(world, 2i32).bodyStates.at(target as i64) = BodyState();",
+      "replacement": "else { }",
+      "fixture": "WAKE-MOVING",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-08"
+    },
+    {
+      "name": "W2-M09-DUPLICATE",
+      "class_id": "M11-09",
+      "scope": "b2WakeSolverSet",
+      "expression": "b2RemoveNonTouchingContact(world, record.localIndex, 1i32);",
+      "replacement": "",
+      "fixture": "C04",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-09"
+    },
+    {
+      "name": "W2-M11-MOVED",
+      "class_id": "M11-11",
+      "scope": "b2RemoveNonTouchingContact",
+      "expression": "world.contacts.at(moved.contactId as i64).localIndex = local;",
+      "replacement": "",
+      "fixture": "C06",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-11"
+    },
+    {
+      "name": "W2-M12-OVERFLOW",
+      "class_id": "M11-12",
+      "scope": "b2RemoveContactFromGraph",
+      "expression": "bits.b2ClearBit(&color.bodySet, a);",
+      "replacement": "bits.b2ClearBit(&world.constraintGraph.colors[11].bodySet, a);",
+      "fixture": "C08",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "W2-M01-FACTOR",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "0.5f32 * world.finalizeInvDt * maxDeltaPosition",
+      "replacement": "1.0f32 * world.finalizeInvDt * maxDeltaPosition",
+      "fixture": "DELTA-FACTOR",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M01-INVH",
+      "class_id": "M11-01",
+      "scope": "b2Solve",
+      "expression": "world.finalizeInvDt = context.inv_dt;",
+      "replacement": "world.finalizeInvDt = context.inv_h;",
+      "fixture": "DELTA-INVH",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M01-SUM",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "tree.b2MaxFloat(maxVelocity, 0.5f32 * world.finalizeInvDt * maxDeltaPosition)",
+      "replacement": "maxVelocity + 0.5f32 * world.finalizeInvDt * maxDeltaPosition",
+      "fixture": "MAX-SUM",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M01-PARENS",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "math.sqrt(mass2.b2LengthSquared(state.linearVelocity)) + mass2.b2AbsFloat(state.angularVelocity) * sim.maxExtent",
+      "replacement": "(math.sqrt(mass2.b2LengthSquared(state.linearVelocity)) + mass2.b2AbsFloat(state.angularVelocity)) * sim.maxExtent",
+      "fixture": "VELOCITY-PARENS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M01-ANGLE",
+      "class_id": "M11-01",
+      "scope": "b2FinalizeBody",
+      "expression": "mass2.b2AbsFloat(state.deltaRotation.s)",
+      "replacement": "mass2.b2AbsFloat(math.libm_forward.trig_funcs.atan2f(state.deltaRotation.s, state.deltaRotation.c))",
+      "fixture": "ANGLE-CORRECTION",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-01"
+    },
+    {
+      "name": "W2-M11-SET",
+      "class_id": "M11-11",
+      "scope": "b2TrySleepIsland",
+      "expression": "b2AddNonTouchingContact(world, contactId, contactSim, 1i32);",
+      "replacement": "b2AddNonTouchingContact(world, contactId, contactSim, setIndex);",
+      "fixture": "C06",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-11"
+    },
+    {
+      "name": "W2-M13-INDEX",
+      "class_id": "M11-13",
+      "scope": "b2WakeSolverSet",
+      "expression": "b2AddContactToGraph(world, contactSim.contactId, contactSim);",
+      "replacement": "b2AddContactToGraph(world, contactSim.contactId, contactSim); world.constraintGraph.colors[world.contacts.at(contactSim.contactId as i64).colorIndex].contactSims.at(world.contacts.at(contactSim.contactId as i64).localIndex as i64).bodySimIndexA = -1i32;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-13"
+    },
+    {
+      "name": "W2-M13-MASS",
+      "class_id": "M11-13",
+      "scope": "b2WakeSolverSet",
+      "expression": "b2AddContactToGraph(world, contactSim.contactId, contactSim);",
+      "replacement": "b2AddContactToGraph(world, contactSim.contactId, contactSim); world.constraintGraph.colors[world.contacts.at(contactSim.contactId as i64).colorIndex].contactSims.at(world.contacts.at(contactSim.contactId as i64).localIndex as i64).invMassA = 0.0f32;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-13"
+    },
+    {
+      "name": "W2-M13-IMPULSE",
+      "class_id": "M11-13",
+      "scope": "b2WakeSolverSet",
+      "expression": "let contactSim: ContactSim = b2GetSolverSet(world, setIndex).contactSims.at(ci as i64);",
+      "replacement": "var contactSim: ContactSim = b2GetSolverSet(world, setIndex).contactSims.at(ci as i64); contactSim.manifold.rollingImpulse = 0.0f32;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-13"
+    },
+    {
+      "name": "W2-M14-RECYCLE",
+      "class_id": "M11-14",
+      "scope": "b2CreateSleepingSet",
+      "expression": "stored = move value;",
+      "replacement": "if (not recycled) stored = move value;",
+      "fixture": "SET-RECYCLE-PROBE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-14",
+      "edits": [
+        {
+          "expression": "let id: i32 = b2AllocId(&world.solverSetIdPool);",
+          "replacement": "let recycled: bool = world.solverSetIdPool.freeCount > 0i32; let id: i32 = b2AllocId(&world.solverSetIdPool);"
+        },
+        {
+          "expression": "stored = move value;",
+          "replacement": "if (not recycled) stored = move value;"
+        }
+      ]
+    },
+    {
+      "name": "W2-M19-CLEAR-BODY",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "world.bodies.at(nextBody as i64).isMarked = false;",
+      "replacement": "",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "W2-M19-CLEAR-CONTACT",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "world.contacts.at(nextContact as i64).isMarked = false;",
+      "replacement": "",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "W2-M19-FIRST",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "var seedOrdinal: i64 = 0i64;",
+      "replacement": "var seedOrdinal: i64 = 1i64;",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "W2-M19-LAST",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "seedOrdinal < bodyIds.length()",
+      "replacement": "seedOrdinal + 1i64 < bodyIds.length()",
+      "fixture": "SPLIT-ISOLATED-LAST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "W2-M19-FIFO",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "let bodyId: i32 = stack.at(stackCount);",
+      "replacement": "let bodyId: i32 = stack.at(0i64); var shift: i64 = 0i64; while (shift < stackCount) { stack.at(shift) = stack.at(shift + 1i64); shift = shift + 1i64; }",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19"
+    },
+    {
+      "name": "W2-M20-NONTOUCH",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "not contact.isMarked and (contact.flags & 1u32) != 0u32",
+      "replacement": "not contact.isMarked",
+      "fixture": "SPLIT-NONTOUCH",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-STATIC",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": " and world.bodies.at(otherId as i64).setIndex != 0i32",
+      "replacement": "",
+      "fixture": "C14",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M21-ALLOC-FIRST",
+      "class_id": "M11-21",
+      "scope": "b2SplitIsland",
+      "expression": "b2DestroyIsland(world, baseId);",
+      "replacement": "let firstIsland: i32 = b2CreateIsland(world, setIndex); b2DestroyIsland(world, baseId);",
+      "fixture": "C13",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-21",
+      "edits": [
+        {
+          "expression": "b2DestroyIsland(world, baseId);",
+          "replacement": "let firstIsland: i32 = b2CreateIsland(world, setIndex); b2DestroyIsland(world, baseId);"
+        },
+        {
+          "expression": "let islandId: i32 = b2CreateIsland(world, setIndex);",
+          "replacement": "let islandId: i32 = if seedOrdinal == 0i64 then firstIsland else b2CreateIsland(world, setIndex);"
+        }
+      ]
+    },
+    {
+      "name": "W2-M21-PARENT",
+      "class_id": "M11-21",
+      "scope": "b2CreateIsland",
+      "expression": "var island = Island();",
+      "replacement": "var island = Island(); if (id as i64 < world.islands.length()) island.parentIsland = world.islands.at(id as i64).parentIsland;",
+      "fixture": "ISLAND-RECYCLE-PARENT",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-21"
+    },
+    {
+      "name": "W2-M22-DESTROY",
+      "class_id": "M11-22",
+      "scope": "b2DestroyIsland",
+      "expression": "if (world.splitIslandId == id) world.splitIslandId = -1i32;",
+      "replacement": "",
+      "fixture": "CANDIDATE-DESTROY",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-22"
+    },
+    {
+      "name": "W2-M23-ALL",
+      "class_id": "M11-23",
+      "scope": "b2Body_SetAwake",
+      "expression": "b2TrySleepIsland(world, world.bodies.at(body.id as i64).islandId);",
+      "replacement": "var sleepAll: i32 = b2GetSolverSet(world, 2i32).islandCount - 1i32; while (sleepAll >= 0i32) { b2TrySleepIsland(world, b2GetSolverSet(world, 2i32).islandSims.at(sleepAll as i64)); sleepAll = sleepAll - 1i32; }",
+      "fixture": "C16",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-23"
+    },
+    {
+      "name": "W2-M22-IMMEDIATE",
+      "class_id": "M11-22",
+      "scope": "b2Solve",
+      "expression": "world.finalizedTaskSplitSleepTime = world.taskSplitSleepTime;",
+      "replacement": "world.finalizedTaskSplitSleepTime = world.taskSplitSleepTime; if (world.taskSplitIslandId != -1i32) b2SplitIsland(world, world.taskSplitIslandId);",
+      "fixture": "SPLIT-TIE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-22"
+    },
+    {
+      "name": "W2-M22-MULTIPLE",
+      "class_id": "M11-22",
+      "scope": "b2Solve",
+      "expression": "if (world.splitIslandId != -1i32) b2SplitIsland(world, world.splitIslandId);",
+      "replacement": "if (world.splitIslandId != -1i32) { var splitIds: List[i32]; var si: i32 = 0i32; while (si < b2GetSolverSet(world, 2i32).islandCount) { let sid: i32 = b2GetSolverSet(world, 2i32).islandSims.at(si as i64); if (world.islands.at(sid as i64).constraintRemoveCount > 0i32) splitIds.push(sid); si = si + 1i32; } var sj: i64 = 0i64; while (sj < splitIds.length()) { b2SplitIsland(world, splitIds.at(sj)); sj = sj + 1i64; } }",
+      "fixture": "SPLIT-NEXT",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-22"
+    },
+    {
+      "name": "W2-M19-MARK-POP",
+      "class_id": "M11-19",
+      "scope": "b2SplitIsland",
+      "expression": "world.bodies.at(otherId as i64).isMarked = true;",
+      "replacement": "",
+      "fixture": "SPLIT-CYCLE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-19",
+      "edits": [
+        {
+          "expression": "world.bodies.at(otherId as i64).isMarked = true;",
+          "replacement": ""
+        },
+        {
+          "expression": "world.bodies.at(seedId as i64).isMarked = true;",
+          "replacement": ""
+        },
+        {
+          "expression": "let bodyId: i32 = stack.at(stackCount);",
+          "replacement": "let bodyId: i32 = stack.at(stackCount); world.bodies.at(bodyId as i64).isMarked = true;"
+        }
+      ]
+    },
+    {
+      "name": "W2-M12-CACHE",
+      "class_id": "M11-12",
+      "scope": "b2TrySleepIsland",
+      "expression": "let source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64);",
+      "replacement": "var source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64); source.cache.count = 0i32;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "W2-M12-IMPULSE",
+      "class_id": "M11-12",
+      "scope": "b2TrySleepIsland",
+      "expression": "let source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64);",
+      "replacement": "var source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64); manifoldPoint(&source.manifold, 0i32).normalImpulse = 0.0f32;",
+      "fixture": "C07",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-12"
+    },
+    {
+      "name": "W2-M20-BODY-COUNT",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.islands.at(islandId as i64).bodyCount = world.islands.at(islandId as i64).bodyCount + 1i32;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-BODY-HEAD",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "if (world.islands.at(islandId as i64).headBody == -1i32) world.islands.at(islandId as i64).headBody = bodyId;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-BODY-TAIL",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.islands.at(islandId as i64).tailBody = bodyId;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-BODY-PREV",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.bodies.at(bodyId as i64).islandPrev = tailBody;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-BODY-NEXT",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.bodies.at(bodyId as i64).islandNext = -1i32;",
+      "replacement": "",
+      "fixture": "SPLIT-TWO-PAIRS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-CONTACT-COUNT",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.islands.at(islandId as i64).contactCount = world.islands.at(islandId as i64).contactCount + 1i32;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-CONTACT-HEAD",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "if (world.islands.at(islandId as i64).headContact == -1i32) world.islands.at(islandId as i64).headContact = contactId;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-CONTACT-TAIL",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.islands.at(islandId as i64).tailContact = contactId;",
+      "replacement": "",
+      "fixture": "C13-FIRST",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-CONTACT-PREV",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.contacts.at(contactId as i64).islandPrev = tailContact;",
+      "replacement": "",
+      "fixture": "SPLIT-TWO-PAIRS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-CONTACT-NEXT",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "world.contacts.at(contactId as i64).islandNext = -1i32;",
+      "replacement": "",
+      "fixture": "SPLIT-TWO-PAIRS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M20-DUPLICATE",
+      "class_id": "M11-20",
+      "scope": "b2SplitIsland",
+      "expression": "not contact.isMarked and (contact.flags & 1u32) != 0u32",
+      "replacement": "(contact.flags & 1u32) != 0u32",
+      "fixture": "SPLIT-TWO-PAIRS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-20"
+    },
+    {
+      "name": "W2-M15-SPURIOUS",
+      "class_id": "M11-15",
+      "scope": "b2TrySleepIsland",
+      "expression": "if (body.bodyMoveIndex != -1i32) {\n            # C Array_Clear retains storage; only a current logical event is observable.\n            if (body.bodyMoveIndex as i64 < world.bodyMoveEvents.length()) world.bodyMoveEvents.at(body.bodyMoveIndex as i64).fellAsleep = true;\n            world.bodies.at(bodyId as i64).bodyMoveIndex = -1i32;\n        }",
+      "replacement": "if (body.bodyMoveIndex != -1i32) {\n            # C Array_Clear retains storage; only a current logical event is observable.\n            if (body.bodyMoveIndex as i64 < world.bodyMoveEvents.length()) world.bodyMoveEvents.at(body.bodyMoveIndex as i64).fellAsleep = true;\n            world.bodies.at(bodyId as i64).bodyMoveIndex = -1i32;\n        } else { var spurious = BodyMoveEvent(); spurious.bodyId = b2MakeBodyId(world, body.id); spurious.fellAsleep = true; world.bodyMoveEvents.push(spurious); }",
+      "fixture": "C02",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-15"
+    },
+    {
+      "name": "W2-M06-GRAPH-FIRST",
+      "class_id": "M11-06",
+      "scope": "b2CollideChanges",
+      "expression": "b2LinkContact(world, id);",
+      "replacement": "",
+      "fixture": "LINK-B",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-06",
+      "edits": [
+        {
+          "expression": "b2LinkContact(world, id);",
+          "replacement": ""
+        },
+        {
+          "expression": "b2AddContactToGraph(world, id, transfer);",
+          "replacement": "b2AddContactToGraph(world, id, transfer); b2LinkContact(world, id);"
+        }
+      ]
+    },
+    {
+      "name": "W2-M16-WRONG-SET",
+      "class_id": "M11-16",
+      "scope": "b2DestroyContact",
+      "expression": "b2RemoveNonTouchingContact(world, record.localIndex, record.setIndex);",
+      "replacement": "b2RemoveNonTouchingContact(world, record.localIndex, 2i32);",
+      "fixture": "DESTROY-MIXED-SETS",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-16"
+    },
+    {
+      "name": "W2-M16-WAKE-FIRST",
+      "class_id": "M11-16",
+      "scope": "b2DestroyContact",
+      "expression": "if (wakeBodies and (record.flags & 1u32) != 0u32) {\n        b2WakeBody(world, record.edgeA.bodyId);\n        b2WakeBody(world, record.edgeB.bodyId);\n    }",
+      "replacement": "",
+      "fixture": "DESTROY-TOUCH-WAKE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-16",
+      "edits": [
+        {
+          "expression": "if (wakeBodies and (record.flags & 1u32) != 0u32) {\n        b2WakeBody(world, record.edgeA.bodyId);\n        b2WakeBody(world, record.edgeB.bodyId);\n    }",
+          "replacement": ""
+        },
+        {
+          "expression": "let record: ContactRecord = world.contacts.at(id as i64);",
+          "replacement": "var record: ContactRecord = world.contacts.at(id as i64); if (wakeBodies and (record.flags & 1u32) != 0u32) {\n        b2WakeBody(world, record.edgeA.bodyId);\n        b2WakeBody(world, record.edgeB.bodyId);\n    } record = world.contacts.at(id as i64);"
+        }
+      ]
+    },
+    {
+      "name": "TH-ROUTE-0",
+      "class_id": "TH-ROUTE-0",
+      "scope": "createBody",
+      "expression": "if (not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }",
+      "replacement": "if (not validSleepThreshold(def.sleepThreshold)) { let allocated: raw.BodyId = raw.b2CreateBody(raw.WorldId((owner.slot + 1i32) as u16, raw.worlds.at(owner.slot as i64).generation), def); result.status = PARAM; return result; }",
+      "fixture": "TH-ROUTE-PROBE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ROUTE-0"
+    },
+    {
+      "name": "TH-ROUTE-1",
+      "class_id": "TH-ROUTE-1",
+      "scope": "createBody8",
+      "expression": "if (not validBodyDef(def)) { result.status = PARAM; return result; }",
+      "replacement": "if (not validBodyDef(def)) { let allocated: raw.BodyId = raw.b2CreateBody(raw.WorldId((owner.slot + 1i32) as u16, raw.worlds.at(owner.slot as i64).generation), def); result.status = PARAM; return result; }",
+      "fixture": "TH-ROUTE-PROBE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ROUTE-1"
+    },
+    {
+      "name": "TH-ROUTE-2",
+      "class_id": "TH-ROUTE-2",
+      "scope": "createBodyWithShape",
+      "expression": "if (not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }",
+      "replacement": "if (not validSleepThreshold(def.sleepThreshold)) { let allocated: raw.BodyId = raw.b2CreateBody(raw.WorldId((owner.slot + 1i32) as u16, raw.worlds.at(owner.slot as i64).generation), def); result.status = PARAM; return result; }",
+      "fixture": "TH-ROUTE-PROBE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ROUTE-2"
+    },
+    {
+      "name": "TH-ROUTE-3",
+      "class_id": "TH-ROUTE-3",
+      "scope": "createBodyWithPreparedShape",
+      "expression": "if (not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }",
+      "replacement": "if (not validSleepThreshold(def.sleepThreshold)) { let allocated: raw.BodyId = raw.b2CreateBody(raw.WorldId((owner.slot + 1i32) as u16, raw.worlds.at(owner.slot as i64).generation), def); result.status = PARAM; return result; }",
+      "fixture": "TH-ROUTE-PROBE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ROUTE-3"
+    },
+    {
+      "name": "TH-ROUTE-4",
+      "class_id": "TH-ROUTE-4",
+      "scope": "createBodyWithBox",
+      "expression": "if (not validSleepThreshold(def.sleepThreshold)) { result.status = PARAM; return result; }",
+      "replacement": "if (not validSleepThreshold(def.sleepThreshold)) { let allocated: raw.BodyId = raw.b2CreateBody(raw.WorldId((owner.slot + 1i32) as u16, raw.worlds.at(owner.slot as i64).generation), def); result.status = PARAM; return result; }",
+      "fixture": "TH-ROUTE-PROBE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / TH-ROUTE-4"
+    },
+    {
+      "name": "W3-MOVE-SHALLOW",
+      "class_id": "MOVE-COPY",
+      "scope": "step",
+      "expression": "var result = StepResult(); result.status = worldMutationStatus(owner);",
+      "replacement": "var result = StepResult(); result = copy result; result.status = worldMutationStatus(owner);",
+      "fixture": "GUARD:MOVE-COPY",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / MOVE-COPY",
+      "file_edits": [
+        {
+          "expression": "class StepResult {",
+          "replacement": "class StepResult {\n    StepResult.copy(other: const ref StepResult) = {\n        var result = StepResult(); result.status = other.status;\n        result.shapeA = other.shapeA; result.shapeB = other.shapeB;\n        result.effectiveSubSteps = other.effectiveSubSteps; result.didSolve = other.didSolve; result.reason = other.reason;\n        result.values.pointer = other.values.pointer; result.values.len = other.values.len; result.values.cap = 0i64;\n        return result;\n    }"
+        }
+      ]
+    },
+    {
+      "name": "W3-BEGIN-SHALLOW",
+      "class_id": "CONTACT-COPY",
+      "scope": "cloneContactEvents",
+      "expression": "while (i < source.begin.length()) { let begin: ContactBegin = source.begin.at(i); result.begin.push(begin); i = i + 1i64; }",
+      "replacement": "source.begin.reserve(source.begin.length() + 1i64); result.begin.pointer = source.begin.pointer; result.begin.len = source.begin.len; result.begin.cap = source.begin.cap; result.w3Borrowed = 1i32;",
+      "fixture": "COPY-BEGIN",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CONTACT-COPY",
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3Borrowed: i32 = 0i32;\n    ContactEvents.destroy() = {\n        if ((w3Borrowed & 1i32) != 0i32) { begin.len = 0i64; begin.cap = 0i64; }\n        if ((w3Borrowed & 2i32) != 0i32) { end.len = 0i64; end.cap = 0i64; }\n        if ((w3Borrowed & 4i32) != 0i32) { hits.len = 0i64; hits.cap = 0i64; }\n    }"
+        }
+      ]
+    },
+    {
+      "name": "W3-END-SHALLOW",
+      "class_id": "CONTACT-COPY",
+      "scope": "cloneContactEvents",
+      "expression": "while (j < source.end.length()) { let end: ContactEnd = source.end.at(j); result.end.push(end); j = j + 1i64; }",
+      "replacement": "source.end.reserve(source.end.length() + 1i64); result.end.pointer = source.end.pointer; result.end.len = source.end.len; result.end.cap = source.end.cap; result.w3Borrowed = 2i32;",
+      "fixture": "COPY-END",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / CONTACT-COPY",
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3Borrowed: i32 = 0i32;\n    ContactEvents.destroy() = {\n        if ((w3Borrowed & 1i32) != 0i32) { begin.len = 0i64; begin.cap = 0i64; }\n        if ((w3Borrowed & 2i32) != 0i32) { end.len = 0i64; end.cap = 0i64; }\n        if ((w3Borrowed & 4i32) != 0i32) { hits.len = 0i64; hits.cap = 0i64; }\n    }"
+        }
+      ]
+    },
+    {
+      "name": "W3-HITS-SHALLOW",
+      "class_id": "HIT-COPY",
+      "scope": "cloneContactEvents",
+      "expression": "while (k < source.hits.length()) { let hit: ContactHit = source.hits.at(k); result.hits.push(hit); k = k + 1i64; }",
+      "replacement": "source.hits.reserve(source.hits.length() + 1i64); result.hits.pointer = source.hits.pointer; result.hits.len = source.hits.len; result.hits.cap = source.hits.cap; result.w3Borrowed = 4i32;",
+      "fixture": "COPY-HIT",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HIT-COPY",
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3Borrowed: i32 = 0i32;\n    ContactEvents.destroy() = {\n        if ((w3Borrowed & 1i32) != 0i32) { begin.len = 0i64; begin.cap = 0i64; }\n        if ((w3Borrowed & 2i32) != 0i32) { end.len = 0i64; end.cap = 0i64; }\n        if ((w3Borrowed & 4i32) != 0i32) { hits.len = 0i64; hits.cap = 0i64; }\n    }"
+        }
+      ]
+    },
+    {
+      "name": "W3-M13-OLD-COLOR",
+      "class_id": "M11-13",
+      "scope": "b2AddContactToGraph",
+      "expression": "var i: i32 = if staticA or staticB then 1i32 else 0i32;",
+      "replacement": "var i: i32 = if staticA or staticB then 1i32 else 0i32; if (source.w3OldColor >= 0i32) i = source.w3OldColor;",
+      "fixture": "C08",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / M11-13",
+      "scoped_edits": [
+        {
+          "scope": "b2TrySleepIsland",
+          "expression": "let source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64);",
+          "replacement": "var source: ContactSim = world.constraintGraph.colors[contactRecord.colorIndex].contactSims.at(contactRecord.localIndex as i64); source.w3OldColor = contactRecord.colorIndex;"
+        }
+      ],
+      "file_edits": [
+        {
+          "expression": "class ContactSim {",
+          "replacement": "class ContactSim {\n    w3OldColor: i32 = -1i32;"
+        }
+      ]
+    },
+    {
+      "name": "W3-STATE-SHARED",
+      "class_id": "STATE-COPY",
+      "scope": "getSleepState",
+      "expression": "var result = SleepState(); result.number = number; result.status = bodyStatus(owner, number);",
+      "replacement": "var result = SleepState(); result.number = number; result.status = bodyStatus(owner, number);",
+      "fixture": "COPY-PROBE:STATE",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / STATE-COPY",
+      "file_edits": [
+        {
+          "expression": "class SleepState {",
+          "replacement": "var w3SleepFlag: bool = false;\nvar w3SleepThreshold: f32 = 0.0f32;\nclass SleepState {"
+        },
+        {
+          "expression": "isSleeping: bool = false;",
+          "replacement": "isSleeping: ref bool = &w3SleepFlag;"
+        },
+        {
+          "expression": "sleepThreshold: f32 = 0.0f32;",
+          "replacement": "sleepThreshold: ref f32 = &w3SleepThreshold;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-MC",
+      "class_id": "HISTORY",
+      "scope": "createBody",
+      "expression": "result.number = BodyNumber(slot, reserved, owner.birthTicket);",
+      "replacement": "result.number = BodyNumber(slot, reserved, owner.birthTicket); w3MoveNumber = result.number;",
+      "fixture": "HISTORY-MC",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "file_edits": [
+        {
+          "expression": "class BodyMove {\n    number: BodyNumber = BodyNumber();",
+          "replacement": "var w3MoveNumber: BodyNumber = BodyNumber();\nclass BodyMove {\n    number: ref BodyNumber = &w3MoveNumber;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-MC-OWNER",
+      "class_id": "HISTORY",
+      "scope": "createBody",
+      "expression": "result.number = BodyNumber(slot, reserved, owner.birthTicket);",
+      "replacement": "result.number = BodyNumber(slot, reserved, owner.birthTicket); w3MoveNumber = result.number;",
+      "fixture": "HISTORY-MC-OWNER",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "file_edits": [
+        {
+          "expression": "class BodyMove {\n    number: BodyNumber = BodyNumber();",
+          "replacement": "var w3MoveNumber: BodyNumber = BodyNumber();\nclass BodyMove {\n    number: ref BodyNumber = &w3MoveNumber;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-M",
+      "class_id": "HISTORY",
+      "scope": "b2CreateBody",
+      "expression": "return b2MakeBodyId(world, id);",
+      "replacement": "w3MoveId = b2MakeBodyId(world, id); return w3MoveId;",
+      "fixture": "HISTORY-MOVE-PROBE",
+      "source": "silnik/fizyka/swiat.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "file_edits": [
+        {
+          "expression": "class BodyMoveEvent {",
+          "replacement": "var w3MoveId: BodyId = BodyId();\nclass BodyMoveEvent {"
+        },
+        {
+          "expression": "bodyId: BodyId = BodyId();",
+          "replacement": "bodyId: ref BodyId = &w3MoveId;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-BEGIN",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let begin: ContactBegin = source.begin.at(i);",
+      "replacement": "var begin: ContactBegin = source.begin.at(i);\n        var w3Owner: i64 = 0i64;\n        while (w3Owner < 128i64) {\n            if (raw.worlds.at(w3Owner).inUse and equalKey(raw.worlds.at(w3Owner).birthTicket, begin.shapeA.ownerTicket)) {\n                let w3Slot: i64 = begin.shapeA.slot as i64;\n                if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32)\n                    begin.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n            }\n            w3Owner = w3Owner + 1i64;\n        }",
+      "fixture": "HISTORY-BEGIN",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY"
+    },
+    {
+      "name": "W3-HISTORY-BEGIN-OWNER",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let begin: ContactBegin = source.begin.at(i);",
+      "replacement": "var begin: ContactBegin = source.begin.at(i);\n        let w3Owner: i64 = source.w3OwnerSlot as i64;\n        if (w3Owner >= 0i64 and w3Owner < 128i64 and raw.worlds.at(w3Owner).inUse) {\n            let w3Slot: i64 = begin.shapeA.slot as i64;\n            if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32) {\n                begin.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n                begin.shapeA.ownerTicket = raw.worlds.at(w3Owner).birthTicket;\n            }\n        }",
+      "fixture": "HISTORY-BEGIN-OWNER",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "scoped_edits": [
+        {
+          "scope": "copyContactEvents",
+          "expression": "var result = ContactEvents(); result.status = worldStatus(owner);",
+          "replacement": "var result = ContactEvents(); result.status = worldStatus(owner); result.w3OwnerSlot = owner.slot;"
+        }
+      ],
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3OwnerSlot: i32 = -1i32;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-END",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let end: ContactEnd = source.end.at(j);",
+      "replacement": "var end: ContactEnd = source.end.at(j);\n        var w3Owner: i64 = 0i64;\n        while (w3Owner < 128i64) {\n            if (raw.worlds.at(w3Owner).inUse and equalKey(raw.worlds.at(w3Owner).birthTicket, end.shapeA.ownerTicket)) {\n                let w3Slot: i64 = end.shapeA.slot as i64;\n                if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32)\n                    end.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n            }\n            w3Owner = w3Owner + 1i64;\n        }",
+      "fixture": "HISTORY-END",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY"
+    },
+    {
+      "name": "W3-HISTORY-END-OWNER",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let end: ContactEnd = source.end.at(j);",
+      "replacement": "var end: ContactEnd = source.end.at(j);\n        let w3Owner: i64 = source.w3OwnerSlot as i64;\n        if (w3Owner >= 0i64 and w3Owner < 128i64 and raw.worlds.at(w3Owner).inUse) {\n            let w3Slot: i64 = end.shapeA.slot as i64;\n            if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32) {\n                end.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n                end.shapeA.ownerTicket = raw.worlds.at(w3Owner).birthTicket;\n            }\n        }",
+      "fixture": "HISTORY-END-OWNER",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "scoped_edits": [
+        {
+          "scope": "copyContactEvents",
+          "expression": "var result = ContactEvents(); result.status = worldStatus(owner);",
+          "replacement": "var result = ContactEvents(); result.status = worldStatus(owner); result.w3OwnerSlot = owner.slot;"
+        }
+      ],
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3OwnerSlot: i32 = -1i32;"
+        }
+      ]
+    },
+    {
+      "name": "W3-HISTORY-HIT",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let hit: ContactHit = source.hits.at(k);",
+      "replacement": "var hit: ContactHit = source.hits.at(k);\n        var w3Owner: i64 = 0i64;\n        while (w3Owner < 128i64) {\n            if (raw.worlds.at(w3Owner).inUse and equalKey(raw.worlds.at(w3Owner).birthTicket, hit.shapeA.ownerTicket)) {\n                let w3Slot: i64 = hit.shapeA.slot as i64;\n                if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32)\n                    hit.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n            }\n            w3Owner = w3Owner + 1i64;\n        }",
+      "fixture": "HISTORY-HIT",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY"
+    },
+    {
+      "name": "W3-HISTORY-HIT-OWNER",
+      "class_id": "HISTORY",
+      "scope": "cloneContactEvents",
+      "expression": "let hit: ContactHit = source.hits.at(k);",
+      "replacement": "var hit: ContactHit = source.hits.at(k);\n        let w3Owner: i64 = source.w3OwnerSlot as i64;\n        if (w3Owner >= 0i64 and w3Owner < 128i64 and raw.worlds.at(w3Owner).inUse) {\n            let w3Slot: i64 = hit.shapeA.slot as i64;\n            if (w3Slot >= 0i64 and w3Slot < raw.worlds.at(w3Owner).shapes.length() and raw.worlds.at(w3Owner).shapes.at(w3Slot).id != -1i32) {\n                hit.shapeA.birthTicket = raw.worlds.at(w3Owner).shapes.at(w3Slot).birthTicket;\n                hit.shapeA.ownerTicket = raw.worlds.at(w3Owner).birthTicket;\n            }\n        }",
+      "fixture": "HISTORY-HIT-OWNER",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "new11 actual product",
+      "original_anchor": "KONTRAKT-11 Dodatek E / HISTORY",
+      "scoped_edits": [
+        {
+          "scope": "copyContactEvents",
+          "expression": "var result = ContactEvents(); result.status = worldStatus(owner);",
+          "replacement": "var result = ContactEvents(); result.status = worldStatus(owner); result.w3OwnerSlot = owner.slot;"
+        }
+      ],
+      "file_edits": [
+        {
+          "expression": "class ContactEvents {",
+          "replacement": "class ContactEvents {\n    w3OwnerSlot: i32 = -1i32;"
+        }
+      ]
+    }
+  ],
+  "required_core_classes": 24,
+  "complete": false,
+  "recipe_count": 195
+}

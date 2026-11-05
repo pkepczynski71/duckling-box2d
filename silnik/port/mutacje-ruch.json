@@ -1,0 +1,166 @@
+{
+  "contract": "KONTRAKT-3.md",
+  "box2d_commit": "8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3",
+  "status": "UNMEASURED: Ed0bf986778c1 Eebd000993b17 for R-R; Ea7aeb41184ea missing E8418de96e63e C Ede7d1b721a1e Ee6b67ce8a51d",
+  "mutations": [
+    {
+      "name": "kolejnosc-tlumienia",
+      "source": "src/solver.c:99-104",
+      "change": "delta + damping*v -> damping*(v + delta), analogicznie for w",
+      "cases": [
+        17,
+        18,
+        19,
+        63,
+        64,
+        65,
+        66
+      ],
+      "observe": [
+        "linearVelocity.x",
+        "linearVelocity.y",
+        "angularVelocity"
+      ],
+      "reason": "Jednoczesna niezerowa sila/grawitacja i tlumienie rozroznia dodanie przyrostu po tlumieniu.",
+      "result": null
+    },
+    {
+      "name": "kolejnosc-komend",
+      "source": "src/body.c:904-942 (akumulacja sil); KONTRAKT-3: kolejnosc indeksow komend",
+      "change": "Wykonaj komendy tego samego kroku w odwrotnej kolejnosci",
+      "cases": [
+        57
+      ],
+      "observe": [
+        "linearVelocity.x",
+        "worldCenter.x"
+      ],
+      "reason": "W E434f66e44101 1: Ec1864543ceb1 x = 2^24, 1, -2^24. W f32 checksum E50e721e49c01 E4074a7ce1b7e = 0, Ec695da8e1d5b = 1; E03db0c4513e3 Eb6112cde002b Ecd5b158f21b7 E35e99f929e01 Eed94e207f3ff.",
+      "result": null
+    },
+    {
+      "name": "brak-zacisku-liniowego",
+      "source": "src/solver.c:107-113",
+      "change": "Pomin ograniczenie dlugosci predkosci liniowej",
+      "cases": [
+        29,
+        32,
+        58,
+        63,
+        64,
+        65,
+        66
+      ],
+      "observe": [
+        "linearVelocity.x",
+        "linearVelocity.y"
+      ],
+      "reason": "E83cd09f23bae+1 ULP Ecf37c87714d0 E157828320351 E41063f87900d E944d936358d6 maximumLinearSpeed=2. E23443958b952 E3d1f2ae627a3-1 Ede7d1b721a1e E3d1f2ae627a3 E4778fe90c3d7 E3c42d9ac9807 Ef881fd308e10.",
+      "result": null
+    },
+    {
+      "name": "brak-zacisku-obrotowego",
+      "source": "src/solver.c:116-122",
+      "change": "Pomin ograniczenie predkosci obrotowej przy allowFastRotation=false",
+      "cases": [
+        35,
+        41,
+        58,
+        63,
+        65
+      ],
+      "observe": [
+        "angularVelocity",
+        "transform.q.c",
+        "transform.q.s"
+      ],
+      "reason": "Prog+1 ULP oraz impuls obrotowy; odpowiedniki allowFastRotation=true have pozostac nieograniczone.",
+      "result": null
+    },
+    {
+      "name": "zacisk-z-inv-h",
+      "source": "src/solver.c:75; src/world.c:749-751",
+      "change": "Uzyj inv_h zamiast inv_dt przy granicy obrotu",
+      "cases": [
+        39,
+        40,
+        41,
+        58,
+        65
+      ],
+      "observe": [
+        "angularVelocity",
+        "transform.q.c",
+        "transform.q.s"
+      ],
+      "reason": "subStepCount=8: E89270a50341b_Eaaa9402664f1 E431f1d7aa5da E77e0ab75bed8 Ee41d1e05d4d9 Ea0c8bf5cbb48 E3c42d9ac9807 E43dc6db61255, Eddc6e2b224d0=1 E35e99f929e01 Ef881fd308e10.",
+      "result": null
+    },
+    {
+      "name": "odwrotna-kolejnosc-ksztaltow",
+      "source": "src/shape.c:139-140; src/body.c:571-619",
+      "change": "Tworz ksztalty 1,0 zamiast 0,1 (z aktualizacja masy po kazdym dodaniu)",
+      "cases": [
+        48,
+        49,
+        50,
+        63,
+        64,
+        65,
+        66
+      ],
+      "observe": [
+        "mass",
+        "rotationalInertia",
+        "localCenter.x",
+        "localCenter.y",
+        "linearVelocity.x",
+        "linearVelocity.y"
+      ],
+      "reason": "NATIVE_REQUIRED",
+      "result": null
+    },
+    {
+      "name": "brak-zerowania-sily",
+      "source": "src/solver.c:613-614",
+      "change": "Pomin sim->force = b2Vec2_zero na koncu kroku swiata",
+      "cases": [
+        51,
+        52,
+        57,
+        63,
+        64,
+        65,
+        66
+      ],
+      "observe": [
+        "linearVelocity.x",
+        "linearVelocity.y",
+        "worldCenter.x",
+        "worldCenter.y"
+      ],
+      "reason": "E56fec6986297 E50e721e49c01 E7ef3d8e6ef6e 1,300,600; step 2 E3c44c3e1b8b7 Edfec2684e16b E0210a98d3838 E67765ea11a94 E283ada7088c2 E931794c54d4b E6e11f40befe2 E32f30ea0e83c Ec1864543ceb1 E434f66e44101 1.",
+      "result": null
+    },
+    {
+      "name": "brak-zerowania-momentu",
+      "source": "src/solver.c:613-614",
+      "change": "Pomin sim->torque = 0.0f na koncu kroku swiata",
+      "cases": [
+        51,
+        53,
+        63,
+        64,
+        65,
+        66
+      ],
+      "observe": [
+        "angularVelocity",
+        "transform.q.c",
+        "transform.q.s"
+      ],
+      "reason": "Ec29f4f951382 E50e721e49c01 E434f66e44101 1 E3c44c3e1b8b7 Ef7277d93e196 Ee015828237b8 E5a69af2690ee 2; E3d0cc7d3d290 E50e721e49c01 E153888832aee E6fe2a0f5118f E7bef82eb68ec E72110207b649.",
+      "result": null
+    }
+  ]
+}

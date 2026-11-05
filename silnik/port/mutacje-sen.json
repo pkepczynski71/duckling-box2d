@@ -1,0 +1,393 @@
+{
+  "native_mutations": [
+    {
+      "name": "WORLD-FIN-2",
+      "scope": "finiteVector",
+      "expression": "finite(value.x)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-2",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-2",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-3",
+      "scope": "finiteVector",
+      "expression": "finite(value.y)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-3",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-3",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-4",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.maximumLinearSpeed)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-4",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-4",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-5",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.contactHertz)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-5",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-5",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-6",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.contactDampingRatio)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-6",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-6",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-7",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.maxContactPushSpeed)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-7",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-7",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-8",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.restitutionThreshold)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-8",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-8",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-FIN-9",
+      "scope": "validSolverWorldParameters",
+      "expression": "finite(parameters.hitEventThreshold)",
+      "replacement": "true",
+      "fixture": "WORLD-FIN-9",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-FIN-9",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-4",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.maximumLinearSpeed > 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-4",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-4",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-5",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.contactHertz >= 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-5",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-5",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-6",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.contactDampingRatio >= 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-6",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-6",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-7",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.maxContactPushSpeed >= 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-7",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-7",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-8",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.restitutionThreshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-8",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-8",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "WORLD-SIGN-9",
+      "scope": "validSolverWorldParameters",
+      "expression": "parameters.hitEventThreshold >= 0.0f32",
+      "replacement": "true",
+      "fixture": "WORLD-SIGN-9",
+      "class_id": "INHERITED-WORLD",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / WORLD-SIGN-9",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "STEP-N",
+      "scope": "validStepParameters",
+      "expression": "parameters.subStepCount <= 0i32",
+      "replacement": "false",
+      "fixture": "STEP-n0",
+      "class_id": "INHERITED-STEP",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / STEP-N",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "STEP-INVH",
+      "scope": "validStepParameters",
+      "expression": "finite(inv_h)",
+      "replacement": "true",
+      "fixture": "STEP-inv-h",
+      "class_id": "INHERITED-STEP",
+      "guard": "G11-11",
+      "source": "silnik/fizyka/gra.dk",
+      "proof_scope": "shared helper only; new11 caller unverified",
+      "original_anchor": "KONTRAKT-11 Dodatek D / STEP-INVH",
+      "expected": {
+        "tag": "GR11",
+        "field": "status/accepted",
+        "baseline": [
+          5,
+          0
+        ],
+        "mutant": [
+          0,
+          1
+        ]
+      }
+    }
+  ],
+  "recipe_count": 16,
+  "core_classes_required": 24,
+  "core_classes_verified": 0,
+  "M12": "ODROCZONE_DO_KROKU_11",
+  "complete": false
+}

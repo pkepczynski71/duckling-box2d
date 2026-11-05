@@ -1,0 +1,382 @@
+{
+  "contract": "7/1",
+  "native_status": "UNMEASURED locally; CI must compile and execute copies, compilation failure is not detection",
+  "native_mutations": [
+    {
+      "name": "masa-od-ogonu",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "var shape: ShapeRecord = shapes.at(i);",
+      "replacement": "var shape: ShapeRecord = shapes.at(shapes.length() - 1i64 - i);",
+      "probe": "corpus",
+      "cases": [
+        15
+      ],
+      "result": null,
+      "expected_failure": "comparison"
+    },
+    {
+      "name": "brak-korekty-predkosci",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "result.state.linearVelocity = b2Add(state.linearVelocity, deltaLinear);",
+      "replacement": "result.state.linearVelocity = state.linearVelocity;",
+      "probe": "corpus",
+      "cases": [
+        13,
+        14,
+        15
+      ],
+      "result": null,
+      "expected_failure": "comparison"
+    },
+    {
+      "name": "brak-naprawy-next",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (shape.prevShapeId != -1i32) world.shapes.at(shape.prevShapeId as i64).nextShapeId = shape.nextShapeId;",
+      "replacement": "# mutation: missing next repair",
+      "probe": "corpus",
+      "cases": [
+        1,
+        25,
+        26
+      ],
+      "result": null,
+      "expected_failure": "integrity"
+    },
+    {
+      "name": "brak-naprawy-prev",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (shape.nextShapeId != -1i32) world.shapes.at(shape.nextShapeId as i64).prevShapeId = shape.prevShapeId;",
+      "replacement": "# mutation: missing prev repair",
+      "probe": "corpus",
+      "cases": [
+        1,
+        25,
+        26
+      ],
+      "result": null,
+      "expected_failure": "integrity"
+    },
+    {
+      "name": "brak-naprawy-glowy",
+      "source": "silnik/fizyka/swiat.dk",
+      "expression": "if (world.bodies.at(shape.bodyId as i64).headShapeId == slot) world.bodies.at(shape.bodyId as i64).headShapeId = shape.nextShapeId;",
+      "replacement": "# mutation: missing head repair",
+      "probe": "corpus",
+      "cases": [
+        2,
+        25
+      ],
+      "result": null,
+      "expected_failure": "integrity"
+    },
+    {
+      "name": "brak-rezerwy-drugiego-biletu",
+      "source": "silnik/fizyka/gra.dk",
+      "expression": "if (ticketLimit(lastIssued) or ticketLimit(nextTicket(lastIssued))) { result.status = LIMIT; return result; }",
+      "replacement": "if (ticketLimit(lastIssued)) { result.status = LIMIT; return result; }",
+      "probe": "tickets",
+      "cases": [],
+      "result": null,
+      "expected_failure": "tickets"
+    },
+    {
+      "name": "brak-drugiego-biletu-pary",
+      "source": "silnik/fizyka/gra.dk",
+      "expression": "result.shape = createShapeRaw(owner, result.body.number, shape, true, invoke);",
+      "replacement": "result.shape = createShapeRaw(owner, result.body.number, shape, true, invoke);\n    lastIssued = result.body.number.birthTicket;",
+      "probe": "tickets",
+      "cases": [],
+      "result": null,
+      "expected_failure": "tickets"
+    },
+    {
+      "source": "silnik/fizyka/gra.dk",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison",
+      "name": "apply-tylko-przy-roznej-density",
+      "expression": "    setDensityRaw(owner, number, density, false);\n    var world: ref raw.World = raw.worlds.at(owner.slot as i64);\n    raw.b2UpdateBodyMassData(world, parent);",
+      "replacement": "    let reviewDensityChanged: bool = raw.worlds.at(owner.slot as i64).shapes.at(number.slot as i64).density != density;\n    setDensityRaw(owner, number, density, false);\n    var world: ref raw.World = raw.worlds.at(owner.slot as i64);\n    if (reviewDensityChanged) raw.b2UpdateBodyMassData(world, parent);"
+    },
+    {
+      "source": "silnik/fizyka/gra.dk",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison",
+      "name": "brak-preflight-usuniecia",
+      "expression": "if (not preflight(owner, parent, 1i32, number.slot, raw.ShapeRecord(), 0.0f32)) return GEOMETRY;",
+      "replacement": "# mutation: missing removal preflight"
+    },
+    {
+      "source": "silnik/fizyka/gra.dk",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison",
+      "name": "brak-preflight-density",
+      "expression": "if (not preflight(owner, parent, 2i32, number.slot, raw.ShapeRecord(), density)) return GEOMETRY;",
+      "replacement": "# mutation: missing density preflight; negative-density guard retained"
+    },
+    {
+      "source": "silnik/fizyka/gra.dk",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison",
+      "name": "brak-validate-hull",
+      "expression": "if (not raw.b2ValidateHull(shape)) return false;",
+      "replacement": "# mutation: missing ValidateHull; edges and area retained"
+    },
+    {
+      "source": "silnik/fizyka/swiat.dk",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison",
+      "name": "brak-early-return-density-zero",
+      "expression": "if (world.shapes.at(slot).density == density) return;",
+      "replacement": "# mutation: write through float-equal density, including signed zero"
+    },
+    {
+      "name": "brak-skonczonosci-dlugosci-kapsuly",
+      "source": "silnik/fizyka/gra.dk",
+      "expression": " and finite(capsuleLength)",
+      "replacement": "",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison"
+    },
+    {
+      "name": "brak-skonczonosci-dlugosci-odcinka",
+      "source": "silnik/fizyka/gra.dk",
+      "expression": " and finite(segmentLength)",
+      "replacement": "",
+      "probe": "corpus",
+      "cases": [
+        1
+      ],
+      "result": null,
+      "expected_failure": "comparison"
+    }
+  ],
+  "review_recipes": [
+    {
+      "name": "generation",
+      "source": "shape.c:62-141",
+      "cases": [
+        25,
+        89,
+        92
+      ],
+      "result": null
+    },
+    {
+      "name": "FIFO",
+      "source": "id_pool.c:19-37",
+      "cases": [
+        25,
+        26
+      ],
+      "result": null
+    },
+    {
+      "name": "owner/birth",
+      "source": "gra shapeStatus",
+      "cases": [
+        65,
+        66,
+        92
+      ],
+      "result": null
+    },
+    {
+      "name": "drugi licznik ksztaltow",
+      "source": "gra lastIssued",
+      "cases": [
+        65,
+        89
+      ],
+      "result": null
+    },
+    {
+      "name": "odziedziczenie objectId",
+      "source": "shape.c:112",
+      "cases": [
+        65,
+        70,
+        77
+      ],
+      "result": null
+    },
+    {
+      "name": "missing kaskady",
+      "source": "body.c:373-391",
+      "cases": [
+        25,
+        65
+      ],
+      "result": null
+    },
+    {
+      "name": "density0 poza extent",
+      "source": "body.c:619-629",
+      "cases": [
+        13,
+        14
+      ],
+      "result": null
+    },
+    {
+      "name": "fixed zeruje mase",
+      "source": "body.c:592-603",
+      "cases": [
+        1,
+        14
+      ],
+      "result": null
+    },
+    {
+      "name": "missing Apply gry",
+      "source": "shape.c:1055-1078",
+      "cases": [
+        13,
+        14
+      ],
+      "result": null
+    },
+    {
+      "name": "missing early return raw",
+      "source": "shape.c:1064-1067",
+      "cases": [
+        13,
+        14
+      ],
+      "result": null
+    },
+    {
+      "name": "capsule < zamiast <=",
+      "source": "shape.c:199-208",
+      "cases": [
+        62
+      ],
+      "result": null
+    },
+    {
+      "name": "zly dispatch capsule",
+      "source": "shape.c:199-208",
+      "cases": [
+        7,
+        8,
+        9,
+        61,
+        62,
+        63
+      ],
+      "result": null
+    },
+    {
+      "name": "podwojny margines",
+      "source": "shape.c:36-56",
+      "cases": [
+        37,
+        38
+      ],
+      "result": null
+    },
+    {
+      "name": "static staly margines",
+      "source": "body.c:716-735",
+      "cases": [
+        37,
+        38
+      ],
+      "result": null
+    },
+    {
+      "name": "zawsze Move lub Enlarge",
+      "source": "body.c:716-735",
+      "cases": [
+        37,
+        38
+      ],
+      "result": null
+    },
+    {
+      "name": "missing deduplikacji",
+      "source": "broad_phase.h:74-82",
+      "cases": [
+        37,
+        38
+      ],
+      "result": null
+    },
+    {
+      "name": "missing UnBufferMove",
+      "source": "broad_phase.c DestroyProxy",
+      "cases": [
+        25,
+        37
+      ],
+      "result": null
+    },
+    {
+      "name": "filtr high",
+      "source": "shape.c:111",
+      "cases": [
+        77,
+        78
+      ],
+      "result": null
+    },
+    {
+      "name": "ref przez wzrost",
+      "source": "plan 77-84",
+      "cases": [
+        77,
+        78
+      ],
+      "result": null
+    },
+    {
+      "name": "poprawiony raw S12",
+      "source": "geometry.c:228-229",
+      "cases": [
+        85
+      ],
+      "result": null
+    },
+    {
+      "name": "getter z rejestru",
+      "source": "shape.c:945-977",
+      "cases": [
+        65,
+        77
+      ],
+      "result": null
+    }
+  ],
+  "ticket_fixtures": [
+    "low MAX carry high",
+    "single shape last ticket",
+    "MAX refuses no changes",
+    "MAX-1 refuses pair before allocation",
+    "MAX-2 accepts exactly pair",
+    "geometry refusal consumes no pair",
+    "world/body/shape shared counter"
+  ]
+}

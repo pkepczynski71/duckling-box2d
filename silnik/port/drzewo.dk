@@ -1,0 +1,454 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+                                                                                    
+                                                                               
+import fizyka.kola as physics;
+import fizyka.drzewo as tree;
+import core.builtins as builtins;
+import core.primitive_io as io;
+
+extern("C") {
+    fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64;
+}
+
+var inputOk = true;
+var inputEnded = false;
+
+fun fromBits(word: u32) -> f32 = {
+    var raw: u32 = word;
+    let value: f32 = (&raw as cptr f32)[0];
+    return value;
+}
+
+fun toBits(value: f32) -> u32 = {
+    var raw: f32 = value;
+    let word: u32 = (&raw as cptr u32)[0];
+    return word;
+}
+
+                                                                        
+fun joinBits(low: u32, high: u32) -> i64 = {
+    var raw: u64 = (low as u64) | ((high as u64) << 32u64);
+    let value: i64 = (&raw as cptr i64)[0];
+    return value;
+}
+
+fun lowBits(value: i64) -> u32 = {
+    return (value as u64) as u32;
+}
+
+fun highBits(value: i64) -> u32 = {
+    return ((value as u64) >> 32u64) as u32;
+}
+
+fun error(message: str) -> () = {
+    write(2i32, builtins.ptr_from_slice[char](message) as cptr char, message.length() as u64);
+}
+
+fun invalid(message: str) -> () = {
+    error("BLAD E95d3b17f0fb1: ");
+    error(message);
+    error("\n");
+    inputOk = false;
+}
+
+fun checkBits(word: u32, expected: f32) -> bool = {
+    let decoded: f32 = fromBits(word);
+    return decoded == expected and toBits(expected) == word and toBits(decoded) == word;
+}
+
+fun checkTransport() -> bool = {
+    if (not checkBits(0u32, 0.0f32) or not checkBits(2147483648u32, -0.0f32)
+        or not checkBits(1065353216u32, 1.0f32) or not checkBits(3212836864u32, -1.0f32)
+        or not checkBits(1u32, 1.401298464324817e-45f32)
+        or not checkBits(2139095039u32, 3.4028234663852886e38f32)) {
+        error("BLAD E0d41b4dbdf78 f32 <-> u32; E72d1df2d36c6 Ee015828237b8 E118553a0da6a E95d3b17f0fb1.\n");
+        return false;
+    }
+    let allBits: i64 = joinBits(4294967295u32, 4294967295u32);
+    let signBit: i64 = joinBits(0u32, 2147483648u32);
+    let mixedBits: i64 = joinBits(2309737967u32, 4275878552u32);
+    if (allBits != -1i64 or lowBits(allBits) != 4294967295u32 or highBits(allBits) != 4294967295u32
+        or signBit != (-9223372036854775807i64 - 1i64) or lowBits(signBit) != 0u32
+        or highBits(signBit) != 2147483648u32 or lowBits(mixedBits) != 2309737967u32
+        or highBits(mixedBits) != 4275878552u32 or (allBits & signBit) != signBit) {
+        error("BLAD E0d41b4dbdf78 E05e1f215075c i64; E72d1df2d36c6 Ee015828237b8 E118553a0da6a E95d3b17f0fb1.\n");
+        return false;
+    }
+    return true;
+}
+
+fun blank(c: i32) -> bool = {
+    return c == 32i32 or c == 9i32 or c == 10i32 or c == 13i32;
+}
+
+                                                                         
+fun readWord(allowEnd: bool) -> u32 = {
+    if (not inputOk) return 0u32;
+    var c: i32 = io.readCharCode();
+    while (blank(c)) c = io.readCharCode();
+    if (c < 0i32 and allowEnd) {
+        inputEnded = true;
+        return 0u32;
+    }
+    if (c < 48i32 or c > 57i32) {
+        invalid("brak liczby dziesietnej u32 (lub przedwczesny koniec).");
+        return 0u32;
+    }
+    var value: u64 = 0u64;
+    var digits: i32 = 0i32;
+    while (c >= 48i32 and c <= 57i32) {
+        value = value * 10u64 + (c - 48i32) as u64;
+        digits = digits + 1i32;
+        if (digits > 10i32 or value > 4294967295u64) {
+            invalid("liczba poza zakresem u32.");
+            return 0u32;
+        }
+        c = io.readCharCode();
+    }
+    if (c >= 0i32 and not blank(c)) invalid("niedozwolony znak po liczbie.");
+    return value as u32;
+}
+
+fun decodeFloat(word: u32) -> f32 = {
+    if ((word & 2139095040u32) == 2139095040u32) invalid("NaN/Inf poza kontraktem.");
+    return fromBits(word);
+}
+
+fun decodeAABB(x0: u32, y0: u32, x1: u32, y1: u32) -> tree.AABB = {
+    let lowerX: f32 = decodeFloat(x0);
+    let lowerY: f32 = decodeFloat(y0);
+    let upperX: f32 = decodeFloat(x1);
+    let upperY: f32 = decodeFloat(y1);
+    if (upperX < lowerX or upperY < lowerY or upperX - lowerX >= 100000.0f32
+        or upperY - lowerY >= 100000.0f32) invalid("Ee3d9d07d0d98 E77e0ab75bed8 E9b73a0409244.");
+    return tree.AABB(physics.Vec2(lowerX, lowerY), physics.Vec2(upperX, upperY));
+}
+
+fun outUnsigned(x: u64) -> () = {
+    if (x >= 10u64) outUnsigned(x / 10u64);
+    io.writeChar(('0' as u64 + x % 10u64) as char);
+}
+
+fun outWord(x: u32) -> () = {
+    io.writeChar(' ');
+    outUnsigned(x as u64);
+}
+
+fun outInt(x: i32) -> () = {
+    outWord(x as u32);
+}
+
+fun outFloat(x: f32) -> () = {
+    outWord(toBits(x));
+}
+
+fun outBits(value: i64) -> () = {
+    outWord(lowBits(value));
+    outWord(highBits(value));
+}
+
+fun outAABB(aabb: tree.AABB) -> () = {
+    outFloat(aabb.lowerBound.x);
+    outFloat(aabb.lowerBound.y);
+    outFloat(aabb.upperBound.x);
+    outFloat(aabb.upperBound.y);
+}
+
+                                                                               
+class Operation {
+    kind: u32 = 0u32;
+    n: u32 = 0u32;
+    aabb: tree.AABB = tree.AABB();
+    category: i64 = 0i64;
+    user: i64 = 0i64;
+    full: bool = false;
+}
+
+                                                                    
+fun zeroOperations() -> Operation[200] = {
+    var values: Operation[200];
+    return values;
+}
+
+class TreeCase {
+    id: u32 = 0u32;
+    count: u32 = 0u32;
+    dumpEvery: bool = false;
+    operations: Operation[200] = zeroOperations();
+}
+
+fun readOperation() -> Operation = {
+    var words: u32[8];
+    var index: i32 = 0i32;
+    while (index < 8i32) {
+        words[index] = readWord(false);
+        index = index + 1i32;
+    }
+    var op = Operation();
+    op.kind = words[0];
+    var used: i32 = 0i32;
+    if (op.kind == 0u32) {
+        op.aabb = decodeAABB(words[1], words[2], words[3], words[4]);
+        op.category = joinBits(words[5], words[6]);
+        op.user = words[7] as i64;
+        if (op.aabb.lowerBound.x <= -100000.0f32 or op.aabb.lowerBound.x >= 100000.0f32
+            or op.aabb.lowerBound.y <= -100000.0f32 or op.aabb.lowerBound.y >= 100000.0f32
+            or op.aabb.upperBound.x <= -100000.0f32 or op.aabb.upperBound.x >= 100000.0f32
+            or op.aabb.upperBound.y <= -100000.0f32 or op.aabb.upperBound.y >= 100000.0f32) {
+            invalid("obszar tworzenia poza B2_HUGE.");
+        }
+        used = 8i32;
+    } else if (op.kind == 1u32) {
+        op.n = words[1];
+        used = 2i32;
+    } else if (op.kind == 2u32 or op.kind == 3u32) {
+        op.n = words[1];
+        op.aabb = decodeAABB(words[2], words[3], words[4], words[5]);
+        used = 6i32;
+    } else if (op.kind == 4u32) {
+        op.n = words[1];
+        op.category = joinBits(words[2], words[3]);
+        used = 4i32;
+    } else if (op.kind == 5u32) {
+        op.aabb = decodeAABB(words[1], words[2], words[3], words[4]);
+        op.category = joinBits(words[5], words[6]);
+        used = 7i32;
+    } else if (op.kind == 6u32) {
+        if (words[1] > 1u32) invalid("fullBuild musi byc 0 albo 1.");
+        op.full = words[1] == 1u32;
+        used = 2i32;
+    } else {
+        invalid("typ operacji poza zakresem 0..6.");
+    }
+    var unusedIndex: i32 = used;
+    while (unusedIndex < 8i32) {
+        if (words[unusedIndex] != 0u32) invalid("nieuzywane slowa musza byc zerami.");
+        unusedIndex = unusedIndex + 1i32;
+    }
+    return op;
+}
+
+fun readCase(id: u32) -> TreeCase = {
+    var record = TreeCase();
+    record.id = id;
+    record.count = readWord(false);
+    let dump: u32 = readWord(false);
+    if (record.count < 1u32 or record.count > 200u32 or dump > 1u32) {
+        invalid("E8dc44deebc2b E6e548997f3f2 Ed0afe5ed2bd6 dumpEvery Ea277b9950b3a E93a55f3eced4.");
+        return record;
+    }
+    record.dumpEvery = dump == 1u32;
+    var operationIndex: i32 = 0i32;
+    while ((operationIndex as u32) < record.count and inputOk) {
+        record.operations[operationIndex] = readOperation();
+        operationIndex = operationIndex + 1i32;
+    }
+    return record;
+}
+
+fun outZeros(count: i32) -> () = {
+    var index: i32 = 0i32;
+    while (index < count) {
+        outWord(0u32);
+        index = index + 1i32;
+    }
+}
+
+fun outOperation(op: Operation) -> () = {
+    outWord(op.kind);
+    if (op.kind == 0u32) {
+        outAABB(op.aabb);
+        outBits(op.category);
+        outWord(lowBits(op.user));
+    } else if (op.kind == 1u32) {
+        outWord(op.n);
+        outZeros(6i32);
+    } else if (op.kind == 2u32 or op.kind == 3u32) {
+        outWord(op.n);
+        outAABB(op.aabb);
+        outZeros(2i32);
+    } else if (op.kind == 4u32) {
+        outWord(op.n);
+        outBits(op.category);
+        outZeros(4i32);
+    } else if (op.kind == 5u32) {
+        outAABB(op.aabb);
+        outBits(op.category);
+        outWord(0u32);
+    } else {
+        outWord(op.full as u32);
+        outZeros(6i32);
+    }
+}
+
+fun outDump(dynamicTree: ref tree.DynamicTree, id: u32, k: u32, proxies: ref i32[200], created: i32) -> () = {
+    io.writeChar('D');
+    outWord(id);
+    outWord(k);
+    outInt(dynamicTree.root);
+    outInt(dynamicTree.nodeCount);
+    outInt(dynamicTree.nodeCapacity);
+    outInt(dynamicTree.freeList);
+    outInt(tree.b2DynamicTree_GetProxyCount(dynamicTree));
+    outInt(tree.b2DynamicTree_GetHeight(dynamicTree));
+    outFloat(tree.b2DynamicTree_GetAreaRatio(dynamicTree));
+    outAABB(tree.b2DynamicTree_GetRootBounds(dynamicTree));
+    var live: i32 = 0i32;
+    var countIndex: i32 = 0i32;
+    while (countIndex < created) {
+        if (proxies[countIndex] >= 0i32) live = live + 1i32;
+        countIndex = countIndex + 1i32;
+    }
+    outInt(live);
+    var n: i32 = 0i32;
+    while (n < created) {
+        let proxyId: i32 = proxies[n];
+        if (proxyId >= 0i32) {
+            outInt(n);
+            outInt(proxyId);
+            outAABB(tree.b2DynamicTree_GetAABB(dynamicTree, proxyId));
+            outBits(tree.b2DynamicTree_GetCategoryBits(dynamicTree, proxyId));
+            outBits(tree.b2DynamicTree_GetUserData(dynamicTree, proxyId));
+        }
+        n = n + 1i32;
+    }
+    io.writeChar('\n');
+}
+
+fun runCase(record: ref TreeCase) -> bool = {
+    var dynamicTree: tree.DynamicTree = tree.b2DynamicTree_Create();
+    var proxies: i32[200];
+    var created: i32 = 0i32;
+    var operationIndex: i32 = 0i32;
+    while ((operationIndex as u32) < record.count) {
+        let op: Operation = record.operations[operationIndex];
+        var proxyId: i32 = 0i32;
+        if (op.kind >= 1u32 and op.kind <= 4u32) {
+            if (op.n >= (created as u32)) {
+                invalid("numer obszaru jeszcze nie utworzony.");
+                tree.b2DynamicTree_Destroy(&dynamicTree);
+                return false;
+            }
+            proxyId = proxies[op.n as i32];
+            if (proxyId < 0i32) {
+                invalid("operacja na usunietym obszarze.");
+                tree.b2DynamicTree_Destroy(&dynamicTree);
+                return false;
+            }
+            if (op.kind == 3u32 and tree.b2AABB_Contains(tree.b2DynamicTree_GetAABB(&dynamicTree, proxyId), op.aabb)) {
+                invalid("powiekszenie zawarte w starym obszarze (asercja C).");
+                tree.b2DynamicTree_Destroy(&dynamicTree);
+                return false;
+            }
+        }
+        var result: i32 = 0i32;
+        var query = tree.TreeQueryResult();
+        if (op.kind == 0u32) {
+            result = tree.b2DynamicTree_CreateProxy(&dynamicTree, op.aabb, op.category, op.user);
+            proxies[created] = result;
+            created = created + 1i32;
+        } else if (op.kind == 1u32) {
+            tree.b2DynamicTree_DestroyProxy(&dynamicTree, proxyId);
+            proxies[op.n as i32] = -1i32;
+        } else if (op.kind == 2u32) {
+            tree.b2DynamicTree_MoveProxy(&dynamicTree, proxyId, op.aabb);
+        } else if (op.kind == 3u32) {
+            tree.b2DynamicTree_EnlargeProxy(&dynamicTree, proxyId, op.aabb);
+        } else if (op.kind == 4u32) {
+            tree.b2DynamicTree_SetCategoryBits(&dynamicTree, proxyId, op.category);
+        } else if (op.kind == 5u32) {
+            query = tree.b2DynamicTree_Query(&dynamicTree, op.aabb, op.category);
+        } else {
+            result = tree.b2DynamicTree_Rebuild(&dynamicTree, op.full);
+        }
+        let k: u32 = (operationIndex + 1i32) as u32;
+        io.writeChar('O');
+        outWord(record.id);
+        outWord(k);
+        outOperation(op);
+        if (op.kind == 0u32 or op.kind == 6u32) {
+            outInt(result);
+        } else if (op.kind == 5u32) {
+            outInt(query.nodeVisits);
+            outInt(query.leafVisits);
+            outWord(query.hits.length() as u32);
+            var hitIndex: i64 = 0i64;
+            while (hitIndex < query.hits.length()) {
+                let hit: tree.TreeHit = query.hits.at(hitIndex);
+                outInt(hit.proxyId);
+                outBits(hit.userData);
+                hitIndex = hitIndex + 1i64;
+            }
+        }
+        io.writeChar('\n');
+        if (record.dumpEvery or k == record.count) outDump(&dynamicTree, record.id, k, &proxies, created);
+        operationIndex = operationIndex + 1i32;
+    }
+    tree.b2DynamicTree_Destroy(&dynamicTree);
+    return true;
+}
+
+fun main() -> i64 = {
+    if (not checkTransport()) return 2i64;
+    var cases: List[TreeCase];
+    var expectedId: u32 = 1u32;
+    while (not inputEnded and inputOk) {
+        let id: u32 = readWord(true);
+        if (not inputEnded and inputOk) {
+            if (id != expectedId) {
+                invalid("identyfikatory musza isc kolejno od 1.");
+                return 3i64;
+            }
+            var record: TreeCase = readCase(id);
+            if (not inputOk) return 3i64;
+            cases.push(move record);
+            expectedId = expectedId + 1u32;
+        }
+    }
+    if (not inputOk) return 3i64;
+    let count: i64 = cases.length();
+    if (count == 0i64) {
+        invalid("E946d517eef62 E7ef3142429d2.");
+        return 3i64;
+    }
+    io.writeStr("PORT4");
+    outWord(count as u32);
+    io.writeChar('\n');
+    var caseIndex: i64 = 0i64;
+    while (caseIndex < count) {
+                                                                               
+        var current: TreeCase = cases.at(caseIndex);
+        if (not runCase(&current)) return 3i64;
+        caseIndex = caseIndex + 1i64;
+    }
+    io.writeStr("END");
+    outWord(count as u32);
+    io.writeChar('\n');
+    return 0i64;
+}

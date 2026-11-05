@@ -1,0 +1,387 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+
+                                                                         
+import fizyka.kola as math2;
+import fizyka.swiat as raw;
+import fizyka.wielokaty as poly;
+import fizyka.ruch as mass2;
+import core.builtins as builtins;
+import core.primitive_io as io;
+extern("C") { fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64; }
+var inputOk: bool = true;
+var rowBytes: i32[2048];
+var rowLength: i32 = 0i32;
+var rowPosition: i32 = 0i32;
+var rowHasNewline: bool = false;
+
+# Box2D 8c661469, include/box2d/types.h:172. Bit transport, no C algorithm.
+fun fromBits(word: u32) -> f32 = {
+    var value: u32 = word;
+    let result: f32 = (&value as cptr f32)[0];
+    return result;
+}
+# Box2D 8c661469, include/box2d/types.h:172. Bit transport.
+fun toBits(value: f32) -> u32 = {
+    var bits: f32 = value;
+    let result: u32 = (&bits as cptr u32)[0];
+    return result;
+}
+# Box2D 8c661469, src/body.c:177. Invalid transport terminates, never a game status.
+fun invalid(message: str) -> () = {
+    if (not inputOk) return;
+    inputOk = false;
+    write(2i32, builtins.ptr_from_slice[char](message) as cptr char, message.length() as u64);
+}
+# Box2D 8c661469, include/box2d/types.h:81. Transport: kontrola-swiat.c:106-120.
+fun readRow() -> () = {
+    rowLength = 0i32;
+    rowPosition = 0i32;
+    rowHasNewline = false;
+    if (not inputOk) return;
+    var c: i32 = io.readCharCode();
+    while (c >= 0i32 and c != 10i32 and inputOk) {
+        if (c == 0i32 or c > 127i32 or rowLength == 2047i32) {
+            invalid("BLAD: ASCII / dlugosc wiersza.\n"); return;
+        }
+        rowBytes[rowLength] = c;
+        rowLength = rowLength + 1i32;
+        c = io.readCharCode();
+    }
+    rowHasNewline = c == 10i32;
+    if (rowHasNewline and rowLength > 0i32 and rowBytes[rowLength - 1i32] == 13i32) rowLength = rowLength - 1i32;
+    if (rowLength == 0i32) { invalid("BLAD: pusty lub brakujacy wiersz.\n"); return; }
+    var i: i32 = 0i32;
+    while (i < rowLength) {
+        if (rowBytes[i] == 13i32) { invalid("BLAD: samotny CR.\n"); return; }
+        i = i + 1i32;
+    }
+}
+# Box2D 8c661469, include/box2d/types.h:81. Transport: kontrola-swiat.c:121-136.
+fun readWord() -> u32 = {
+    if (not inputOk) return 0u32;
+    if (rowPosition > 0i32) {
+        if (rowPosition >= rowLength or rowBytes[rowPosition] != 32i32) {
+            invalid("BLAD: wymagana pojedyncza spacja.\n"); return 0u32;
+        }
+        rowPosition = rowPosition + 1i32;
+    }
+    if (rowPosition >= rowLength) { invalid("BLAD: E946d517eef62 Edcd4a212f815 u32.\n"); return 0u32; }
+    var c: i32 = rowBytes[rowPosition];
+    if (c < 48i32 or c > 57i32) { invalid("BLAD: E946d517eef62 Edcd4a212f815 u32.\n"); return 0u32; }
+    let leadingZero: bool = c == 48i32;
+    var value: u64 = 0u64;
+    var digits: i32 = 0i32;
+    while (c >= 48i32 and c <= 57i32) {
+        value = value * 10u64 + (c - 48i32) as u64;
+        digits = digits + 1i32;
+        if (digits > 10i32 or value > 4294967295u64 or (leadingZero and digits > 1i32)) {
+            invalid("BLAD: niekanoniczne u32.\n"); return 0u32;
+        }
+        rowPosition = rowPosition + 1i32;
+        c = if rowPosition < rowLength then rowBytes[rowPosition] else -1i32;
+    }
+    return value as u32;
+}
+# Box2D 8c661469, include/box2d/types.h:81. Transport marker P/A/B.
+fun readTag(tag: i32) -> () = {
+    if (not inputOk) return;
+    readRow();
+    if (not inputOk) return;
+    if (rowBytes[0] != tag) { invalid("BLAD: znacznik wiersza.\n"); return; }
+    rowPosition = 1i32;
+}
+# Box2D 8c661469, include/box2d/types.h:81. Transport: kontrola-swiat.c:104-143.
+fun endRow() -> () = {
+    if (inputOk and rowPosition != rowLength) invalid("BLAD: nadmiar danych w wierszu.\n");
+}
+# Box2D 8c661469, include/box2d/types.h:81. Reject trailing tokens.
+fun checkEnd() -> () = {
+    if (not inputOk) return;
+    let c: i32 = io.readCharCode();
+    if (c >= 0i32) invalid("BLAD: E5659622a1b7e\n");
+}
+# Box2D 8c661469, src/body.c:180-184. Reject NaN/Inf before any operation.
+fun decodeFloat(word: u32) -> f32 = {
+    if (not inputOk) return 0.0f32;
+    if ((word & 2139095040u32) == 2139095040u32) { invalid("BLAD: NaN/Inf.\n"); return 0.0f32; }
+    return fromBits(word);
+}
+# Box2D 8c661469, src/math_functions.                                         
+fun decodeRot(c: u32, s: u32) -> math2.Rot = {
+    if (not inputOk) return math2.Rot();
+    let q: math2.Rot = math2.Rot(decodeFloat(c), decodeFloat(s));
+    if (not inputOk) return q;
+    let lengthSquared: f32 = q.s * q.s + q.c * q.c;
+    if (not (1.0f32 - 0.0006f32 < lengthSquared and lengthSquared < 1.0f32 + 0.0006f32)) invalid("BLAD: obrot.\n");
+    return q;
+}
+
+                                                                             
+fun zeroGeometry() -> u32[40] = { var values: u32[40]; return values; }
+class Side {
+    tag: u32 = 0u32;
+    xf: math2.Transform = math2.Transform();
+    geometry: u32[40] = zeroGeometry();
+    circle: math2.Circle = math2.Circle();
+    capsule: raw.Capsule = raw.Capsule();
+    segment: raw.Segment = raw.Segment();
+    polygon: poly.Polygon = poly.Polygon();
+}
+
+                                                                                
+fun readSide(marker: i32) -> Side = {
+    var side = Side();
+    readTag(marker);
+    if (not inputOk) return side;
+    side.tag = readWord();
+    if (not inputOk) return side;
+    if (side.tag > 4u32) { invalid("BLAD: E2a1073a6e67f E8886cbca14d1.\n"); return side; }
+    let px: f32 = decodeFloat(readWord());
+    let py: f32 = decodeFloat(readWord());
+    let qc: u32 = readWord();
+    let qs: u32 = readWord();
+    side.xf = math2.Transform(math2.Vec2(px, py), decodeRot(qc, qs));
+    var i: i32 = 0i32;
+    while (i < 40i32 and inputOk) {
+        side.geometry[i] = readWord();
+        i = i + 1i32;
+    }
+    endRow();
+    if (not inputOk) return side;
+    var used: i32 = 0i32;
+    if (side.tag == 0u32) used = 3i32;
+    if (side.tag == 1u32) used = 5i32;
+    if (side.tag == 2u32) used = 4i32;
+    if (side.tag == 3u32) used = 18i32;
+    if (side.tag == 4u32) used = 7i32;
+    var padding: i32 = used;
+    while (padding < 40i32) {
+        if (side.geometry[padding] != 0u32) { invalid("BLAD: E296098d67338 Ec2dbf4ab3469.\n"); return side; }
+        padding = padding + 1i32;
+    }
+                                                                            
+    var field: i32 = if side.tag == 3u32 then 1i32 else 0i32;
+    while (field < used and inputOk) {
+        decodeFloat(side.geometry[field]);
+        field = field + 1i32;
+    }
+    if (not inputOk) return side;
+    if (side.tag == 0u32) {
+        side.circle = math2.Circle(math2.Vec2(fromBits(side.geometry[0]), fromBits(side.geometry[1])), fromBits(side.geometry[2]));
+        if (side.circle.radius < 0.0f32) invalid("BLAD: promien.\n");
+    }
+    if (side.tag == 1u32) {
+        side.capsule = raw.Capsule(math2.Vec2(fromBits(side.geometry[0]), fromBits(side.geometry[1])),
+            math2.Vec2(fromBits(side.geometry[2]), fromBits(side.geometry[3])), fromBits(side.geometry[4]));
+        if (side.capsule.radius < 0.0f32) invalid("BLAD: promien.\n");
+    }
+    if (side.tag == 2u32) {
+        side.segment = raw.Segment(math2.Vec2(fromBits(side.geometry[0]), fromBits(side.geometry[1])),
+            math2.Vec2(fromBits(side.geometry[2]), fromBits(side.geometry[3])));
+    }
+    if (side.tag == 3u32) {
+        if (side.geometry[0] < 3u32 or side.geometry[0] > 8u32) { invalid("BLAD: E8dc44deebc2b Eafd122813069.\n"); return side; }
+        side.polygon.count = side.geometry[0] as i32;
+        side.polygon.radius = fromBits(side.geometry[1]);
+        if (side.polygon.radius < 0.0f32) { invalid("BLAD: promien.\n"); return side; }
+        var point: i32 = 0i32;
+        while (point < 8i32) {
+            if (point >= side.polygon.count and (side.geometry[2i32+2i32*point] != 0u32 or side.geometry[3i32+2i32*point] != 0u32)) {
+                invalid("BLAD: nieuzywany punkt.\n"); return side;
+            }
+            side.polygon.vertices[point] = math2.Vec2(fromBits(side.geometry[2i32+2i32*point]), fromBits(side.geometry[3i32+2i32*point]));
+            point = point + 1i32;
+        }
+        if (not raw.b2ValidateHull(&side.polygon)) { invalid("BLAD: otoczka.\n"); return side; }
+        raw.b2MakePolygon(&side.polygon);
+    }
+    if (side.tag == 4u32) {
+        let halfWidth: f32 = fromBits(side.geometry[0]);
+        let halfHeight: f32 = fromBits(side.geometry[1]);
+        let center: math2.Vec2 = math2.Vec2(fromBits(side.geometry[2]), fromBits(side.geometry[3]));
+        let rotation: math2.Rot = decodeRot(side.geometry[4], side.geometry[5]);
+        let radius: f32 = fromBits(side.geometry[6]);
+        if (not inputOk) return side;
+        if (halfWidth <= 0.0f32 or halfHeight <= 0.0f32 or radius < 0.0f32) { invalid("BLAD: box.\n"); return side; }
+        side.polygon = mass2.b2MakeOffsetRoundedBox(halfWidth, halfHeight, center, rotation, radius);
+    }
+    return side;
+}
+
+                                                                       
+fun validatePair(kind: u32, a: ref Side, b: ref Side) -> () = {
+    var typeA: u32 = a.tag;
+    var typeB: u32 = b.tag;
+    if (typeA == 4u32) typeA = 3u32;
+    if (typeB == 4u32) typeB = 3u32;
+    var expectedA: u32 = 0u32;
+    var expectedB: u32 = 0u32;
+    if (kind == 0u32) { expectedA = 1u32; expectedB = 0u32; }
+    if (kind == 1u32) { expectedA = 3u32; expectedB = 0u32; }
+    if (kind == 2u32) { expectedA = 1u32; expectedB = 1u32; }
+    if (kind == 3u32) { expectedA = 2u32; expectedB = 0u32; }
+    if (kind == 4u32) { expectedA = 2u32; expectedB = 1u32; }
+    if (kind == 5u32) { expectedA = 3u32; expectedB = 1u32; }
+    if (kind == 6u32) { expectedA = 2u32; expectedB = 3u32; }
+    if (typeA != expectedA or typeB != expectedB) { invalid("BLAD: typy pary.\n"); return; }
+    var lengthA: f32 = 0.0f32;
+    var lengthB: f32 = 0.0f32;
+    if (typeA == 1u32) lengthA = poly.b2DistanceSquared(a.capsule.center1, a.capsule.center2);
+    if (typeA == 2u32) lengthA = poly.b2DistanceSquared(a.segment.point1, a.segment.point2);
+    if (typeB == 1u32) lengthB = poly.b2DistanceSquared(b.capsule.center1, b.capsule.center2);
+    if ((typeA == 1u32 or typeA == 2u32) and (toBits(lengthA) & 2139095040u32) == 2139095040u32) {
+        invalid("BLAD: dlugosc A.\n"); return;
+    }
+    if (typeB == 1u32 and (toBits(lengthB) & 2139095040u32) == 2139095040u32) {
+        invalid("BLAD: dlugosc B.\n"); return;
+    }
+    let epsSqr: f32 = math2.FLT_EPSILON * math2.FLT_EPSILON;
+    if ((kind == 0u32 or kind == 2u32 or kind == 3u32 or kind == 4u32) and not (lengthA > epsSqr)) {
+        invalid("BLAD: dlugosc A.\n"); return;
+    }
+    if ((kind == 2u32 or kind == 4u32) and not (lengthB > epsSqr)) {
+        invalid("BLAD: dlugosc B.\n"); return;
+    }
+    if (kind == 5u32 and not (lengthB > math2.FLT_EPSILON)) { invalid("BLAD: dlugosc B.\n"); return; }
+    if (kind == 6u32 and not (lengthA > math2.FLT_EPSILON)) invalid("BLAD: dlugosc A.\n");
+}
+
+                                                                              
+fun collide(kind: u32, a: ref Side, b: ref Side) -> math2.Manifold = {
+    if (kind == 0u32) return raw.b2CollideCapsuleAndCircle(&a.capsule, a.xf, b.circle, b.xf);
+    if (kind == 1u32) return raw.b2CollidePolygonAndCircle(&a.polygon, a.xf, b.circle, b.xf);
+    if (kind == 2u32) return raw.b2CollideCapsules(&a.capsule, a.xf, &b.capsule, b.xf);
+    if (kind == 3u32) return raw.b2CollideSegmentAndCircle(&a.segment, a.xf, b.circle, b.xf);
+    if (kind == 4u32) return raw.b2CollideSegmentAndCapsule(&a.segment, a.xf, &b.capsule, b.xf);
+    if (kind == 5u32) return raw.b2CollidePolygonAndCapsule(&a.polygon, a.xf, &b.capsule, b.xf);
+    return raw.b2CollideSegmentAndPolygon(&a.segment, a.xf, &b.polygon, b.xf);
+}
+
+                                                                           
+fun outUnsigned(value: u64) -> () = {
+    if (value >= 10u64) outUnsigned(value / 10u64);
+    io.writeChar((48u64 + value % 10u64) as char);
+}
+fun outDec(value: u32) -> () = { io.writeChar(' '); outUnsigned(value as u64); }
+fun outHex(word: u32) -> () = {
+    io.writeChar(' ');
+    var shift: i32 = 28i32;
+    while (shift >= 0i32) {
+        let digit: u32 = (word >> (shift as u32)) & 15u32;
+        if (digit < 10u32) io.writeChar((48u32 + digit) as char);
+        else io.writeChar((97u32 + digit - 10u32) as char);
+        shift = shift - 4i32;
+    }
+}
+fun outFloat(value: f32) -> () = { outHex(toBits(value)); }
+fun outVec(value: math2.Vec2) -> () = { outFloat(value.x); outFloat(value.y); }
+fun newline() -> () = { io.writeChar('\n'); }
+
+                                                                                 
+fun outPoint(point: math2.ManifoldPoint) -> () = {
+    outVec(point.point);
+    outVec(point.anchorA);
+    outVec(point.anchorB);
+    outFloat(point.separation);
+    outFloat(point.normalImpulse);
+    outFloat(point.tangentImpulse);
+    outFloat(point.totalNormalImpulse);
+    outFloat(point.normalVelocity);
+    outHex(point.id as u32);
+    outHex(point.persisted as u32);
+}
+
+                                                                        
+fun checkTransport() -> bool = {
+    return toBits(fromBits(2147483648u32)) == 2147483648u32
+        and toBits(fromBits(1u32)) == 1u32 and toBits(fromBits(2139095039u32)) == 2139095039u32
+        and fromBits(1065353216u32) == 1.0f32 and fromBits(3212836864u32) == -1.0f32;
+}
+
+                                                                                     
+fun outSide(side: ref Side) -> () = {
+    outHex(side.tag);
+    outVec(side.xf.p);
+    outFloat(side.xf.q.c);
+    outFloat(side.xf.q.s);
+    var i: i32 = 0i32;
+    while (i < 40i32) {
+        if (side.tag == 3u32 and i == 0i32) outHex(side.geometry[i]);
+        else outFloat(fromBits(side.geometry[i]));
+        i = i + 1i32;
+    }
+}
+
+                                                                                     
+fun main() -> i64 = {
+    if (not checkTransport()) return 2i64;
+    readRow();
+    if (not inputOk) return 3i64;
+    if (rowLength < 6i32 or rowBytes[0] != 80i32 or rowBytes[1] != 79i32 or rowBytes[2] != 82i32
+        or rowBytes[3] != 84i32 or rowBytes[4] != 57i32 or rowBytes[5] != 65i32) {
+        invalid("BLAD: naglowek PORT9A.\n"); return 3i64;
+    }
+    rowPosition = 6i32;
+    let count: u32 = readWord();
+    endRow();
+    if (not inputOk) return 3i64;
+    if (count < 1u32 or count > 448u32) { invalid("BLAD: E8dc44deebc2b E7ef3142429d2.\n"); return 3i64; }
+    io.writeStr("PORT9A"); outDec(count); newline();
+    var caseIndex: u32 = 0u32;
+    while (caseIndex < count and inputOk) {
+        readTag(80i32);
+        if (not inputOk) return 3i64;
+        let id: u32 = readWord();
+        let kind: u32 = readWord();
+        endRow();
+        if (not inputOk) return 3i64;
+        if (id != caseIndex + 1u32 or kind > 6u32) { invalid("BLAD: naglowek pary.\n"); return 3i64; }
+        var a: Side = readSide(65i32);
+        if (not inputOk) return 3i64;
+        var b: Side = readSide(66i32);
+        if (not inputOk) return 3i64;
+        validatePair(kind, &a, &b);
+        if (not inputOk) return 3i64;
+        io.writeStr("E"); outDec(id); outDec(kind); outSide(&a); outSide(&b); newline();
+        let result: math2.Manifold = collide(kind, &a, &b);
+        io.writeStr("M"); outDec(id);
+        outVec(result.normal);
+        outFloat(result.rollingImpulse);
+        outHex(result.pointCount as u32);
+        outPoint(result.point0);
+        outPoint(result.point1);
+        newline();
+        io.writeStr("ENDCASE"); outDec(id); newline();
+        caseIndex = caseIndex + 1u32;
+    }
+    checkEnd();
+    if (not inputOk) return 3i64;
+    io.writeStr("END"); outDec(count); newline();
+    return 0i64;
+}

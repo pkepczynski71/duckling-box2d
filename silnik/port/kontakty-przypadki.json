@@ -1,0 +1,2822 @@
+{
+  "wersja": "9b/1",
+  "profil": "COMPONENT_A9",
+  "baza": "20ce8a01",
+  "stan": "ZAMROZONY_2026-10-30_BAZA_8e7de304",
+  "zawieraSekwencjeOperacji": false,
+  "zawieraGenerator": false,
+  "N": 64,
+  "rodziny": 16,
+  "wariantowNaRodzine": 4,
+  "rejestry": {
+    "swiaty": 16,
+    "ciala": 256,
+    "ksztalty": 512,
+    "kontakty": 256,
+    "kopieRuchow": 4,
+    "kopieZdarzenKontaktowych": 4
+  },
+  "maxZywychSwiatow": 2,
+  "maxHistoriaBodyNumber": "2*B",
+  "maxHistoriaShapeNumber": "2*S",
+  "sumaOpMax": 8448,
+  "rzeczywistaLiczbaOperacji": null,
+  "formulaQ": "16384+2048*(B+S+C)+512*B+27*(max(32,nextPow2(max(1,4*C)))+max(16,nextPow2(max(1,4*S))))+512*(4*C+8*C)",
+  "objetosc": {
+    "bezTaskNaStrumien": 2488635392,
+    "zTaskNaStrumien": 4977270784,
+    "trzyStrumienie": 14931812352,
+    "fixturyDodatnieMaxWejsc": 64,
+    "fixturyDodatnieOpMax": 16,
+    "fixturyDodatnieBSCMax": [
+      4,
+      4,
+      4
+    ],
+    "fixturyDodatnieNaStrone": 141066240,
+    "fixturyDodatnieRezerwaNaStrone": 167772160,
+    "razemTrzyStronyZFixturami": 15355011072,
+    "najwiekszyPrzypadekNaStrone": 799277056,
+    "status": "SUFIT_WYLICZONY_NIE_POMIAR_PLIKU"
+  },
+  "progiB3": {
+    "zrodlo": "constants.h:23,38;manifold.c:43–76;math_functions.h:318–328",
+    "radius": "3a800000",
+    "speculativeDistance": "3ca3d70a",
+    "xB": [
+      "3cb3d709",
+      "3cb3d70a",
+      "3cb3d70b"
+    ],
+    "separation": [
+      "3ca3d709",
+      "3ca3d70a",
+      "3ca3d70b"
+    ],
+    "pointCount": [
+      1,
+      1,
+      0
+    ],
+    "dowod": "Ee023de4f2acf f32 z Ece6990654bfa, Ecd5b158f21b7 E3147a86ee9da E571f18490e82; Ed67d49d43ae12 E847bd45e97ec Ec36252584119 E947578d56c3f Ede7d1b721a1e fatAABB."
+  },
+  "przypadki": [
+    {
+      "id": 1,
+      "rodzina": "B1",
+      "wariant": 1,
+      "opis": "E120ff0974ebe E77b2883fafab E98fc34a4e5dc, E8e9eb383f341 E0b51cad1f65f E1bf61810dc30; CB E4fd4fad61098 count0/capacity16, GB0..10 count1.",
+      "opMax": 64,
+      "maxHistoriaSlotow": {
+        "B": 0,
+        "S": 0,
+        "C": 0
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 17680,
+        "snapshotyKoncoweMax": 64,
+        "taskBlokiMax": 64,
+        "bezTaskBajty": 1131520,
+        "zTaskBajty": 2263040
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 2,
+      "rodzina": "B1",
+      "wariant": 2,
+      "opis": "Efbfbf230e125 E005d19e74411 E9674aaa18d98 E95731edd551e, E008e2f2ed954 E50e721e49c01 Eaf174dcd9900 E336221797f20 E1565ccdbd2ae, E283ada7088c2 Eac908eed1708/E82ca203d04a8.",
+      "opMax": 64,
+      "maxHistoriaSlotow": {
+        "B": 0,
+        "S": 0,
+        "C": 0
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 17680,
+        "snapshotyKoncoweMax": 64,
+        "taskBlokiMax": 64,
+        "bezTaskBajty": 1131520,
+        "zTaskBajty": 2263040
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 3,
+      "rodzina": "B1",
+      "wariant": 3,
+      "opis": "E120ff0974ebe E1bf61810dc30 E6199aecf23ab E6f61ec5c7a0a/E9efa66815eca E4d3de6062df4; E631f494748f8 Ef8fe6a08083b E4d3de6062df4 Ecd5b158f21b7 Efd0afd487b6a Ec938f26af09c.",
+      "opMax": 64,
+      "maxHistoriaSlotow": {
+        "B": 0,
+        "S": 0,
+        "C": 0
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 17680,
+        "snapshotyKoncoweMax": 64,
+        "taskBlokiMax": 64,
+        "bezTaskBajty": 1131520,
+        "zTaskBajty": 2263040
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 4,
+      "rodzina": "B1",
+      "wariant": 4,
+      "opis": "Efbfbf230e125 E6271eea09aa9 E005d19e74411 E008e2f2ed954 Ede7d1b721a1e E5886b07cc9a5 E862417b9e7c3: E45b39e23b6af end0→end1→end0, missing TASK, E95aefb081ece E9413f6b4956a.",
+      "opMax": 64,
+      "maxHistoriaSlotow": {
+        "B": 0,
+        "S": 0,
+        "C": 0
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 17680,
+        "snapshotyKoncoweMax": 64,
+        "taskBlokiMax": 64,
+        "bezTaskBajty": 1131520,
+        "zTaskBajty": 2263040
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 5,
+      "rodzina": "B2",
+      "wariant": 1,
+      "opis": "CC, E5d94b00cd37c E73c76d56fd40, Ed4185a6548e1 A Ee015828237b8 B; E16a0eeb0791b Ebcee72e6df5d-E9f1277d878f3 E6199aecf23ab PAIRS Ede7d1b721a1e E9f1277d878f3 E6199aecf23ab COLLIDE; missing Ee6f07d43b5c2 E944d936358d6 Efa8847b0c331.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M01",
+        "M04"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 6,
+      "rodzina": "B2",
+      "wariant": 2,
+      "opis": "KC z Ea7bb48a246f4 E8a39178d327e–E881df12b68cd (E986a1b7135f4=Efcbcf165908d); E87b3e52dfe4e E36beed835188 E23b33a647bcb E3b5288bfb9d3; Ecea1a41d8b2a E3931010b9fea A.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M01",
+        "M02",
+        "M04"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 7,
+      "rodzina": "B2",
+      "wariant": 3,
+      "opis": "PC z Ea7bb48a246f4 E8a39178d327e–E2b3b18120924 (E986a1b7135f4=Efcbcf165908d), E2a75570e760c E6348bae1eba7; E0deeb8fa1dbb E2b3b18120924 A.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M01",
+        "M02",
+        "M04"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 8,
+      "rodzina": "B2",
+      "wariant": 4,
+      "opis": "KK, E9f69b35267b1 Ee1178b681977 E1565ccdbd2ae Ede7d1b721a1e Edbdbdcf94f1d E9ce48cd10df11; E78efd5a7a5b9 Eb743ede3bc5d E951b1ec7fc16, Ed9224b79a85a E0deeb8fa1dbb A/B.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M01",
+        "M02",
+        "M04"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 9,
+      "rodzina": "B3",
+      "wariant": 1,
+      "opis": "CC, rA=rB=3a800000, A.x=0,B.x=3cb3d709,y=0,q=(1,0): E66af36d5b056=3ca3d709, 1ULP Eac8859ccf949 Ed4f02eaafd1a; E9f1277d878f3 E944d936358d6 Ef136683675d6 E66af36d5b056.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M05"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 10,
+      "rodzina": "B3",
+      "wariant": 2,
+      "opis": "CC, Ee4432baa9081 Ee96e02d8e47f E939b22bc707e Ede7d1b721a1e B.x=3cb3d70a: E66af36d5b056=3ca3d70a, E21ce4c931001 Ecc36754834c2 Ed4f02eaafd1a; pointCount1.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M05"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 11,
+      "rodzina": "B3",
+      "wariant": 3,
+      "opis": "CC, Ee4432baa9081 Ee96e02d8e47f E939b22bc707e Ede7d1b721a1e B.x=3cb3d70b: E66af36d5b056=3ca3d70b, 1ULP Ead60c45cad65 Ed4f02eaafd1a; pointCount0, fatAABB E9bc4d90f6f05 Efe55bd22d947, Ebc6955218fef E467a06e67669.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M05"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 12,
+      "rodzina": "B3",
+      "wariant": 4,
+      "opis": "CC z E62d4123c0134 E3f9a236c2bb9 E75e07ef9bcaa Ede7d1b721a1e E8762a60299f1 Edbdbdcf94f1d, E0eca9b7b937d E9f1277d878f3→pointCount0→E9f1277d878f3 E2de7df7eee3a fatAABB; E283ada7088c2 Ec1a78613530c Eeb2ee521564d.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M05"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 13,
+      "rodzina": "B4",
+      "wariant": 1,
+      "opis": "Eca9fd1aa5e13 Eac908eed1708, Eef2a6f58978b E862417b9e7c3 A=0,B=0; Ecced28c6dc3f/E47ea3f52a2f1/E6c45cb72a36e/E3ace60b0a0c1 Ecd5b158f21b7 E6a20e02c3db6 E82ca203d04a8.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 14,
+      "rodzina": "B4",
+      "wariant": 2,
+      "opis": "E7566ad8da86a E0967115f2813 E68eb531a8f66 z A=1,B=0; OR E8d0eebb37dce, E8e7c0686e285 E067a34cdead7 PP E3b9fbfb3a612 do1 i0; E0144b1defcf7 E6199aecf23ab contactId.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 15,
+      "rodzina": "B4",
+      "wariant": 3,
+      "opis": "E7566ad8da86a E0967115f2813 E68eb531a8f66 z A=0,B=1, E9f69b35267b1 E1f58b9145b24/Ed6a98598212e/contactId E6199aecf23ab E8b9014fc4742; Ee6f07d43b5c2/E361e48d0308f Ecd5b158f21b7 E7d46b9edf656 E6199aecf23ab Ed6a98598212e.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 16,
+      "rodzina": "B4",
+      "wariant": 4,
+      "opis": "E8a9fa67872a0 A=1,B=1; missing Eaee85f07e334 Ee6f07d43b5c2 Ede7d1b721a1e missing Ee6f07d43b5c2 E944d936358d6 E58d276cd1069 E1a4ee619b567; TASK E03494afd4248/E8322e87d2458/E42a79594de37.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 17,
+      "rodzina": "B5",
+      "wariant": 1,
+      "opis": "E0d2db74e72c8 localCenter E6199aecf23ab Ec58af3def23b E9a6444b5c495 Ee29832de04f3, q=(0,1); fixture52 Ed50cb0aea4d6 Eb0de598f2e8e 0.25/1 Ede7d1b721a1e restitution0.5/1.5.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [
+        "G-MAT-F-FIN",
+        "G-MAT-F-NONNEG",
+        "G-MAT-ROUTES",
+        "G-LEGACY-GEOMETRY",
+        "G-LEGACY-S12"
+      ],
+      "klasyMutacji": [
+        "M20",
+        "M21"
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40",
+        "F-MATERIAL-ROUTES",
+        "F-LEGACY40"
+      ],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 18,
+      "rodzina": "B5",
+      "wariant": 2,
+      "opis": "E6b447d70c712 COM q=(0,-1), fixture52 rollingResistance E03db0c4513e3 Ede7d1b721a1e E78efd5a7a5b9 Edcd270c0c416; E9baf3a40312f E04fe795104b7 Ea0c8bf5cbb48 E9baf3a40312f E9e6da7f27c48.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [
+        "G-MAT-R-FIN",
+        "G-MAT-R-NONNEG",
+        "G-MAT-ROUTES"
+      ],
+      "klasyMutacji": [
+        "M20",
+        "M21"
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40",
+        "F-MATERIAL-ROUTES"
+      ],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 19,
+      "rodzina": "B5",
+      "wariant": 3,
+      "opis": "Ea1e43e7682d9 E139b09b78a6f, rollingResistance E03db0c4513e3→0 E3d9fc4bde7ce Ee2971bee9914 Ecc74e114249e, tangentSpeed -2/+0.5, checksum E33129567e0bd E61ad2400f4f6.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [
+        "G-MAT-ROLL-FIN",
+        "G-MAT-ROLL-NONNEG",
+        "G-MAT-ROUTES"
+      ],
+      "klasyMutacji": [
+        "M20",
+        "M21"
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40",
+        "F-MATERIAL-ROUTES"
+      ],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 20,
+      "rodzina": "B5",
+      "wariant": 4,
+      "opis": "Ecbbccf083487 E23b33a647bcb E0deeb8fa1dbb, Eb0de598f2e8e=0 i1; tangentSpeed -0/+0 Ecf37c87714d0 -1/+2, userMaterialId E913d3b4475ff; missing E748aa66d0d69.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 3,
+        "S": 3,
+        "C": 3
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [
+        "G-MAT-T-FIN",
+        "G-MAT-ROUTES"
+      ],
+      "klasyMutacji": [
+        "M20",
+        "M21"
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40",
+        "F-MATERIAL-ROUTES"
+      ],
+      "limitWyjscia": {
+        "qBajty": 56080,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 7178240,
+        "zTaskBajty": 14356480
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 21,
+      "rodzina": "B6",
+      "wariant": 1,
+      "opis": "PP E8e7c0686e285 E067a34cdead7; fixture51 E38aa4e42f3c0 E5884ec40704e id0/id1 Eda4aea433f4d, E78efd5a7a5b9 normalImpulse 3f800000/40000000, Eba01435d2b41 bf000000/3e800000; E4945a70fa7f9 E6199aecf23ab Ea56145270ce6.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M13",
+        "M15",
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 22,
+      "rodzina": "B6",
+      "wariant": 2,
+      "opis": "PP z Ed06b971a37e8 E2f5eb350b5b0 Ede7d1b721a1e Ed06b971a37e8 Ef9abe7606215 E5e746ca9f51e Ea56145270ce6, E78efd5a7a5b9 E87b3e52dfe4e Ed8425ef851ea; E915c0f60e808 dostaje0, E255703f87148=Efcbcf165908d.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M13",
+        "M14",
+        "M15",
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 23,
+      "rodzina": "B6",
+      "wariant": 3,
+      "opis": "PP pozostaje touching, oba stare id niezgodne; rollingImpulse=3f000000 przechodzi mimo braku zgodnego id; cache7 niezerowe.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M13",
+        "M14",
+        "M15",
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 24,
+      "rodzina": "B6",
+      "wariant": 4,
+      "opis": "PP 2→1→0→E3ace60b0a0c1; E19b25856e1c1 E11239872d178=40400000,E7d2857159e30=c0000000,E63fbb88660d6=3f000000,E5e1ecee06a7f count3/A0,1,2/B2,1,0; E11239872d178/E7d2857159e30 E01be30bb4a27, missing E2012d3761c9e. E8652ad2c7096 E19b25856e1c1 Edb4fc2cf6309 E5884ec40704e Ea56145270ce6 Eddc146bc1ee1 Edd76283a7989 E079651703164 E50e721e49c01 Ee2971bee9914 E04217c2e73b5 Eac40aff37be0 Ede7d1b721a1e E7bef82eb68ec E78efd5a7a5b9 Ed8425ef851ea: E94df0302070b first Eff651d1fb71c, Ecd5b158f21b7 Ee6d0c9ebe49c.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 2,
+        "S": 2,
+        "C": 1
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M13",
+        "M14",
+        "M15",
+        "M16",
+        "M17",
+        "M18",
+        "M19"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 35088,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 4491264,
+        "zTaskBajty": 8982528
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 25,
+      "rodzina": "B7",
+      "wariant": 1,
+      "opis": "12 Ebcee72e6df5d-E9f1277d878f3 w8 Ef9eba8166f26; fixture53 E87fc904694ea E2d494f036122 Ed2185e72e0e7 E6ee0eb490ff8 Ede7d1b721a1e E2d494f036122 E3d9814136e1a A; Ea30aaf0ecefd E5edd1832df25 E507a9a8be3d1 E3c44c3e1b8b7 E5606f358625b localIndex.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 26,
+      "rodzina": "B7",
+      "wariant": 2,
+      "opis": "E7566ad8da86a E0967115f2813 Ef86a26a7cf7e, E9f69b35267b1 Ee1178b681977 Edbdbdcf94f1d; fixture53 E87fc904694ea E2d494f036122 E3d9814136e1a B Ede7d1b721a1e Efa190fd65908 A.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 27,
+      "rodzina": "B7",
+      "wariant": 3,
+      "opis": "E599eadcaa074 Eaccb0badeeb5 Ede7d1b721a1e Eedb117d88e4d Ebcee72e6df5d-E9f1277d878f3, Ef718a7a58dd7 Ea7cd9938ab5e LIFO E50e721e49c01 E498d092ea59f E336221797f20; E9e73e72eecc5 ContactNumber STALE.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 28,
+      "rodzina": "B7",
+      "wariant": 4,
+      "opis": "E599eadcaa074 E91ea8a5de35a Ea7cd9938ab5e E50e721e49c01 E32fc55ea0b40 E336221797f20 E272e18f928e6 contactId, Eaadd690aad49 Eec72420df5df; Ec39da7cc242d pairSet Ede7d1b721a1e E9834fad97e13 Eee5a9a31c4d1 E15a205acbc24.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "tak",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M08",
+        "M09"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 29,
+      "rodzina": "B8",
+      "wariant": 1,
+      "opis": "Eae047cf3caba E9f1277d878f3 Eb5b2babb1a82 E50e721e49c01 kolorze0, E6c45cb72a36e E88d5207466ba E507a9a8be3d1 E5ea52c02e5e6 Eaa214ea38326, RemoveSwap z E5a25c2b40cbf.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M10",
+        "M27"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 30,
+      "rodzina": "B8",
+      "wariant": 2,
+      "opis": "Eae047cf3caba E9f1277d878f3 Eb5b2babb1a82 z E10ee18ff62dc E2053dbbf6ec7 E50e721e49c01 kolorze1; E6f61ec5c7a0a E054a5c91e77c Edb9ef2f3d208 Eb5b2babb1a82, E5edd1832df25 localIndex.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M10",
+        "M27"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 31,
+      "rodzina": "B8",
+      "wariant": 3,
+      "opis": "Ecae7d57bc067 Ede7d1b721a1e E3ace60b0a0c1 E6199aecf23ab Ed54df8fb1830 E1030381ace8a; E5606f358625b Edc7f47021437 Ed44ecc64cccb E8d3d1fea3b1b, E6ffcaae3587c Ecd5b158f21b7 Eb88a3cc4b7a4.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M10",
+        "M27"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 32,
+      "rodzina": "B8",
+      "wariant": 4,
+      "opis": "E0eb8e3931fdb E30a1ce3d52a3 E3d9814136e1a Eac908eed1708, E3f440ef4a088 E68752bf62253 E6f5a6034e770=1; E0296c43c240a Ede7d1b721a1e E4dd5b6e2bf3b E6199aecf23ab E3dfc3466e28e Eb504aa4b0c85 Efa13149d723c.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-COPY-LOOKUP",
+        "G-COPY-LIST"
+      ],
+      "klasyMutacji": [
+        "M10",
+        "M27"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 33,
+      "rodzina": "B9",
+      "wariant": 1,
+      "opis": "Ea6a32dbc5618 rootB E425c89ed5bb7 rootA z E82eae205a7d2 Eb486e8d8fb09 Eb4051b80bb80>=2; E16a0eeb0791b Ee015828237b8 E8851aaa7d08c Ede7d1b721a1e E6199aecf23ab E8851aaa7d08c.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M29",
+        "M30",
+        "M31",
+        "M32",
+        "M33",
+        "M34",
+        "M35"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 34,
+      "rodzina": "B9",
+      "wariant": 2,
+      "opis": "Eef087dd45c30 Ee1178b681977 E0deeb8fa1dbb E8d0eebb37dce, E53f35b386044 Eddc9e6691942 Ecdce8218c199, E8851aaa7d08c E32f30ea0e83c E3d92283ddbf7 Ef245940166d1 islandSims; E5edd1832df25 E28cd2c5c15d1 E291218c9a0b2.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M29",
+        "M30",
+        "M31",
+        "M32",
+        "M33",
+        "M34",
+        "M35"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 35,
+      "rodzina": "B9",
+      "wariant": 3,
+      "opis": "E9fef377ea90d E9a747e5e7c0b, E6c45cb72a36e E09ae6811958c E8a5050a9ea1e removeCount E283ada7088c2 Ead1a64057f9a; E6f61ec5c7a0a E88d5207466ba E054a5c91e77c E45dd76c002f3 E3d9814136e1a.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M29",
+        "M30",
+        "M31",
+        "M32",
+        "M33",
+        "M34",
+        "M35"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 36,
+      "rodzina": "B9",
+      "wariant": 4,
+      "opis": "E6b4fa156dada Ec58af3def23b Ea330395cc0a5 z Eb8d0769aac3b Ede7d1b721a1e Ec58af3def23b Ea330395cc0a5 E9a747e5e7c0b; E6f61ec5c7a0a E5a25c2b40cbf E054a5c91e77c E1118f9816ddc E274783628a1a Ede7d1b721a1e E8bdf9cae947b islandId.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 8,
+        "C": 12
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M29",
+        "M30",
+        "M31",
+        "M32",
+        "M33",
+        "M34",
+        "M35"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 154144,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 19730432,
+        "zTaskBajty": 39460864
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 37,
+      "rodzina": "B10",
+      "wariant": 1,
+      "opis": "E656ca45d1891 E191840e6107b E73c76d56fd40 +13 E2053dbbf6ec7, wszystkie13 E9f1277d878f3; Eaa11bb2482a3 kolory1..10, dalsze11, nigdy0.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M22",
+        "M23",
+        "M25",
+        "M26"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 38,
+      "rodzina": "B10",
+      "wariant": 2,
+      "opis": "E518f962aec78 E4ae0b8d730c6 E5ca94c01daa4 z E0deeb8fa1dbb E2053dbbf6ec7 E6199aecf23ab Eaf174dcd9900 E344e79586d3f E5ea52c02e5e6 E78efd5a7a5b9 E06e01144bc4c E85155fd97f43; E2053dbbf6ec7 Ecd5b158f21b7 E705202703c9c bodySet.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M22",
+        "M23",
+        "M25",
+        "M26"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 39,
+      "rodzina": "B10",
+      "wariant": 3,
+      "opis": "E88aec9a071df Edcd4a212f815 E9f1277d878f3 przez10/11/13; E916c6a3e71ee E94fa3e5538d5, missing Ecf454276df34 B2_FORCE_OVERFLOW.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M22",
+        "M23",
+        "M25",
+        "M26",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 40,
+      "rodzina": "B10",
+      "wariant": 4,
+      "opis": "E4f0f38d731bb E60742b3bc50c E8e7c0686e285 E73c76d56fd40 E1bda60b69899 Eed9f048704df E2053dbbf6ec7 Ec7bb94aff11c; E9e0c21b8ea65 E274783628a1a E73c76d56fd40 E7dd887dc71b5 E894dd891f199 E2053dbbf6ec7; E41a69d8fdb6613 Eac908eed1708.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M22",
+        "M23",
+        "M25",
+        "M26",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 41,
+      "rodzina": "B11",
+      "wariant": 1,
+      "opis": "E656ca45d1891 E73c76d56fd40–dynamic13, Ed7d6ec01f5000..10 Ede7d1b721a1e E8e7c0686e285 E94fa3e5538d5; Ed7439bee2477 E94fa3e5538d5 Ecd5b158f21b7 E3c44c3e1b8b7 bodySet.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M25",
+        "M26",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 42,
+      "rodzina": "B11",
+      "wariant": 2,
+      "opis": "13 Eac908eed1708 E0187c180b703 E73c76d56fd40–E73c76d56fd40, E8e7c0686e285 E50e721e49c01 E94fa3e5538d5; E37f93afd3c83 E445929267209 E189f40034be7=0 E944d936358d6 count2, Ea7e2d26e8d15 Ec61bca506556 RemoveSwap E5a25c2b40cbf. Eac5c760152e3 E2d494f036122 E3d9814136e1a z>=3 E94fa3e5538d5 E3c44c3e1b8b7 E45be1cb66c09 B10/id39; E400afc59ee67 Ed83df4c9bd75 Q4.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M25",
+        "M26",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 43,
+      "rodzina": "B11",
+      "wariant": 3,
+      "opis": "E3f32da1d7eac Efa84492719db E71de50466f0f E944d936358d6 E122f78e71b95 E94fa3e5538d5, E5606f358625b E139b09b78a6f E1934fc73d721 E8d3d1fea3b1b Ebbe1ab0d5ba5; E9e73e72eecc5 E94fa3e5538d5 E01a44d970bf3.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M25",
+        "M26",
+        "M27",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 44,
+      "rodzina": "B11",
+      "wariant": 4,
+      "opis": "E9a2c1f24cb09 E0deeb8fa1dbb E23b33a647bcb Ede7d1b721a1e Ed9a3c017f9e9 Edbdbdcf94f1d, RemoveSwap Ea45638f99cd7 Ee3317026ddba E94fa3e5538d5 E60e68f28cc7f CT.localIndex; bodySet11 E01a44d970bf3 E84465a00438f.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 14,
+        "S": 14,
+        "C": 13
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M25",
+        "M26",
+        "M27",
+        "M28"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 45,
+      "rodzina": "B12",
+      "wariant": 1,
+      "opis": "Kinematic–dynamic, kinematic ma bodySimIndex, invMass/invI0 i zajmuje bit koloru.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 4,
+        "S": 4,
+        "C": 4
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M23",
+        "M24"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 68880,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 8816640,
+        "zTaskBajty": 17633280
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 46,
+      "rodzina": "B12",
+      "wariant": 2,
+      "opis": "Ece55d3e8048c Ebd3375a33867 E49594691dd4d Ec58af3def23b E73c76d56fd40: missing E894dd891f199 Efa84492719db E71de50466f0f, E6e4188fc9e2f E32f30ea0e83c E2053dbbf6ec7.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 4,
+        "S": 4,
+        "C": 4
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M23",
+        "M24"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 68880,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 8816640,
+        "zTaskBajty": 17633280
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 47,
+      "rodzina": "B12",
+      "wariant": 3,
+      "opis": "Static–dynamic z canonical staticA: indeks static=-1, invMass/invI0, missing bitu static.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 4,
+        "S": 4,
+        "C": 4
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M23",
+        "M24"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 68880,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 8816640,
+        "zTaskBajty": 17633280
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 48,
+      "rodzina": "B12",
+      "wariant": 4,
+      "opis": "E72c8a23b638b E054a5c91e77c: E73c76d56fd40 E03e71c6d7dc6, Ebd3375a33867 E03e71c6d7dc6, E8e7c0686e285 E2053dbbf6ec7 E8a39178d327e. D–K E03e71c6d7dc6–E03e71c6d7dc6 E67c76d662654 E578a173bc3ce E9a747e5e7c0b, E1d5fceabdb14 Ecd5b158f21b7 E3c44c3e1b8b7 Ed0dea1df95b8 Ede7d1b721a1e Ecd5b158f21b7 E0be5d8d115c3; E2053dbbf6ec7–E2053dbbf6ec7/Ebd3375a33867–E2053dbbf6ec7 E7c65e9d8d415 E308d1ff5ee06; D–E2053dbbf6ec7 E1a52d68b9d7d.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 4,
+        "S": 4,
+        "C": 4
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M03",
+        "M23",
+        "M24"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 68880,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 8816640,
+        "zTaskBajty": 17633280
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 49,
+      "rodzina": "B13",
+      "wariant": 1,
+      "opis": "E1f965d7d73ad Ed5971f86dd5d do129 Ea7cd9938ab5e E09ae6811958c, bity31/32/63/64/127/128 Ede7d1b721a1e body63/64; Ea549c162e90c po1/2/3/4/5 E58a5b5419008.",
+      "opMax": 256,
+      "maxHistoriaSlotow": {
+        "B": 65,
+        "S": 130,
+        "C": 129
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11",
+        "M12"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 1561088,
+        "snapshotyKoncoweMax": 256,
+        "taskBlokiMax": 256,
+        "bezTaskBajty": 399638528,
+        "zTaskBajty": 799277056
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 50,
+      "rodzina": "B13",
+      "wariant": 2,
+      "opis": "Eff624a4b9cdb Ef86a26a7cf7e, E9c7f1ba0d9dd Ed9a3c017f9e9 Edbdbdcf94f1d E1241936d4dd3; LIFO E431f1d7aa5da Ee1178b681977 contactId E913d3b4475ff E32f30ea0e83c Eec72420df5df Ede7d1b721a1e Ed6a98598212e.",
+      "opMax": 256,
+      "maxHistoriaSlotow": {
+        "B": 65,
+        "S": 130,
+        "C": 129
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11",
+        "M12"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 1561088,
+        "snapshotyKoncoweMax": 256,
+        "taskBlokiMax": 256,
+        "bezTaskBajty": 399638528,
+        "zTaskBajty": 799277056
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 51,
+      "rodzina": "B13",
+      "wariant": 3,
+      "opis": "Eff624a4b9cdb Ef86a26a7cf7e, E5f40f4434ecf E247ace49f933 E7d5ae37da82e Ede7d1b721a1e E7c3557bfd312; E283ada7088c2 Eccf8fc542e0f E3ff6c05723bb E5ea52c02e5e6 Ed5971f86dd5d Ede7d1b721a1e E283ada7088c2 E963c36b12688 Eec72420df5df.",
+      "opMax": 256,
+      "maxHistoriaSlotow": {
+        "B": 65,
+        "S": 130,
+        "C": 129
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11",
+        "M12"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 1561088,
+        "snapshotyKoncoweMax": 256,
+        "taskBlokiMax": 256,
+        "bezTaskBajty": 399638528,
+        "zTaskBajty": 799277056
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 52,
+      "rodzina": "B13",
+      "wariant": 4,
+      "opis": "Eff624a4b9cdb Ef86a26a7cf7e, E4bb24efc9641 Ef108e4e88ff0 E03494afd4248/E8322e87d2458 Ede7d1b721a1e E9f3f74496218 E02cb4f17f977 Ea7cd9938ab5e; E9834fad97e13 E2a9e7ff8da61 E90d168d2f77a Ede7d1b721a1e Ec39da7cc242d pairSet.",
+      "opMax": 256,
+      "maxHistoriaSlotow": {
+        "B": 65,
+        "S": 130,
+        "C": 129
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M11",
+        "M12"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 1561088,
+        "snapshotyKoncoweMax": 256,
+        "taskBlokiMax": 256,
+        "bezTaskBajty": 399638528,
+        "zTaskBajty": 799277056
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 53,
+      "rodzina": "B14",
+      "wariant": 1,
+      "opis": "E20afc5666018 z Ecd269b6eed43 E0e238813f17b, E6f61ec5c7a0a E39d1e3909959 Eba5379e09d3f E534339b339ec; Ea09b5116269e E097743c5f8a2 E88a241eaa407 Ede7d1b721a1e E9834fad97e13 E3d9814136e1a Ea18e10c37fe0.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 6,
+        "S": 12,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-LEGACY-LIFE",
+        "G-LEGACY-GEOMETRY",
+        "G-LEGACY-S12"
+      ],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M36"
+      ],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 54,
+      "rodzina": "B14",
+      "wariant": 2,
+      "opis": "Eea9bb7ea83fe E230d8358dc8e z Ef95c647b894b E9f1277d878f3/Ebcee72e6df5d-E9f1277d878f3, E361e48d0308f Ee015828237b8 Ea96395b667e8 Eb8c1b73ed3f9; E700383ff9d8a E218c8624cd0c E4fd4fad61098 Ebdfad9bd4075 E054a5c91e77c.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 6,
+        "S": 12,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M07",
+        "M35",
+        "M36"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 55,
+      "rodzina": "B14",
+      "wariant": 3,
+      "opis": "Eea9bb7ea83fe E0f50f8cbcc7d E054a5c91e77c E45db32e0c373 BodySim E054a5c91e77c z Ed25f53f62e6b E122f78e71b95 Ec6ed7cd08a43; E16a0eeb0791b Efdcfcd619057 E6199aecf23ab E6f61ec5c7a0a E3c44c3e1b8b7 E5884ec40704e E3673014e72b6 bodySimIndex, E6199aecf23ab E164ae3d605e9 Ea85116ab815e.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 6,
+        "S": 12,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M08",
+        "M35",
+        "M36"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 56,
+      "rodzina": "B14",
+      "wariant": 4,
+      "opis": "E56f467bb8620 E0296c43c240a E85155fd97f43, E6f61ec5c7a0a E684289e6ae2e E88a241eaa407; missing E57f50cd9c437 E361e48d0308f Ede7d1b721a1e missing E5f40f4434ecf Ef2a6cfe7aa47 Eb5b2babb1a82.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 6,
+        "S": 12,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [],
+      "klasyMutacji": [
+        "M06",
+        "M08",
+        "M36"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 190848,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 24428544,
+        "zTaskBajty": 48857088
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 57,
+      "rodzina": "B15",
+      "wariant": 1,
+      "opis": "Contact ownership and reused identifier status checks.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-W47",
+        "G-W48",
+        "G-W49",
+        "G-LEGACY-LIFE"
+      ],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 58,
+      "rodzina": "B15",
+      "wariant": 2,
+      "opis": "Contact ownership and reused identifier status checks.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-OWNER47",
+        "G-OWNER48",
+        "G-LEGACY-OWNER"
+      ],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 59,
+      "rodzina": "B15",
+      "wariant": 3,
+      "opis": "E7279de0eadb3 contactId Ede7d1b721a1e E467a06e67669 E9e73e72eecc5 Ebc6955218fef: STALE E6199aecf23ab Ef7a18611f42e. E120ff0974ebe Number5 z46has=Efcbcf165908d E3c44c3e1b8b7 owner0 Ede7d1b721a1e E944d936358d6 E9e3254466ea7 Ed54548e33a7d E431f1d7aa5da FOREIGN Ee015828237b8 E04dd1ae6f017 Eff5d8c1dca9b. E10cae49c850f -1/Ea277b9950b3a nextIndex E5b39c3df32b2 Ecfd698cea1da E8bb8f8dcb536 E33129567e0bd E2f5eb350b5b0 E4c1029697ee3, E2e3d5b83085d E139b09b78a6f Ed25f53f62e6b E71cb862f1112.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-RANGE",
+        "G-OCCUPIED",
+        "G-BIRTH-LOW",
+        "G-BIRTH-HIGH",
+        "G-CONTACT-ID",
+        "G-CARRY",
+        "G-MAX-READ",
+        "G-LEGACY-LIMIT"
+      ],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [
+        "F-CONTACT-RANGE",
+        "F-CONTACT-OCCUPIED",
+        "F-TICKET-LOW",
+        "F-TICKET-HIGH",
+        "F-CONTACT-ID",
+        "F-TICKET-CARRY",
+        "F-TICKET-MAX",
+        "F-TICKET-SHAPE40"
+      ],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 60,
+      "rodzina": "B15",
+      "wariant": 4,
+      "opis": "E01b7c31ef1e6 E8a9e64ecafc9 E693698e38d74 E139b09b78a6f Ede7d1b721a1e E005d19e74411 Ea85116ab815e Eec72420df5df E6199aecf23ab PAIRS/COLLIDE/MERGE/CLOSE. Raw31 Efefbdb67a3b2>0 (3c888889) Ede7d1b721a1e Efefbdb67a3b2<0 (bc888889),E1b16b1df538b=1: status6, R+UP+K Ede7d1b721a1e Ebae10bcdb3da E16a0eeb0791b, kod0, stderr0 Ea9fec58e15e1, missing Eb1d781d58b46/E913a4cb91be2 E73879ad4ea8d/Ed3dc2e2f084b/E8fb01bdd3173; Ed0763fb4a395 E8e9eb383f341 E693698e38d74 contactId E1fe059fbba90. Game32 Efefbdb67a3b2>0 Ee04b474575536, game32 Efefbdb67a3b2<0 Ea1f7f1e199c0 Ee015828237b8 E9b3fa1c8666c E99f091fdde4f;dt0 E2c799b4ed92d. Ea5738fa01df3 Q5/G-STEP for E96bff90c6caa Ed7439bee2477 Efefbdb67a3b2 E50e721e49c01 Ef76fb6e1c64b N64, E283ada7088c2 E5a108876819f opMax128.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-BATCH",
+        "G-STEP"
+      ],
+      "klasyMutacji": [],
+      "powiazaneFixtury": [
+        "F-TICKET-BATCH"
+      ],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 61,
+      "rodzina": "B16",
+      "wariant": 1,
+      "opis": "E09b538d1d0fa/E361e48d0308f E50e721e49c01 Ee2971bee9914 Ecc74e114249e, E6f61ec5c7a0a E9f1277d878f3 Ebe8c33f9b10f E926b1cbac46a, Ef58940a31399 E6558838331b7 Ee1204e6bab82 E70434b55ecc7 Ee015828237b8 E118553a0da6a: E361e48d0308f E3c44c3e1b8b7 E9e73e72eecc5 Eaea49165ba40.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-EVENT-NUMBER",
+        "G-END-SIDE"
+      ],
+      "klasyMutacji": [
+        "M37",
+        "M38",
+        "M39",
+        "M40"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 62,
+      "rodzina": "B16",
+      "wariant": 2,
+      "opis": "E0eb8e3931fdb E631f494748f8 Ea343f28597de Ee6f07d43b5c2/E361e48d0308f, Ec40afe414732 E68752bf62253 E6f5a6034e770 przez50; Eb50ee0db178c E335d79948f5e Ede7d1b721a1e E7e72a0f110a6 E8ea20d7601da E142042c1949d z Eeac920de9965.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-COPY-LOOKUP",
+        "G-COPY-LIST",
+        "G-COPY-EVENTS"
+      ],
+      "klasyMutacji": [
+        "M37",
+        "M38",
+        "M39",
+        "M40"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 63,
+      "rodzina": "B16",
+      "wariant": 3,
+      "opis": "E09b538d1d0fa M30 Ed7a8169cdee3 Ee015828237b8 Ed61929ef819a E7d137dbb4297 Ede7d1b721a1e E164ae3d605e9; E8ea20d7601da E4fd4fad61098 E799c3576fb20 E4dd5b6e2bf3b Ede7d1b721a1e Number5.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-EVENT-MANIFOLD"
+      ],
+      "klasyMutacji": [
+        "M37",
+        "M38",
+        "M39",
+        "M40"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    },
+    {
+      "id": 64,
+      "rodzina": "B16",
+      "wariant": 4,
+      "opis": "Eeb2fa3242638 E6199aecf23ab E6f61ec5c7a0a E230d8358dc8e Ede7d1b721a1e E4d3de6062df4, E8e7c0686e285 E5886b07cc9a5; E9617961b221b Ec71b7dee0e3b E1bf61810dc30 E94dcf8429dc4/E913a4cb91be2 E4a32c3c6b097 Efa3c35c1b658 E9cf90abc5195, Ecd5b158f21b7 Ebee6e9cb8d61 E50e721e49c01 Eb504aa4b0c85.",
+      "opMax": 128,
+      "maxHistoriaSlotow": {
+        "B": 8,
+        "S": 16,
+        "C": 16
+      },
+      "FIXTURE_INPUT": "nie",
+      "oslony": [
+        "G-W49",
+        "G-COPY-EVENTS",
+        "G-END-SIDE",
+        "G-READ-PURE"
+      ],
+      "klasyMutacji": [
+        "M37",
+        "M38",
+        "M39",
+        "M40"
+      ],
+      "powiazaneFixtury": [],
+      "limitWyjscia": {
+        "qBajty": 204160,
+        "snapshotyKoncoweMax": 128,
+        "taskBlokiMax": 128,
+        "bezTaskBajty": 26132480,
+        "zTaskBajty": 52264960
+      },
+      "dowodNatywny": "UNMEASURED_CZESC_2"
+    }
+  ],
+  "oslony": [
+    {
+      "id": "G-W47",
+      "przypadki": [
+        57
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "STALE→OK/FOREIGN, bez awarii",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-W48",
+      "przypadki": [
+        57
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "STALE→FOREIGN",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-W49",
+      "przypadki": [
+        57,
+        64
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "STALE→OK, kopia stara vs nowa",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-OWNER47",
+      "przypadki": [
+        58
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "FOREIGN→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-OWNER48",
+      "przypadki": [
+        58
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "FOREIGN→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-RANGE",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-CONTACT-RANGE"
+      ],
+      "czystyInnyWynik": "STALE→inny czysty wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-OCCUPIED",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-CONTACT-OCCUPIED"
+      ],
+      "czystyInnyWynik": "STALE→inny czysty wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-BIRTH-LOW",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-LOW"
+      ],
+      "czystyInnyWynik": "STALE→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-BIRTH-HIGH",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-HIGH"
+      ],
+      "czystyInnyWynik": "STALE→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-CONTACT-ID",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-CONTACT-ID"
+      ],
+      "czystyInnyWynik": "STALE→inny czysty wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-BATCH",
+      "przypadki": [
+        60
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-BATCH"
+      ],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-CARRY",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-CARRY"
+      ],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAX-READ",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-MAX"
+      ],
+      "czystyInnyWynik": "OK→LIMIT",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-F-FIN",
+      "przypadki": [
+        17
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-F-NONNEG",
+      "przypadki": [
+        17
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "czystyInnyWynik": "PARAM→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-R-FIN",
+      "przypadki": [
+        18
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "czystyInnyWynik": "PARAM→inny wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-R-NONNEG",
+      "przypadki": [
+        18
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "czystyInnyWynik": "PARAM→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-ROLL-FIN",
+      "przypadki": [
+        19
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "czystyInnyWynik": "PARAM→inny wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-ROLL-NONNEG",
+      "przypadki": [
+        19
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "wymaganySwiadek": "rollingResistance=bf800000, reszta legalna.",
+      "czystyInnyWynik": "PARAM→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-T-FIN",
+      "przypadki": [
+        20
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL40"
+      ],
+      "czystyInnyWynik": "PARAM→inny wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-MAT-ROUTES",
+      "przypadki": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "powiazaneFixtury": [
+        "F-MATERIAL-ROUTES"
+      ],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-COPY-LOOKUP",
+      "przypadki": [
+        32,
+        62
+      ],
+      "powiazaneFixtury": [],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-COPY-LIST",
+      "przypadki": [
+        32,
+        62
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "phase2 lub magazyn inny",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-COPY-EVENTS",
+      "przypadki": [
+        62,
+        64
+      ],
+      "powiazaneFixtury": [],
+      "wymaganySwiadek": "Dwa K z niepustymi zdarzeniami; mutate50 jednego wyniku, potem oba K i GE.",
+      "czystyInnyWynik": "drugi K lub ponowny odczyt zmieniony",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-EVENT-NUMBER",
+      "przypadki": [
+        61
+      ],
+      "powiazaneFixtury": [],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-EVENT-MANIFOLD",
+      "przypadki": [
+        63
+      ],
+      "powiazaneFixtury": [],
+      "czystyInnyWynik": "GC begin M30 inny",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-END-SIDE",
+      "przypadki": [
+        61,
+        64
+      ],
+      "powiazaneFixtury": [],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-READ-PURE",
+      "przypadki": [
+        64
+      ],
+      "powiazaneFixtury": [],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-STEP",
+      "przypadki": [
+        60
+      ],
+      "powiazaneFixtury": [],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-LEGACY-LIFE",
+      "przypadki": [
+        53,
+        57
+      ],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "czystyInnyWynik": "STALE→inny czysty wynik",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-LEGACY-OWNER",
+      "przypadki": [
+        58
+      ],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "czystyInnyWynik": "FOREIGN→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-LEGACY-GEOMETRY",
+      "przypadki": [
+        17,
+        53
+      ],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "czystyInnyWynik": "GEOMETRY→OK",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-LEGACY-S12",
+      "przypadki": [
+        17,
+        53
+      ],
+      "powiazaneFixtury": [
+        "F-LEGACY40"
+      ],
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    },
+    {
+      "id": "G-LEGACY-LIMIT",
+      "przypadki": [
+        59
+      ],
+      "powiazaneFixtury": [
+        "F-TICKET-SHAPE40"
+      ],
+      "czystyInnyWynik": "LIMIT→OK/zmiana stanu",
+      "status": "PROJEKT_SWIADKA_NIEURUCHOMIONY"
+    }
+  ],
+  "klasyMutacji": [
+    {
+      "id": "M01",
+      "opis": "E2d64329465af E0b27c158feb3",
+      "przypadki": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "zrodlo": "contact.c:69–130,151–205",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M02",
+      "opis": "E2d64329465af E986a1b7135f4",
+      "przypadki": [
+        6,
+        7,
+        8
+      ],
+      "zrodlo": "contact.c:151–205",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M03",
+      "opis": "sztuczna para segment–segment",
+      "przypadki": [
+        48
+      ],
+      "zrodlo": "contact.c:194–198",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M04",
+      "opis": "begin przy CreateContact",
+      "przypadki": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "zrodlo": "contact.c:296–326",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M05",
+      "opis": "destroy przy pointCount0 zamiast disjoint",
+      "przypadki": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "zrodlo": "world.c:380–426,623–633",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M06",
+      "opis": "missing pairSet remove",
+      "przypadki": [
+        25,
+        26,
+        27,
+        28,
+        53,
+        54,
+        55,
+        56
+      ],
+      "zrodlo": "contact.c:339–341",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M07",
+      "opis": "missing naprawy prev/next strony A",
+      "przypadki": [
+        25,
+        26,
+        27,
+        28,
+        53,
+        54
+      ],
+      "zrodlo": "contact.c:367–390",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M08",
+      "opis": "missing naprawy prev/next strony B",
+      "przypadki": [
+        25,
+        26,
+        27,
+        28,
+        55,
+        56
+      ],
+      "zrodlo": "contact.c:393–414",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M09",
+      "opis": "moved localIndex non-touching set",
+      "przypadki": [
+        25,
+        26,
+        27,
+        28
+      ],
+      "zrodlo": "contact.c:425–438;world.c:472–484",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M10",
+      "opis": "moved localIndex koloru",
+      "przypadki": [
+        29,
+        30,
+        31,
+        32
+      ],
+      "zrodlo": "constraint_graph.c:199–210",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M11",
+      "opis": "Ed67e2e944994 Eaa5af4084f37 E50e721e49c01 E336221797f20 Ed6a98598212e",
+      "przypadki": [
+        13,
+        14,
+        15,
+        16,
+        49,
+        50,
+        51,
+        52
+      ],
+      "zrodlo": "world.c:586–681",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M12",
+      "opis": "Ebac906df358e Ee1204e6bab82 E507a9a8be3d1 E6199aecf23ab E7bf990038f8d",
+      "przypadki": [
+        49,
+        50,
+        51,
+        52
+      ],
+      "zrodlo": "contact.c:229–249,298–326;world.c:650–657",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M13",
+      "opis": "Ed8425ef851ea Ee54806738adf Eb4491931c99b Eb2449fdb9fd8 Ea56145270ce6",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:567–585",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M14",
+      "opis": "przeniesienie niezmatchowanej reszty",
+      "przypadki": [
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:590–621 (#if0)",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M15",
+      "opis": "missing resetu totalNormalImpulse",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:562",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M16",
+      "opis": "missing resetu normalVelocity",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:563",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M17",
+      "opis": "E2d64329465af E255703f87148",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:564–581",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M18",
+      "opis": "zgubiony rollingImpulse",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:544–547",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M19",
+      "opis": "zgubiony cache",
+      "przypadki": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "zrodlo": "contact.c:69–130,313;constraint_graph.c:136–137",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M20",
+      "opis": "E2d64329465af/missing COM Ec1d60fe5815f",
+      "przypadki": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "zrodlo": "world.c:410–415;contact.c:556–558",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M21",
+      "opis": "missing E5e8d01b921ad E99498ce6617a",
+      "przypadki": [
+        17,
+        18,
+        19,
+        20
+      ],
+      "zrodlo": "contact.c:483–499",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M22",
+      "opis": "static w kolorze0",
+      "przypadki": [
+        37,
+        38,
+        39,
+        40
+      ],
+      "zrodlo": "constraint_graph.c:102–131",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M23",
+      "opis": "static zajmuje bodySet",
+      "przypadki": [
+        37,
+        38,
+        39,
+        40,
+        45,
+        46,
+        47,
+        48
+      ],
+      "zrodlo": "constraint_graph.c:102–131",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M24",
+      "opis": "kinematic nie zajmuje bodySet",
+      "przypadki": [
+        45,
+        46,
+        47,
+        48
+      ],
+      "zrodlo": "constraint_graph.c:20–23,75–99",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M25",
+      "opis": "Eb274eb8927cc E94fa3e5538d5",
+      "przypadki": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "zrodlo": "constraint_graph.c:70,134–180",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M26",
+      "opis": "B2_FORCE_OVERFLOW=1",
+      "przypadki": [
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "zrodlo": "constraint_graph.c:28,74",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M27",
+      "opis": "Efdfe7ab44867 E3a402005e873 E1030381ace8a",
+      "przypadki": [
+        29,
+        30,
+        31,
+        32,
+        43,
+        44
+      ],
+      "zrodlo": "constraint_graph.c:191–197",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M28",
+      "opis": "RemoveSwap overflow",
+      "przypadki": [
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "zrodlo": "constraint_graph.c:199–210",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M29",
+      "opis": "odwrotny root link",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:210–215",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M30",
+      "opis": "missing path compression",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:159–203,547–569",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M31",
+      "opis": "missing increment removeCount",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:253–259",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M32",
+      "opis": "E86b6d9e38d93 Ed9a3c017f9e9 E8851aaa7d08c",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:547–593",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M33",
+      "opis": "missing mapowania Merge",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:438–453,462–501",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M34",
+      "opis": "moved island.localIndex",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36
+      ],
+      "zrodlo": "island.c:65–74",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M35",
+      "opis": "destroyBody E5f7a65712239 Ecea867933849 E0700fb49bd99",
+      "przypadki": [
+        33,
+        34,
+        35,
+        36,
+        54,
+        55
+      ],
+      "zrodlo": "body.c:99–175,370–408",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M36",
+      "opis": "destroyShape kasuje cudze kontakty",
+      "przypadki": [
+        53,
+        54,
+        55,
+        56
+      ],
+      "zrodlo": "shape.c:257–271",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M37",
+      "opis": "E86b6d9e38d93 E95c0e17f48d9 E361e48d0308f",
+      "przypadki": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "zrodlo": "world.c:807–810,1538–1551",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M38",
+      "opis": "E1a0a6a36ca0a E55feba2b9c76 E82ca203d04a8",
+      "przypadki": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "zrodlo": "types.h:1050–1078;world.c:1538–1551",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M39",
+      "opis": "Edd2fca283f0a/E9413f6b4956a Eaea49165ba40 E06f90df3e7ed",
+      "przypadki": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "zrodlo": "contact.c:354–364;world.c:632–668",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    },
+    {
+      "id": "M40",
+      "opis": "E70ca9a18c255 E4dd5b6e2bf3b Ee6f07d43b5c2",
+      "przypadki": [
+        61,
+        62,
+        63,
+        64
+      ],
+      "zrodlo": "world.c:632–633",
+      "status": "WYMAGANE_W_CZESCI_2_NIEURUCHOMIONE"
+    }
+  ],
+  "fixturyPozaN64": {
+    "wymagane": [
+      "F-REGISTRY",
+      "F-TICKET-LOW",
+      "F-TICKET-HIGH",
+      "F-TICKET-CARRY",
+      "F-TICKET-MAX",
+      "F-TICKET-BATCH",
+      "F-TICKET-SHAPE40",
+      "F-CONTACT-RANGE",
+      "F-CONTACT-OCCUPIED",
+      "F-CONTACT-ID",
+      "F-MATERIAL40",
+      "F-MATERIAL-ROUTES",
+      "F-LEGACY40",
+      "F-SPECULATIVE-FALSE",
+      "F-SHORT-CAPSULE-SEGMENT",
+      "F-INPUT-ERRORS"
+    ],
+    "grupyNieSaLiczbaProcesow": true,
+    "limitDodatnichProcesow": 64,
+    "limitOperacjiNaProces": 16,
+    "limitBSC": [
+      4,
+      4,
+      4
+    ],
+    "bledneWejsciaIOslonyMutantowLiczoneOsobno": true,
+    "liczbaRecepturNatywnych": null,
+    "liczbaUruchomionychMutantow": 0
+  }
+}

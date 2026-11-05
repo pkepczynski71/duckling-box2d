@@ -1,0 +1,273 @@
+                                                                         
+import core.builtins as builtins;
+import core.primitive_io as io;
+import core.containers;
+
+var outputOk = true;
+
+extern("C") {
+    class B2Vec2 { x: f32 = 0.0f32; y: f32 = 0.0f32; }
+    class B2Rot { c: f32; s: f32; }
+    class B2WorldId { index1: u16; generation: u16; }
+    class B2BodyId { index1: i32; world0: u16; generation: u16; }
+    class B2ShapeId { index1: i32; world0: u16; generation: u16; }
+    class B2Polygon {
+        vertices: B2Vec2[8];
+        normals: B2Vec2[8];
+        centroid: B2Vec2;
+        radius: f32;
+        count: i32;
+    }
+    class B2WorldDef {
+        gravity: B2Vec2;
+        restitutionThreshold: f32;
+        hitEventThreshold: f32;
+        contactHertz: f32;
+        contactDampingRatio: f32;
+        maxContactPushSpeed: f32;
+        maximumLinearSpeed: f32;
+                                                                            
+        frictionCallback: cptr u8;
+        restitutionCallback: cptr u8;
+        enableSleep: bool;
+        enableContinuous: bool;
+        workerCount: i32;
+        enqueueTask: cptr u8;
+        finishTask: cptr u8;
+        userTaskContext: cptr u8;
+        userData: cptr u8;
+        internalValue: i32;
+    }
+    class B2BodyDef {
+        bodyType: i32;                                  
+        position: B2Vec2;
+        rotation: B2Rot;
+        linearVelocity: B2Vec2;
+        angularVelocity: f32;
+        linearDamping: f32;
+        angularDamping: f32;
+        gravityScale: f32;
+        sleepThreshold: f32;
+        name: cptr char;
+        userData: cptr u8;
+        enableSleep: bool;
+        isAwake: bool;
+        fixedRotation: bool;
+        isBullet: bool;
+        isEnabled: bool;
+        allowFastRotation: bool;
+        internalValue: i32;
+    }
+    class B2SurfaceMaterial {
+        friction: f32;
+        restitution: f32;
+        rollingResistance: f32;
+        tangentSpeed: f32;
+        userMaterialId: i32;
+        customColor: u32;
+    }
+    class B2Filter { categoryBits: u64; maskBits: u64; groupIndex: i32; }
+    class B2ShapeDef {
+        userData: cptr u8;
+        material: B2SurfaceMaterial;
+        density: f32;
+        filter: B2Filter;
+        isSensor: bool;
+        enableSensorEvents: bool;
+        enableContactEvents: bool;
+        enableHitEvents: bool;
+        enablePreSolveEvents: bool;
+        invokeContactCreation: bool;
+        updateBodyMass: bool;
+        internalValue: i32;
+    }
+    class Vector2 { x: f32; y: f32; }
+    class Color { r: u8; g: u8; b: u8; a: u8; }
+    class Image { data: cptr u8; width: i32; height: i32; mipmaps: i32; format: i32; }
+
+    fundecl b2DefaultWorldDef() -> B2WorldDef;
+    fundecl b2DefaultBodyDef() -> B2BodyDef;
+    fundecl b2DefaultShapeDef() -> B2ShapeDef;
+    fundecl b2CreateWorld(def: cptr B2WorldDef) -> B2WorldId;
+    fundecl b2DestroyWorld(world: B2WorldId);
+    fundecl b2World_Step(world: B2WorldId, timeStep: f32, subStepCount: i32);
+    fundecl b2CreateBody(world: B2WorldId, def: cptr B2BodyDef) -> B2BodyId;
+    fundecl b2MakeBox(hx: f32, hy: f32) -> B2Polygon;
+    fundecl b2CreatePolygonShape(body: B2BodyId, def: cptr B2ShapeDef, polygon: cptr B2Polygon) -> B2ShapeId;
+    fundecl b2Body_GetPosition(body: B2BodyId) -> B2Vec2;
+    fundecl b2Body_GetRotation(body: B2BodyId) -> B2Rot;
+
+    fundecl SetTraceLogLevel(level: i32);
+    fundecl InitWindow(width: i32, height: i32, title: cptr char);
+    fundecl IsWindowReady() -> bool;
+    fundecl CloseWindow();
+    fundecl BeginDrawing();
+    fundecl ClearBackground(color: Color);
+    fundecl DrawRectangle(x: i32, y: i32, width: i32, height: i32, color: Color);
+    fundecl DrawTriangle(a: Vector2, b: Vector2, c: Vector2, color: Color);
+    fundecl DrawText(text: cptr char, x: i32, y: i32, size: i32, color: Color);
+    fundecl rlDrawRenderBatchActive();
+    fundecl LoadImageFromScreen() -> Image;
+    fundecl ExportImage(image: Image, path: cptr char) -> bool;
+    fundecl UnloadImage(image: Image);
+    fundecl EndDrawing();
+}
+
+                                                                             
+fun outUnsigned(x: u64) -> () = {
+    if (x >= 10u64) outUnsigned(x / 10u64);
+    io.writeChar(('0' as u64 + x % 10u64) as char);
+}
+
+fun outSigned(x: i64) -> () = {
+    if (x < 0i64) {
+        io.writeChar('-');
+        outUnsigned((0i64 - x) as u64);
+    } else outUnsigned(x as u64);
+}
+
+                                                                        
+                                                                     
+                                                                        
+fun outFloat(value: f32) -> () = {
+    var raw = value;
+    let bits = (&raw as cptr u32)[0];
+    var x = value as f64;
+    if (bits >= 2147483648u32) {
+        io.writeChar('-');
+        x = 0.0 - x;
+    }
+    if (not (x >= 0.0 and x < 1000000000.0)) {
+        io.writeStr("INVALID");
+        outputOk = false;
+        return;
+    }
+    let scaled = x * 1000000.0;
+    var rounded = scaled as u64;
+    let remainder = scaled - rounded as f64;
+    if (remainder > 0.5 or (remainder == 0.5 and rounded % 2u64 == 1u64)) {
+        rounded = rounded + 1u64;
+    }
+    outUnsigned(rounded / 1000000u64);
+    io.writeChar('.');
+    var fraction = rounded % 1000000u64;
+    var divisor = 100000u64;
+    while (divisor > 0u64) {
+        io.writeChar(('0' as u64 + fraction / divisor) as char);
+        fraction = fraction % divisor;
+        divisor = divisor / 10u64;
+    }
+}
+
+fun defFloat(key: str, value: f32) -> () = {
+    io.writeStr("DEF "); io.writeStr(key); io.writeChar(' ');
+    outFloat(value); io.writeChar('\n');
+}
+fun defInt(key: str, value: i64) -> () = {
+    io.writeStr("DEF "); io.writeStr(key); io.writeChar(' ');
+    outSigned(value); io.writeChar('\n');
+}
+fun defUnsigned(key: str, value: u64) -> () = {
+    io.writeStr("DEF "); io.writeStr(key); io.writeChar(' ');
+    outUnsigned(value); io.writeChar('\n');
+}
+
+fun screenPoint(pos: B2Vec2, rot: B2Rot, dx: f32, dy: f32) -> Vector2 = {
+    return Vector2((pos.x + rot.c * dx - rot.s * dy) * 100.0f32,
+        600.0f32 - (pos.y + rot.s * dx + rot.c * dy) * 100.0f32);
+}
+
+fun main() -> i64 = {
+    var worldDef = b2DefaultWorldDef();
+    var bodyDef = b2DefaultBodyDef();
+    var shapeDef = b2DefaultShapeDef();
+    defFloat("world.gravity_y", worldDef.gravity.y);
+    defFloat("world.contact_hertz", worldDef.contactHertz);
+    defInt("world.enable_sleep", worldDef.enableSleep as i64);
+    defInt("world.worker_count", worldDef.workerCount as i64);
+    defInt("body.type", bodyDef.bodyType as i64);
+    defFloat("body.rotation_c", bodyDef.rotation.c);
+    defFloat("body.gravity_scale", bodyDef.gravityScale);
+    defInt("body.is_enabled", bodyDef.isEnabled as i64);
+    defInt("body.internal_value", bodyDef.internalValue as i64);
+    defFloat("shape.material_friction", shapeDef.material.friction);
+    defFloat("shape.density", shapeDef.density);
+    defUnsigned("shape.filter_category_bits", shapeDef.filter.categoryBits);
+    defUnsigned("shape.filter_mask_bits", shapeDef.filter.maskBits);
+    defInt("shape.update_body_mass", shapeDef.updateBodyMass as i64);
+    if (not outputOk) return 4i64;
+
+    worldDef.gravity = B2Vec2(0.0f32, -10.0f32);
+    let world = b2CreateWorld(&worldDef as cptr B2WorldDef);
+    bodyDef.position = B2Vec2(4.0f32, 0.25f32);
+    bodyDef.bodyType = 0i32;
+    let floorBody = b2CreateBody(world, &bodyDef as cptr B2BodyDef);
+    var floorBox = b2MakeBox(4.0f32, 0.25f32);
+    b2CreatePolygonShape(floorBody, &shapeDef as cptr B2ShapeDef, &floorBox as cptr B2Polygon);
+    bodyDef = b2DefaultBodyDef();
+    bodyDef.bodyType = 2i32;
+    bodyDef.position = B2Vec2(4.0f32, 5.0f32);
+    let boxBody = b2CreateBody(world, &bodyDef as cptr B2BodyDef);
+    var boxPolygon = b2MakeBox(0.2f32, 0.2f32);
+    b2CreatePolygonShape(boxBody, &shapeDef as cptr B2ShapeDef, &boxPolygon as cptr B2Polygon);
+
+    SetTraceLogLevel(7i32);                              
+    InitWindow(800i32, 600i32, builtins.ptr_from_slice[char]("Duckling silnik proba\0") as cptr char);
+    if (not IsWindowReady()) {
+        b2DestroyWorld(world);
+        return 2i64;
+    }
+    let red = Color(230u8, 41u8, 55u8, 255u8);
+    var step = 1i64;
+    var ok = true;
+    while (step <= 180i64 and ok) {
+        b2World_Step(world, 1.0f32 / 60.0f32, 4i32);
+        let pos = b2Body_GetPosition(boxBody);
+        let rot = b2Body_GetRotation(boxBody);
+        io.writeStr("POS "); outSigned(step); io.writeChar(' ');
+        outFloat(pos.x); io.writeChar(' '); outFloat(pos.y); io.writeChar(' ');
+        outFloat(rot.c); io.writeChar(' '); outFloat(rot.s); io.writeChar('\n');
+        if (not outputOk) {
+            b2DestroyWorld(world);
+            CloseWindow();
+            return 4i64;
+        }
+        BeginDrawing();
+        ClearBackground(Color(245u8, 245u8, 245u8, 255u8));
+        DrawRectangle(0i32, 550i32, 800i32, 50i32, Color(0u8, 117u8, 44u8, 255u8));
+        let a = screenPoint(pos, rot, -0.2f32, 0.2f32);
+        let b = screenPoint(pos, rot, -0.2f32, -0.2f32);
+        let c = screenPoint(pos, rot, 0.2f32, -0.2f32);
+        let d = screenPoint(pos, rot, 0.2f32, 0.2f32);
+        DrawTriangle(a, b, c, red);
+        DrawTriangle(a, c, d, red);
+        DrawText(builtins.ptr_from_slice[char]("Duckling\0") as cptr char,
+            10i32, 10i32, 20i32, Color(80u8, 80u8, 80u8, 255u8));
+        if (step % 2i64 == 0i64) {
+                                                                                 
+            rlDrawRenderBatchActive();
+            let image = LoadImageFromScreen();
+            var path: containers.String;
+            path.append("wynik/klatki/klatka-");
+            path.append(('0' as i64 + step / 100i64) as char);
+            path.append(('0' as i64 + (step / 10i64) % 10i64) as char);
+            path.append(('0' as i64 + step % 10i64) as char);
+            path.append(".png");
+            path.append('\0');
+            ok = ExportImage(image, builtins.ptr_from_slice[char](path.asSlice()) as cptr char);
+            if (step == 180i64) {
+                let finalOk = ExportImage(image,
+                    builtins.ptr_from_slice[char]("wynik/klatka-180.png\0") as cptr char);
+                ok = ok and finalOk;
+            }
+            UnloadImage(image);
+        }
+        EndDrawing();
+        step = step + 1i64;
+    }
+    b2DestroyWorld(world);
+    CloseWindow();
+    if (not ok) return 3i64;
+    io.writeStr("KONIEC OK\n");
+    return 0i64;
+}

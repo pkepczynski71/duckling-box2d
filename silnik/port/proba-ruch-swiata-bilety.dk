@@ -1,0 +1,277 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+                                                                          
+                                                          
+import fizyka.gra as game;
+import fizyka.swiat as raw;
+import fizyka.kola as math2;
+import fizyka.zbior as bits;
+import core.primitive_io as io;
+
+# Box2D 8c661469, src/world.                                                            
+fun guardAndParameters() -> bool = {
+    let owner: game.WorldResult = game.createWorld(math2.Vec2(), 400.0f32);
+    let other: game.WorldResult = game.createWorld(math2.Vec2(), 400.0f32);
+    if (owner.status != game.OK or other.status != game.OK) return false;
+    var def = raw.BodyDef(); def.bodyType = 2i32;
+    let first: game.BodyResult = game.createBody8(owner.number, def);
+    let second: game.BodyResult = game.createBody8(owner.number, def);
+    if (first.status != game.OK or second.status != game.OK) return false;
+    let source: raw.ShapeRecord = game.circleShape(0.5f32, 1.0f32);
+    let shapeA: game.ShapeResult = game.addPreparedShape(owner.number, first.number, source, true);
+    let shapeB: game.ShapeResult = game.addPreparedShape(owner.number, second.number, source, true);
+    if (shapeA.status != game.OK or shapeB.status != game.OK) return false;
+                                                                               
+                                                                                  
+    if (game.applyForceToCenter(owner.number, first.number, math2.Vec2()) != game.OK) return false;
+    var invalidBody: game.BodyNumber = first.number;
+    invalidBody.ownerTicket.low = invalidBody.ownerTicket.low ^ 1u32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.FOREIGN) return false;
+    invalidBody = first.number;
+    invalidBody.ownerTicket.high = invalidBody.ownerTicket.high ^ 1u32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.FOREIGN) return false;
+    invalidBody = first.number;
+    invalidBody.birthTicket.low = invalidBody.birthTicket.low ^ 1u32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.STALE) return false;
+    invalidBody = first.number;
+    invalidBody.birthTicket.high = invalidBody.birthTicket.high ^ 1u32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.STALE) return false;
+    invalidBody = first.number; invalidBody.slot = -1i32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.STALE) return false;
+    invalidBody = first.number; invalidBody.slot = 256i32;
+    if (game.applyForceToCenter(owner.number, invalidBody, math2.Vec2()) != game.STALE) return false;
+    let liveParent: game.BodyResult = game.shapeBody(owner.number, shapeA.number);
+    if (liveParent.status != game.OK) return false;
+    var invalidShape: game.ShapeNumber = shapeA.number;
+    invalidShape.ownerTicket.low = invalidShape.ownerTicket.low ^ 1u32;
+    var invalidParent: game.BodyResult = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.FOREIGN) return false;
+    invalidShape = shapeA.number;
+    invalidShape.ownerTicket.high = invalidShape.ownerTicket.high ^ 1u32;
+    invalidParent = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.FOREIGN) return false;
+    invalidShape = shapeA.number;
+    invalidShape.birthTicket.low = invalidShape.birthTicket.low ^ 1u32;
+    invalidParent = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.STALE) return false;
+    invalidShape = shapeA.number;
+    invalidShape.birthTicket.high = invalidShape.birthTicket.high ^ 1u32;
+    invalidParent = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.STALE) return false;
+    invalidShape = shapeA.number; invalidShape.slot = -1i32;
+    invalidParent = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.STALE) return false;
+    invalidShape = shapeA.number; invalidShape.slot = 512i32;
+    invalidParent = game.shapeBody(owner.number, invalidShape);
+    if (invalidParent.status != game.STALE) return false;
+    var invalidWorld: game.WorldNumber = owner.number;
+    invalidWorld.birthTicket.low = invalidWorld.birthTicket.low ^ 1u32;
+    var invalidWorldView: game.WorldLookup = game.lookupWorld(invalidWorld);
+    if (invalidWorldView.status != game.STALE) return false;
+    invalidWorld = owner.number;
+    invalidWorld.birthTicket.high = invalidWorld.birthTicket.high ^ 1u32;
+    invalidWorldView = game.lookupWorld(invalidWorld);
+    if (invalidWorldView.status != game.STALE) return false;
+    invalidWorld = owner.number; invalidWorld.slot = -1i32;
+    invalidWorldView = game.lookupWorld(invalidWorld);
+    if (invalidWorldView.status != game.STALE) return false;
+    invalidWorld = owner.number; invalidWorld.slot = 128i32;
+    invalidWorldView = game.lookupWorld(invalidWorld);
+    if (invalidWorldView.status != game.STALE) return false;
+    if (game.applyForceToCenter(owner.number, first.number, math2.Vec2(3.0f32, 4.0f32)) != game.OK) return false;
+    let paused: game.StepResult = game.step(owner.number, game.StepParameters(0.0f32, 4i32));
+    if (paused.status != game.OK or paused.values.length() != 0i64) return false;
+    let worldSlot: i64 = owner.number.slot as i64;
+    let endIndex: i32 = raw.worlds.at(worldSlot).endEventArrayIndex;
+    let solved: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 4i32));
+    if (solved.status != game.OK or solved.values.length() != 2i64) return false;
+    if (raw.worlds.at(worldSlot).locked or raw.worlds.at(worldSlot).endEventArrayIndex != 1i32 - endIndex) return false;
+    let firstSim: raw.BodySim = raw.b2GetSolverSet(raw.worlds.at(worldSlot), 2i32).bodySims.at(0i64);
+    if (firstSim.force.x != 0.0f32 or firstSim.force.y != 0.0f32) return false;
+    let contactData: game.ContactLookup = game.findContact(owner.number, shapeA.number, shapeB.number);
+    if (contactData.status != game.OK or not contactData.has) return false;
+    let contactNumber: game.ContactNumber = contactData.value.number;
+    let firstData: game.ContactValue = contactData.value;
+    let canonical: raw.ContactRecord = raw.worlds.at(worldSlot).contacts.at(contactNumber.slot as i64);
+    if (firstData.shapeA.slot != canonical.shapeIdA or firstData.shapeB.slot != canonical.shapeIdB
+        or firstData.shapeA.slot == firstData.shapeB.slot) return false;
+    let expectedA: game.ShapeNumber = if firstData.shapeA.slot == shapeA.number.slot then shapeA.number else shapeB.number;
+    let expectedB: game.ShapeNumber = if firstData.shapeB.slot == shapeB.number.slot then shapeB.number else shapeA.number;
+    if (firstData.shapeA.slot != expectedA.slot or firstData.shapeB.slot != expectedB.slot
+        or not bits.equalKey(firstData.shapeA.birthTicket, expectedA.birthTicket)
+        or not bits.equalKey(firstData.shapeB.birthTicket, expectedB.birthTicket)
+        or not bits.equalKey(firstData.shapeA.ownerTicket, owner.number.birthTicket)
+        or not bits.equalKey(firstData.shapeB.ownerTicket, owner.number.birthTicket)) return false;
+    let again: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 4i32));
+    if (again.status != game.OK or again.values.length() != 2i64 or solved.values.length() != 2i64) return false;
+    let currentData: game.ContactLookup = game.lookupContact(owner.number, contactNumber);
+    if (currentData.status != game.OK or not currentData.has
+        or currentData.value.number.slot != contactNumber.slot
+        or not bits.equalKey(currentData.value.number.birthTicket, contactNumber.birthTicket)
+        or not bits.equalKey(currentData.value.number.ownerTicket, contactNumber.ownerTicket)
+        or currentData.value.shapeA.slot != firstData.shapeA.slot or currentData.value.shapeB.slot != firstData.shapeB.slot
+        or not bits.equalKey(currentData.value.shapeA.birthTicket, firstData.shapeA.birthTicket)
+        or not bits.equalKey(currentData.value.shapeB.birthTicket, firstData.shapeB.birthTicket)
+        or not bits.equalKey(currentData.value.shapeA.ownerTicket, firstData.shapeA.ownerTicket)
+        or not bits.equalKey(currentData.value.shapeB.ownerTicket, firstData.shapeB.ownerTicket)) return false;
+    if (raw.worlds.at(worldSlot).locked or raw.worlds.at(worldSlot).endEventArrayIndex != endIndex
+        or not bits.equalKey(raw.worlds.at(worldSlot).stepIndex, bits.Key64(2u32, 0u32))) return false;
+    let sim: raw.BodySim = raw.b2GetSolverSet(raw.worlds.at(worldSlot), 2i32).bodySims.at(0i64);
+    if (sim.force.x != 0.0f32 or sim.force.y != 0.0f32) return false;
+    var nanBits: u32 = 2143289344u32; let nan: f32 = (&nanBits as cptr f32)[0];
+    let badTime: game.StepResult = game.step(owner.number, game.StepParameters(nan, 4i32));
+    let badCount: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 0i32));
+    if (badTime.status != game.PARAM or badCount.status != game.PARAM) return false;
+    if (game.applyForceToCenter(owner.number, first.number, math2.Vec2(nan, 0.0f32)) != game.PARAM
+        or game.setLinearVelocity(owner.number, first.number, math2.Vec2(nan, 0.0f32)) != game.PARAM
+        or game.setAngularVelocity(owner.number, first.number, nan) != game.PARAM) return false;
+    if (game.applyForceToCenter(other.number, first.number, math2.Vec2(nan, 0.0f32)) != game.FOREIGN) return false;
+    if (game.destroyBody(owner.number, first.number) != game.OK) return false;
+    if (game.applyForceToCenter(owner.number, first.number, math2.Vec2(nan, 0.0f32)) != game.STALE) return false;
+    if (game.destroyWorld(owner.number) != game.OK or game.destroyWorld(other.number) != game.OK) return false;
+    let stale: game.StepResult = game.step(owner.number, game.StepParameters(nan, 0i32));
+    return stale.status == game.STALE;
+}
+
+# Box2D 8c661469, src/world.                                  
+                                                                                
+                                                                             
+fun copyBirthHigh() -> bool = {
+    let owner: game.WorldResult = game.createWorld(math2.Vec2(), 400.0f32);
+    if (owner.status != game.OK) return false;
+    var def = raw.BodyDef(); def.bodyType = 2i32; def.gravityScale = 0.0f32;
+    def.linearVelocity = math2.Vec2(2.0f32, 0.0f32);
+    game.lastIssued = bits.Key64(17u32, 10u32);
+    let firstBody: game.BodyResult = game.createBody8(owner.number, def);
+    if (firstBody.status != game.OK or not bits.equalKey(firstBody.number.birthTicket, bits.Key64(18u32, 10u32))) return false;
+    let firstCopy: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 1i32));
+    if (firstCopy.status != game.OK or firstCopy.values.length() != 1i64) return false;
+    let firstMove: game.BodyMove = firstCopy.values.at(0i64);
+    if (not bits.equalKey(firstMove.number.birthTicket, firstBody.number.birthTicket)) return false;
+    if (game.destroyBody(owner.number, firstBody.number) != game.OK) return false;
+    game.lastIssued = bits.Key64(17u32, 11u32);
+    let secondBody: game.BodyResult = game.createBody8(owner.number, def);
+    if (secondBody.status != game.OK or not bits.equalKey(secondBody.number.birthTicket, bits.Key64(18u32, 11u32))) return false;
+    let secondCopy: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 1i32));
+    if (secondCopy.status != game.OK or secondCopy.values.length() != 1i64) return false;
+    let secondMove: game.BodyMove = secondCopy.values.at(0i64);
+    if (not bits.equalKey(secondMove.number.birthTicket, secondBody.number.birthTicket)) return false;
+    if (firstMove.number.slot != secondMove.number.slot
+        or firstMove.number.birthTicket.low != secondMove.number.birthTicket.low
+        or firstMove.number.birthTicket.high != 10u32 or secondMove.number.birthTicket.high != 11u32
+        or not bits.equalKey(firstMove.number.ownerTicket, secondMove.number.ownerTicket)
+        or firstMove.transform.p.x != secondMove.transform.p.x or firstMove.transform.p.y != secondMove.transform.p.y
+        or firstMove.transform.q.c != secondMove.transform.q.c or firstMove.transform.q.s != secondMove.transform.q.s
+        or firstMove.hasObjectId != secondMove.hasObjectId or not bits.equalKey(firstMove.objectId, secondMove.objectId)
+        or firstMove.fellAsleep != secondMove.fellAsleep) return false;
+    if (game.destroyWorld(owner.number) != game.OK) return false;
+    return firstCopy.values.at(0i64).number.birthTicket.high == 10u32
+        and secondCopy.values.at(0i64).number.birthTicket.high == 11u32;
+}
+
+# Box2D 8c661469, src/body.                                        
+fun motionAndCopies() -> bool = {
+    if (not copyBirthHigh()) return false;
+    let owner: game.WorldResult = game.createWorld(math2.Vec2(0.0f32, -10.0f32), 400.0f32);
+    if (owner.status != game.OK) return false;
+    var def = raw.BodyDef(); def.bodyType = 2i32; def.gravityScale = 0.0f32;
+    def.linearVelocity = math2.Vec2(2.0f32, 0.0f32);
+    game.lastIssued = bits.Key64(4294967295u32, 17u32);
+    let body: game.BodyResult = game.createBody8(owner.number, def);
+    if (body.status != game.OK or not bits.equalKey(body.number.birthTicket, bits.Key64(0u32, 18u32))) return false;
+    var shape: raw.ShapeRecord = game.circleShape(0.5f32, 1.0f32); shape.filter.maskBits = 0i64;
+    let created: game.ShapeResult = game.addPreparedShape(owner.number, body.number, shape, true);
+    if (created.status != game.OK) return false;
+    let extra: game.ShapeResult = game.addPreparedShape(owner.number, body.number, shape, true);
+    if (extra.status != game.OK) return false;
+    var shapes: game.ShapeList = game.getShapes(owner.number, body.number);
+    if (shapes.status != game.OK or shapes.values.length() != 2i64) return false;
+    shapes.values.at(0i64) = shapes.values.at(1i64);
+    let shapesAgain: game.ShapeList = game.getShapes(owner.number, body.number);
+    if (shapesAgain.status != game.OK or shapesAgain.values.at(0i64).slot != extra.number.slot) return false;
+    let parent: game.BodyResult = game.shapeBody(owner.number, extra.number);
+    if (parent.status != game.OK or parent.number.slot != body.number.slot or not bits.equalKey(parent.number.birthTicket, body.number.birthTicket)) return false;
+    let objectId: bits.Key64 = bits.Key64(0u32, 2147483648u32);
+    if (game.setBodyObjectId(owner.number, body.number, true, objectId) != game.OK) return false;
+    var first: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 1i32));
+    if (first.status != game.OK or first.values.length() != 1i64) return false;
+    let event: game.BodyMove = first.values.at(0i64);
+    if (event.transform.p.x != 0.5f32 or event.transform.p.y != 0.0f32 or event.fellAsleep
+        or not event.hasObjectId or not bits.equalKey(event.objectId, objectId)) return false;
+    if (game.setBodyObjectId(owner.number, body.number, false, bits.Key64()) != game.OK) return false;
+    let second: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 4i32));
+    let third: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 8i32));
+    if (second.status != game.OK or third.status != game.OK or third.values.length() != 1i64) return false;
+    let thirdEvent: game.BodyMove = third.values.at(0i64);
+    if (thirdEvent.transform.p.x != 1.5f32 or thirdEvent.hasObjectId) return false;
+    if (first.values.at(0i64).transform.p.x != 0.5f32 or not bits.equalKey(first.values.at(0i64).objectId, objectId)) return false;
+    first.values.at(0i64).transform.p.x = 99.0f32;
+    let current: game.BodyLookup = game.lookupBody(owner.number, body.number);
+    if (current.value.transform.p.x != 1.5f32) return false;
+    let middle: game.BodyResult = game.createBody8(owner.number, def);
+    def.linearVelocity = math2.Vec2(7.0f32, -3.0f32); def.angularVelocity = 2.0f32;
+    let last: game.BodyResult = game.createBody8(owner.number, def);
+    if (middle.status != game.OK or last.status != game.OK) return false;
+    let worldSlot: i64 = owner.number.slot as i64;
+    let beforeLocal: i32 = raw.worlds.at(worldSlot).bodies.at(last.number.slot as i64).localIndex;
+    let beforeState: raw.BodyState = raw.b2GetSolverSet(raw.worlds.at(worldSlot), 2i32).bodyStates.at(beforeLocal as i64);
+    if (game.destroyBody(owner.number, middle.number) != game.OK) return false;
+    let afterLocal: i32 = raw.worlds.at(worldSlot).bodies.at(last.number.slot as i64).localIndex;
+    let afterState: raw.BodyState = raw.b2GetSolverSet(raw.worlds.at(worldSlot), 2i32).bodyStates.at(afterLocal as i64);
+    if (afterLocal != 1i32 or raw.b2GetSolverSet(raw.worlds.at(worldSlot), 2i32).bodySims.at(1i64).bodyId != last.number.slot
+        or afterState.linearVelocity.x != beforeState.linearVelocity.x or afterState.linearVelocity.y != beforeState.linearVelocity.y
+        or afterState.angularVelocity != beforeState.angularVelocity
+        or afterState.deltaPosition.x != beforeState.deltaPosition.x or afterState.deltaPosition.y != beforeState.deltaPosition.y
+        or afterState.deltaRotation.c != beforeState.deltaRotation.c or afterState.deltaRotation.s != beforeState.deltaRotation.s) return false;
+    let maximum: bits.Key64 = bits.Key64(4294967295u32, 4294967295u32);
+    game.lastIssued = maximum;
+    if (game.applyForce(owner.number, last.number, math2.Vec2(1.0f32, 2.0f32), math2.Vec2()) != game.OK) return false;
+    if (game.applyLinearImpulseToCenter(owner.number, last.number, math2.Vec2()) != game.OK) return false;
+    let fourth: game.StepResult = game.step(owner.number, game.StepParameters(0.25f32, 4i32));
+    if (fourth.status != game.OK or fourth.values.length() != 2i64 or not bits.equalKey(game.lastIssued, maximum)) return false;
+    let moved: game.BodyMove = fourth.values.at(1i64);
+    if (moved.number.slot != last.number.slot or not bits.equalKey(moved.number.birthTicket, last.number.birthTicket)
+        or not bits.equalKey(moved.number.ownerTicket, owner.number.birthTicket)) return false;
+    let paused: game.StepResult = game.step(owner.number, game.StepParameters(-0.0f32, 1i32));
+    if (paused.status != game.OK or paused.values.length() != 0i64 or fourth.values.length() != 2i64) return false;
+    if (game.destroyWorld(owner.number) != game.OK) return false;
+    let stale: game.StepResult = game.step(owner.number, game.StepParameters(-1.0f32, 0i32));
+    if (stale.status != game.STALE or first.values.at(0i64).transform.p.x != 99.0f32
+        or third.values.at(0i64).transform.p.x != 1.5f32 or not bits.equalKey(game.lastIssued, maximum)) return false;
+    return true;
+}
+
+# Box2D 8c661469, src/solver.c:1261-1275,1487-1496. B13 arithmetic without allocating huge worlds.
+fun main() -> i64 = {
+    if (not game.bodyBlocksFit(0i32) or not game.bodyBlocksFit(128i32) or not game.bodyBlocksFit(129i32)
+        or not game.bodyBlocksFit(131064i32) or not game.bodyBlocksFit(131065i32)
+        or game.bodyBlocksFit(131066i32) or game.bodyBlocksFit(131067i32) or not game.bodyBlocksFit(131068i32)) return 1i64;
+    if (not guardAndParameters()) return 2i64;
+    if (not motionAndCopies()) return 3i64;
+    io.writeStr("RUCH SWIATA BILETY OK\n"); return 0i64;
+}

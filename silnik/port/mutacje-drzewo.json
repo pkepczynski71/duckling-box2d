@@ -1,0 +1,162 @@
+{
+  "contract": "KONTRAKT-4.md",
+  "box2d_commit": "8c661469c9507d3ad6fbd2fea3f1aa71669c2fe3",
+  "status": "UNMEASURED: Ed0bf986778c1 Eebd000993b17 for R-D, Ea7aeb41184ea E283ada7088c2 E8418de96e63e C Ede7d1b721a1e Ee6b67ce8a51d",
+  "mutations": [
+    {
+      "name": "zamiana-dzieci",
+      "source": "src/dynamic_tree.c:1158-1159",
+      "change": "W Query wloz child2 na stos przed child1 zamiast child1 przed child2",
+      "cases": [
+        8,
+        18,
+        23,
+        28,
+        36,
+        41,
+        42
+      ],
+      "observe": [
+        "O.hit[0].proxyId",
+        "O.hit[i].userDataLow"
+      ],
+      "reason": "E48bce7db5a84 Eb7d1f94c2e64 Eab194ade142c have multiple E8206ecfd83a0 z E05ed1b4eae86 proxyId. E3c5e21a5d985 E22aa16649c84 Ecb72a062d07b Efd6a3092daca, E5c85bb36f386 E79d0deec2515 E25085ade0ed6 E35e99f929e01 Efa0686d02896 Ed64c7c1f7f02.",
+      "result": null
+    },
+    {
+      "name": "zla-kolejnosc-listy-wolnych",
+      "source": "src/dynamic_tree.c:160-167; 150-155; 799-800",
+      "cases": [
+        4,
+        13,
+        14,
+        15,
+        16,
+        17,
+        36,
+        39
+      ],
+      "observe": [
+        "D.freeList",
+        "O.proxyId",
+        "D.root",
+        "D.live[i].proxyId"
+      ],
+      "reason": "E8441a588ad93 E0bc3ab6a6b53 Ede7d1b721a1e E82458999e970 Ecf37c87714d0 E9f3f74496218 Ed4185a6548e1 E6199aecf23ab Eb0f9a2c79f16 E3e1d09a69cc9 E0045b1ac3933 Eb141009262a1 E70f0b8e6e134 E50e721e49c01 E27ee04c9c875 Ede7d1b721a1e freeList. NOT E2e8ca33ce19e E4a32c3c6b097 E55db7a79eb69 Eb63e47faf17f.",
+      "result": null
+    },
+    {
+      "name": "mniejsze-na-mniejsze-rowne-sasiad",
+      "source": "src/dynamic_tree.c:219,243,271",
+      "cases": [
+        8,
+        18,
+        23,
+        41,
+        42
+      ],
+      "observe": [
+        "D.root",
+        "D.height",
+        "D.areaRatio",
+        "O.nodeVisits",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "E12156e921bdb 41 E142042c1949d E77e0ab75bed8, Ea56145270ce6 42 E1635a37ee521 Ebbaf57cab14d; Ef84e9e86f84a Ecd5b158f21b7 Efe8d567e9001 Edb31222ff3fc Ec3c895aa52a2 E25809409e0b5. E498af051511e z E66a1a48ae5aa Eecd9290adf09 E663ea1bfffe5 Ef6ca75a5d467 E0e85510f97a7, E3f33536a2423 Eeb87821f650a Ee122a2bc259b Ea8a08c228d86.",
+      "result": null
+    },
+    {
+      "name": "pominiety-obrot",
+      "source": "src/dynamic_tree.c:692-695; b2RotateNodes:338-623",
+      "change": "Pomin wywolanie b2RotateNodes w b2InsertLeaf przy shouldRotate=true",
+      "cases": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        40
+      ],
+      "observe": [
+        "D.root",
+        "D.height",
+        "D.areaRatio",
+        "O.nodeVisits",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "E022facf52b64 E100fcf5a0d2a E50e721e49c01 Ee2971bee9914 Ecc43d7a23515 Ede7d1b721a1e E958772d64ace Ec0fa49de0d60 have Edf2baaf678b2 Efd08bb9a4972. W Ea56145270ce6 18-23 Eb6ca0868bca6 E6199aecf23ab E19f46aeeee36 E6e548997f3f2 Ede7d1b721a1e Ea8b771920b83 E6199aecf23ab E479657ba4c79 E9baff1a80c59; E9804c11f352b E003a8cb6dbd7 E4aaa703f2ebd.",
+      "result": null
+    },
+    {
+      "name": "pominiety-BG-przy-B-lisciu",
+      "source": "src/dynamic_tree.c:358-422; silnik/fizyka/drzewo.dk:372-383",
+      "change": "Pomin tylko obrot BG w galezi B.height == 0, zachowaj pozostale obroty",
+      "cases": [
+        43
+      ],
+      "observe": [
+        "D.height",
+        "D.areaRatio",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "E4671e5632121 R-D: Eda05cc46a520 E64e6efcabd70 Ede7d1b721a1e Ea8b771920b83 Eb7d1f94c2e64. E5e2c614c23f0 Edd2332e60729: operation 4, height 2 Eb2449fdb9fd8 3; Ec71d3c5155b4 Ed13d233ad06c E036a8a704eee Ea62e3f259246 E01a44d970bf3 Eac0b52a2ae6e Ed763a792f268.",
+      "result": null
+    },
+    {
+      "name": "pominiety-BF-przy-B-lisciu",
+      "source": "src/dynamic_tree.c:358-422; silnik/fizyka/drzewo.dk:360-371",
+      "change": "Pomin tylko obrot BF w galezi B.height == 0, zachowaj pozostale obroty",
+      "cases": [
+        44
+      ],
+      "observe": [
+        "D.height",
+        "D.areaRatio",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "Efbfb5148f851 E210e5c230f71 R-D: Eda05cc46a520 E64e6efcabd70 Ede7d1b721a1e Ea8b771920b83 Eb7d1f94c2e64. E5e2c614c23f0 Edd2332e60729: operation 4, height 2 Eb2449fdb9fd8 3; E283ada7088c2 E9d7baa51ac66 E65c74c15a686 E2a48b6c930c4 Ef19cade6a21a C.",
+      "result": null
+    },
+    {
+      "name": "brak-drugiej-petli-znacznikow-powiekszenia",
+      "source": "src/dynamic_tree.c:855-865; silnik/fizyka/drzewo.dk:645-653",
+      "change": "Usun druga petle oznaczajaca powiekszonych przodkow po zatrzymaniu pierwszej petli",
+      "cases": [
+        47,
+        48,
+        49
+      ],
+      "observe": [
+        "O.rebuildCount",
+        "D.root",
+        "D.areaRatio",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "E12156e921bdb 47: E8656d77eaa8e 27 Eac0b52a2ae6e E6e548997f3f2 15, Eaa8d8283f3dd E95aefb081ece(Efcbcf165908d). E5e2c614c23f0 R-D E571ee8978e85 Ebc2e4bea2e33 3 Eb2449fdb9fd8 1. E12156e921bdb 48-49: E37003a7873cd-E1aa38e28a68a-Ea8b771920b83-E1e31577a4b0e-E1edd866482c0 Ecf37c87714d0 E61e7f6a27bc6 E5a25c2b40cbf E82458999e970.",
+      "result": null
+    },
+    {
+      "name": "nawiasowanie-kosztu-dziedziczonego",
+      "source": "src/dynamic_tree.c:226; silnik/fizyka/drzewo.dk:285",
+      "change": "Zmien inherited + (direct - areaBase) na (inherited + direct) - areaBase, z zaokragleniem f32 po kazdym dzialaniu",
+      "cases": [
+        50
+      ],
+      "observe": [
+        "D.root",
+        "D.height",
+        "D.areaRatio",
+        "O.nodeVisits",
+        "O.hit[i].proxyId"
+      ],
+      "reason": "Ee778dc2ccd3f T-D-2: operation 7 E6ecc3df6bffd(4), E6199aecf23ab E95aefb081ece 3+2 Ede7d1b721a1e E4837b5f1c7a3 E07e83c9df15e Eede0d1d9ac5a E76cca6601397 2+2. Eab8f5c765050 E46b2e93c2f9a: 0x3cb70cae Ef130559f0e7f 0x3cb70cac; E9372c470eead Edc7f47021437 Edbfb06e967f7 {0,1} Ef130559f0e7f E906beb185d91 1. Eb80a37564fbb E079651703164 (operation 8): E9372c470eead E571ee8978e85 nodeVisits 5 Ef130559f0e7f 7. E11366eeda268 Eda05cc46a520 E392ab6b0fc81 E99320f5fdd8d E50e721e49c01 Ea478fdcea9ca E51d2631b2318; Ed13d233ad06c Ec71d3c5155b4 E0840f545c010 UNMEASURED.",
+      "result": null
+    }
+  ]
+}

@@ -1,0 +1,834 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+                                                                                    
+                                                                               
+import fizyka.kola as physics;
+import fizyka.drzewo as tree;
+import fizyka.zbior as table;
+import fizyka.szeroka as broad;
+import core.builtins as builtins;
+import core.primitive_io as io;
+
+extern("C") {
+    fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64;
+}
+
+var inputOk = true;
+var inputEnded = false;
+
+fun fromBits(word: u32) -> f32 = {
+    var raw: u32 = word;
+    let value: f32 = (&raw as cptr f32)[0];
+    return value;
+}
+
+fun toBits(value: f32) -> u32 = {
+    var raw: f32 = value;
+    let word: u32 = (&raw as cptr u32)[0];
+    return word;
+}
+
+                                                                        
+fun joinBits(low: u32, high: u32) -> i64 = {
+    var raw: u64 = (low as u64) | ((high as u64) << 32u64);
+    let value: i64 = (&raw as cptr i64)[0];
+    return value;
+}
+
+fun lowBits(value: i64) -> u32 = {
+    return (value as u64) as u32;
+}
+
+fun highBits(value: i64) -> u32 = {
+    return ((value as u64) >> 32u64) as u32;
+}
+
+fun error(message: str) -> () = {
+    write(2i32, builtins.ptr_from_slice[char](message) as cptr char, message.length() as u64);
+}
+
+fun invalid(message: str) -> () = {
+    error("BLAD E95d3b17f0fb1: ");
+    error(message);
+    error("\n");
+    inputOk = false;
+}
+
+fun checkBits(word: u32, expected: f32) -> bool = {
+    let decoded: f32 = fromBits(word);
+    return decoded == expected and toBits(expected) == word and toBits(decoded) == word;
+}
+
+fun checkTransport() -> bool = {
+    if (not checkBits(0u32, 0.0f32) or not checkBits(2147483648u32, -0.0f32)
+        or not checkBits(1065353216u32, 1.0f32) or not checkBits(3212836864u32, -1.0f32)
+        or not checkBits(1u32, 1.401298464324817e-45f32)
+        or not checkBits(2139095039u32, 3.4028234663852886e38f32)) {
+        error("BLAD E0d41b4dbdf78 f32 <-> u32; E72d1df2d36c6 Ee015828237b8 E118553a0da6a E95d3b17f0fb1.\n");
+        return false;
+    }
+    let allBits: i64 = joinBits(4294967295u32, 4294967295u32);
+    let signBit: i64 = joinBits(0u32, 2147483648u32);
+    let mixedBits: i64 = joinBits(2309737967u32, 4275878552u32);
+    if (allBits != -1i64 or lowBits(allBits) != 4294967295u32 or highBits(allBits) != 4294967295u32
+        or signBit != (-9223372036854775807i64 - 1i64) or lowBits(signBit) != 0u32
+        or highBits(signBit) != 2147483648u32 or lowBits(mixedBits) != 2309737967u32
+        or highBits(mixedBits) != 4275878552u32 or (allBits & signBit) != signBit) {
+        error("BLAD E0d41b4dbdf78 E05e1f215075c i64; E72d1df2d36c6 Ee015828237b8 E118553a0da6a E95d3b17f0fb1.\n");
+        return false;
+    }
+    return true;
+}
+
+fun blank(c: i32) -> bool = {
+    return c == 32i32 or c == 9i32 or c == 10i32 or c == 13i32;
+}
+
+                                                                         
+fun readWord(allowEnd: bool) -> u32 = {
+    if (not inputOk) return 0u32;
+    var c: i32 = io.readCharCode();
+    while (blank(c)) c = io.readCharCode();
+    if (c < 0i32 and allowEnd) {
+        inputEnded = true;
+        return 0u32;
+    }
+    if (c < 48i32 or c > 57i32) {
+        invalid("brak liczby dziesietnej u32 (lub przedwczesny koniec).");
+        return 0u32;
+    }
+    var value: u64 = 0u64;
+    var digits: i32 = 0i32;
+    while (c >= 48i32 and c <= 57i32) {
+        value = value * 10u64 + (c - 48i32) as u64;
+        digits = digits + 1i32;
+        if (digits > 10i32 or value > 4294967295u64) {
+            invalid("liczba poza zakresem u32.");
+            return 0u32;
+        }
+        c = io.readCharCode();
+    }
+    if (c >= 0i32 and not blank(c)) invalid("niedozwolony znak po liczbie.");
+    return value as u32;
+}
+
+fun decodeFloat(word: u32) -> f32 = {
+    if ((word & 2139095040u32) == 2139095040u32) invalid("NaN/Inf poza kontraktem.");
+    return fromBits(word);
+}
+
+fun decodeAABB(x0: u32, y0: u32, x1: u32, y1: u32) -> tree.AABB = {
+    let lowerX: f32 = decodeFloat(x0);
+    let lowerY: f32 = decodeFloat(y0);
+    let upperX: f32 = decodeFloat(x1);
+    let upperY: f32 = decodeFloat(y1);
+    if (upperX < lowerX or upperY < lowerY or upperX - lowerX >= 100000.0f32
+        or upperY - lowerY >= 100000.0f32) invalid("Ee3d9d07d0d98 E77e0ab75bed8 E9b73a0409244.");
+    return tree.AABB(physics.Vec2(lowerX, lowerY), physics.Vec2(upperX, upperY));
+}
+
+fun outUnsigned(x: u64) -> () = {
+    if (x >= 10u64) outUnsigned(x / 10u64);
+    io.writeChar(('0' as u64 + x % 10u64) as char);
+}
+
+fun outWord(x: u32) -> () = {
+    io.writeChar(' ');
+    outUnsigned(x as u64);
+}
+
+fun outInt(x: i32) -> () = {
+    outWord(x as u32);
+}
+
+fun outFloat(x: f32) -> () = {
+    outWord(toBits(x));
+}
+
+fun outBits(value: i64) -> () = {
+    outWord(lowBits(value));
+    outWord(highBits(value));
+}
+
+fun outAABB(aabb: tree.AABB) -> () = {
+    outFloat(aabb.lowerBound.x);
+    outFloat(aabb.lowerBound.y);
+    outFloat(aabb.upperBound.x);
+    outFloat(aabb.upperBound.y);
+}
+
+                                                       
+class Operation {
+    kind: u32 = 0u32;
+    n: i32 = 0i32;
+    m: i32 = 0i32;
+    aabb: tree.AABB = tree.AABB();
+    bits: i64 = 0i64;
+    key: table.Key64 = table.Key64();
+    force: bool = false;
+}
+
+fun emptyOperations() -> List[Operation] = { var values: List[Operation]; return values; }
+
+class BroadCase {
+    id: u32 = 0u32;
+    mode: u32 = 0u32;
+    initialCapacity: i32 = 0i32;
+    dumpEvery: bool = false;
+    world: broad.CollisionView = broad.CollisionView();
+    operations: List[Operation] = emptyOperations();
+}
+
+fun readBool() -> bool = {
+    let word: u32 = readWord(false);
+    if (word > 1u32) invalid("bool poza 0/1.");
+    return word == 1u32;
+}
+
+fun readCount(limit: u32) -> i32 = {
+    let word: u32 = readWord(false);
+    if (word > limit) invalid("licznik poza kontraktem.");
+    return word as i32;
+}
+
+                                                                            
+fun signedWord(word: u32) -> i32 = {
+    var raw: u32 = word;
+    let result: i32 = (&raw as cptr i32)[0];
+    return result;
+}
+
+fun readOperation(mode: u32) -> Operation = {
+    var words: u32[16];
+    var i: i32 = 0i32;
+    while (i < 16i32) {
+        words[i] = readWord(false);
+        i = i + 1i32;
+    }
+    var op = Operation();
+    op.kind = words[0];
+    var used: i32 = 0i32;
+    if (mode == 1u32) {
+        if (op.kind <= 2u32) {
+            op.key = table.Key64(words[1], words[2]);
+            if (table.equalKey(op.key, table.Key64()) or table.b2KeyHash(op.key) == 0u32) invalid("niedopuszczalny klucz zbioru.");
+            used = 2i32;
+        } else if (op.kind != 3u32) invalid("nieznana operacja zbioru.");
+    } else {
+        if (op.kind == 0u32 or op.kind == 2u32 or op.kind == 3u32 or op.kind == 10u32) {
+            op.n = words[1] as i32;
+            op.aabb = decodeAABB(words[2], words[3], words[4], words[5]);
+            used = 5i32;
+            if (op.kind == 0u32) {
+                if (words[6] > 1u32) invalid("forcePairCreation poza 0/1.");
+                op.force = words[6] == 1u32;
+                used = 6i32;
+                if (op.aabb.lowerBound.x <= -100000.0f32 or op.aabb.lowerBound.y <= -100000.0f32
+                    or op.aabb.upperBound.x >= 100000.0f32 or op.aabb.upperBound.y >= 100000.0f32) invalid("CREATE poza B2_HUGE.");
+            } else if (op.kind == 10u32) {
+                op.bits = joinBits(words[6], words[7]);
+                used = 7i32;
+                if (words[1] > 2u32) invalid("nieznany typ drzewa.");
+            }
+        } else if (op.kind == 1u32 or op.kind == 4u32 or op.kind == 8u32) {
+            op.n = words[1] as i32;
+            used = 1i32;
+        } else if (op.kind == 7u32 or op.kind == 9u32) {
+            op.n = words[1] as i32;
+            op.m = words[2] as i32;
+            used = 2i32;
+        } else if (op.kind != 5u32 and op.kind != 6u32) invalid("nieznana operacja szerokiej fazy.");
+    }
+    var unused: i32 = used + 1i32;
+    while (unused < 16i32) {
+        if (words[unused] != 0u32) invalid("E87b3e52dfe4e E296098d67338 Ec2dbf4ab3469 E6e548997f3f2.");
+        unused = unused + 1i32;
+    }
+    return op;
+}
+
+fun validShape(world: ref broad.CollisionView, n: i32) -> bool = {
+    return n >= 0i32 and (n as i64) < world.shapes.length();
+}
+
+fun validBody(world: ref broad.CollisionView, n: i32) -> bool = {
+    return n >= 0i32 and (n as i64) < world.bodies.length();
+}
+
+fun readCase(id: u32) -> BroadCase = {
+    var record = BroadCase();
+    record.id = id;
+    record.mode = readWord(false);
+    var operationCount: i32 = 0i32;
+    if (record.mode == 1u32) {
+        let capacity: u32 = readWord(false);
+        if (capacity != 16u32 and capacity != 32u32 and capacity != 64u32) invalid("niebezpieczna pojemnosc zbioru.");
+        record.initialCapacity = capacity as i32;
+        operationCount = readCount(1024u32);
+        record.dumpEvery = readBool();
+    } else if (record.mode == 0u32) {
+        let bodyCount: i32 = readCount(128u32);
+        let shapeCount: i32 = readCount(128u32);
+        let jointCount: i32 = readCount(128u32);
+        record.world.customMode = readCount(3u32);
+        let ruleCount: i32 = readCount(256u32);
+        operationCount = readCount(1024u32);
+        record.dumpEvery = readBool();
+        record.world.worldId = readCount(3u32) as u16;
+        if (record.world.customMode != 3i32 and ruleCount != 0i32) invalid("reguly tylko w trybie 3.");
+        if (not inputOk) return record;
+        var b: i32 = 0i32;
+        while (b < bodyCount and inputOk) {
+            var body = broad.BodyView();
+            body.id = b;
+            body.bodyType = readCount(2u32);
+            record.world.bodies.push(move body);
+            b = b + 1i32;
+        }
+        var s: i32 = 0i32;
+        while (s < shapeCount and inputOk) {
+            var shape = broad.ShapeView();
+            shape.id = s;
+            shape.bodyId = readWord(false) as i32;
+            let categoryLow: u32 = readWord(false);
+            let categoryHigh: u32 = readWord(false);
+            let maskLow: u32 = readWord(false);
+            let maskHigh: u32 = readWord(false);
+            shape.filter.categoryBits = joinBits(categoryLow, categoryHigh);
+            shape.filter.maskBits = joinBits(maskLow, maskHigh);
+            shape.filter.groupIndex = signedWord(readWord(false));
+            shape.sensorIndex = if readBool() then s else -1i32;
+            let generation: u32 = readWord(false);
+            if (generation < 1u32 or generation > 65535u32) invalid("pokolenie poza 1..65535.");
+            shape.generation = generation as u16;
+            if (not validBody(&record.world, shape.bodyId)) invalid("nieznane cialo ksztaltu.");
+            record.world.shapes.push(move shape);
+            s = s + 1i32;
+        }
+        var j: i32 = 0i32;
+        while (j < jointCount and inputOk) {
+            var joint = broad.JointView();
+            joint.bodyIdA = readWord(false) as i32;
+            joint.bodyIdB = readWord(false) as i32;
+            joint.collideConnected = readBool();
+            if (not validBody(&record.world, joint.bodyIdA) or not validBody(&record.world, joint.bodyIdB)
+                or joint.bodyIdA == joint.bodyIdB) {
+                invalid("niepoprawne ciala polaczenia.");
+                return record;
+            }
+            let bodyA: broad.BodyView = record.world.bodies.at(joint.bodyIdA as i64);
+            let bodyB: broad.BodyView = record.world.bodies.at(joint.bodyIdB as i64);
+            if (bodyA.bodyType != 2i32 and bodyB.bodyType != 2i32) invalid("polaczenie bez ciala dynamicznego.");
+            # Box2D 8c661469, src/joint.c:175-203: new edges at the heads.
+            joint.nextKeyA = bodyA.headJointKey;
+            joint.nextKeyB = bodyB.headJointKey;
+            record.world.bodies.at(joint.bodyIdA as i64).headJointKey = j << 1i32;
+            record.world.bodies.at(joint.bodyIdA as i64).jointCount = bodyA.jointCount + 1i32;
+            record.world.bodies.at(joint.bodyIdB as i64).headJointKey = (j << 1i32) | 1i32;
+            record.world.bodies.at(joint.bodyIdB as i64).jointCount = bodyB.jointCount + 1i32;
+            record.world.joints.push(move joint);
+            j = j + 1i32;
+        }
+        var r: i32 = 0i32;
+        while (r < ruleCount and inputOk) {
+            var rule = broad.FilterRule();
+            rule.shapeA = readWord(false) as i32;
+            rule.shapeB = readWord(false) as i32;
+            rule.decision = readBool();
+            if (not validShape(&record.world, rule.shapeA) or not validShape(&record.world, rule.shapeB)) invalid("nieznany ksztalt reguly.");
+            var previous: i64 = 0i64;
+            while (previous < record.world.customRules.length()) {
+                let prior: broad.FilterRule = record.world.customRules.at(previous);
+                if (prior.shapeA == rule.shapeA and prior.shapeB == rule.shapeB) invalid("powtorzona regula filtra.");
+                previous = previous + 1i64;
+            }
+            record.world.customRules.push(move rule);
+            r = r + 1i32;
+        }
+    } else invalid("nieznany tryb przypadku.");
+    if (operationCount < 1i32) invalid("E946d517eef62 E6e548997f3f2.");
+    var o: i32 = 0i32;
+    while (o < operationCount and inputOk) {
+        var op: Operation = readOperation(record.mode);
+        record.operations.push(move op);
+        o = o + 1i32;
+    }
+    return record;
+}
+
+fun prefix(tag: str, id: u32, k: u32) -> () = {
+    io.writeStr(tag);
+    outWord(id);
+    outWord(k);
+}
+
+fun newline() -> () = { io.writeChar('\n'); }
+
+fun outZeros(count: i32) -> () = {
+    var i: i32 = 0i32;
+    while (i < count) { outWord(0u32); i = i + 1i32; }
+}
+
+fun outOperation(op: Operation, mode: u32) -> () = {
+    outWord(op.kind);
+    var used: i32 = 0i32;
+    if (mode == 1u32) {
+        if (op.kind <= 2u32) {
+            outWord(op.key.low);
+            outWord(op.key.high);
+            used = 2i32;
+        }
+    } else {
+        if (op.kind == 0u32 or op.kind == 2u32 or op.kind == 3u32 or op.kind == 10u32) {
+            outInt(op.n);
+            outAABB(op.aabb);
+            used = 5i32;
+            if (op.kind == 0u32) {
+                outWord(op.force as u32);
+                used = 6i32;
+            } else if (op.kind == 10u32) {
+                outBits(op.bits);
+                used = 7i32;
+            }
+        } else if (op.kind == 1u32 or op.kind == 4u32 or op.kind == 8u32) {
+            outInt(op.n);
+            used = 1i32;
+        } else if (op.kind == 7u32 or op.kind == 9u32) {
+            outInt(op.n);
+            outInt(op.m);
+            used = 2i32;
+        }
+    }
+    outZeros(15i32 - used);
+}
+
+fun outInitial(record: ref BroadCase) -> () = {
+    io.writeChar('I');
+    outWord(record.id);
+    outWord(record.mode);
+    if (record.mode == 1u32) {
+        outInt(record.initialCapacity);
+        outWord(record.operations.length() as u32);
+        outWord(record.dumpEvery as u32);
+        newline();
+        return;
+    }
+    outWord(record.world.bodies.length() as u32);
+    outWord(record.world.shapes.length() as u32);
+    outWord(record.world.joints.length() as u32);
+    outInt(record.world.customMode);
+    outWord(record.world.customRules.length() as u32);
+    outWord(record.operations.length() as u32);
+    outWord(record.dumpEvery as u32);
+    outWord(record.world.worldId as u32);
+    newline();
+    var b: i64 = 0i64;
+    while (b < record.world.bodies.length()) {
+        let body: broad.BodyView = record.world.bodies.at(b);
+        prefix("EB", record.id, b as u32);
+        outInt(body.bodyType);
+        newline();
+        b = b + 1i64;
+    }
+    var s: i64 = 0i64;
+    while (s < record.world.shapes.length()) {
+        let shape: broad.ShapeView = record.world.shapes.at(s);
+        prefix("ES", record.id, s as u32);
+        outInt(shape.bodyId);
+        outBits(shape.filter.categoryBits);
+        outBits(shape.filter.maskBits);
+        outInt(shape.filter.groupIndex);
+        outWord((shape.sensorIndex != -1i32) as u32);
+        outWord(shape.generation as u32);
+        newline();
+        s = s + 1i64;
+    }
+    var j: i64 = 0i64;
+    while (j < record.world.joints.length()) {
+        let joint: broad.JointView = record.world.joints.at(j);
+        prefix("EJ", record.id, j as u32);
+        outInt(joint.bodyIdA);
+        outInt(joint.bodyIdB);
+        outWord(joint.collideConnected as u32);
+        newline();
+        j = j + 1i64;
+    }
+    var r: i64 = 0i64;
+    while (r < record.world.customRules.length()) {
+        let rule: broad.FilterRule = record.world.customRules.at(r);
+        prefix("EF", record.id, r as u32);
+        outInt(rule.shapeA);
+        outInt(rule.shapeB);
+        outWord(rule.decision as u32);
+        newline();
+        r = r + 1i64;
+    }
+}
+
+fun outHashSet(set: ref table.HashSet, id: u32, k: u32, setKind: u32) -> () = {
+    prefix("HS", id, k);
+    outWord(setKind);
+    outInt(set.capacity);
+    outInt(set.count);
+    var i: i32 = 0i32;
+    while (i < set.capacity) {
+        let item: table.SetItem = set.items.at(i as i64);
+        outWord(item.key.low);
+        outWord(item.key.high);
+        outWord(item.hash);
+        i = i + 1i32;
+    }
+    newline();
+}
+
+fun keyLess(a: table.Key64, b: table.Key64) -> bool = {
+    return a.high < b.high or (a.high == b.high and a.low < b.low);
+}
+
+                                                                             
+fun outPairSet(set: ref table.HashSet, id: u32, k: u32) -> () = {
+    var keys: List[table.Key64];
+    var i: i32 = 0i32;
+    while (i < set.capacity) {
+        let item: table.SetItem = set.items.at(i as i64);
+        if (item.hash != 0u32) {
+            keys.push(item.key);
+            var j: i64 = keys.length() - 1i64;
+            var shifting: bool = true;
+            while (j > 0i64 and shifting) {
+                let prior: table.Key64 = keys.at(j - 1i64);
+                if (keyLess(item.key, prior)) {
+                    keys.at(j) = prior;
+                    j = j - 1i64;
+                } else shifting = false;
+            }
+            keys.at(j) = item.key;
+        }
+        i = i + 1i32;
+    }
+    prefix("PS", id, k);
+    outInt(set.count);
+    var p: i64 = 0i64;
+    while (p < keys.length()) {
+        let key: table.Key64 = keys.at(p);
+        outWord(key.high);
+        outWord(key.low);
+        p = p + 1i64;
+    }
+    newline();
+}
+
+fun outDump(bp: ref broad.BroadPhase, world: ref broad.CollisionView, id: u32, k: u32) -> () = {
+    var live: i32 = 0i32;
+    var s: i64 = 0i64;
+    while (s < world.shapes.length()) {
+        let shape: broad.ShapeView = world.shapes.at(s);
+        if (shape.proxyKey != -1i32) live = live + 1i32;
+        s = s + 1i64;
+    }
+    prefix("D", id, k);
+    outWord(bp.moveArray.length() as u32);
+    outInt(bp.moveSet.count);
+    outInt(bp.pairSet.count);
+    outInt(live);
+    outInt(bp.movePairCapacity);
+    outInt(bp.movePairIndex);
+    newline();
+    prefix("M", id, k);
+    outWord(bp.moveArray.length() as u32);
+    var m: i64 = 0i64;
+    while (m < bp.moveArray.length()) {
+        let key: i32 = bp.moveArray.at(m);
+        outInt(key);
+        m = m + 1i64;
+    }
+    newline();
+    var t: i32 = 0i32;
+    while (t < 3i32) {
+        prefix("T", id, k);
+        outInt(t);
+        outInt(bp.trees[t].root);
+        outInt(bp.trees[t].nodeCount);
+        outInt(bp.trees[t].nodeCapacity);
+        outInt(bp.trees[t].freeList);
+        outInt(tree.b2DynamicTree_GetProxyCount(&bp.trees[t]));
+        outInt(tree.b2DynamicTree_GetHeight(&bp.trees[t]));
+        outAABB(tree.b2DynamicTree_GetRootBounds(&bp.trees[t]));
+        newline();
+        t = t + 1i32;
+    }
+    var n: i64 = 0i64;
+    while (n < world.shapes.length()) {
+        let current: broad.ShapeView = world.shapes.at(n);
+        if (current.proxyKey != -1i32) {
+            let proxyType: i32 = broad.B2_PROXY_TYPE(current.proxyKey);
+            let proxyId: i32 = broad.B2_PROXY_ID(current.proxyKey);
+            prefix("P", id, k);
+            outWord(n as u32);
+            outInt(current.proxyKey);
+            outAABB(tree.b2DynamicTree_GetAABB(&bp.trees[proxyType], proxyId));
+            outBits(tree.b2DynamicTree_GetCategoryBits(&bp.trees[proxyType], proxyId));
+            outInt(broad.b2BroadPhase_GetShapeIndex(bp, current.proxyKey));
+            newline();
+        }
+        n = n + 1i64;
+    }
+    outHashSet(&bp.moveSet, id, k, 0u32);
+    outHashSet(&bp.pairSet, id, k, 1u32);
+    outPairSet(&bp.pairSet, id, k);
+}
+
+fun outQuery(trace: ref broad.QueryTrace, id: u32, k: u32, q: u32) -> () = {
+    prefix("Q", id, k);
+    outWord(q);
+    outInt(trace.moveIndex);
+    outInt(trace.queryProxyKey);
+    outInt(trace.treeType);
+    outInt(trace.result.nodeVisits);
+    outInt(trace.result.leafVisits);
+    outWord(trace.result.hits.length() as u32);
+    var h: i64 = 0i64;
+    while (h < trace.result.hits.length()) {
+        let hit: tree.TreeHit = trace.result.hits.at(h);
+        outInt(hit.proxyId);
+        outInt(hit.userData as i32);
+        h = h + 1i64;
+    }
+    newline();
+}
+
+fun outShapeId(id: broad.ShapeId) -> () = {
+    outInt(id.index1);
+    outWord(id.world0 as u32);
+    outWord(id.generation as u32);
+}
+
+fun outUpdate(bp: ref broad.BroadPhase, update: ref broad.PairUpdateResult, id: u32, k: u32) -> () = {
+    var q: i64 = 0i64;
+    while (q < update.queries.length()) {
+        outQuery(update.queries.at(q), id, k, q as u32);
+        q = q + 1i64;
+    }
+    var f: i64 = 0i64;
+    while (f < update.filterCalls.length()) {
+        let call: broad.FilterTrace = update.filterCalls.at(f);
+        prefix("F", id, k);
+        outWord(f as u32);
+        outShapeId(call.idA);
+        outShapeId(call.idB);
+        outWord(call.decision as u32);
+        newline();
+        f = f + 1i64;
+    }
+    var c: i64 = 0i64;
+    while (c < update.requests.length()) {
+        let request: broad.ContactRequest = update.requests.at(c);
+        prefix("C", id, k);
+        outWord(c as u32);
+        outInt(request.moveIndex);
+        outInt(request.shapeIndexA);
+        outInt(request.shapeIndexB);
+        newline();
+        c = c + 1i64;
+    }
+    prefix("U", id, k);
+    outWord(update.hadWork as u32);
+    outInt(update.moveCountAtEntry);
+    outInt(bp.movePairCapacity);
+    outInt(bp.movePairIndex);
+    outInt(update.heapPairCount);
+    outWord(update.requests.length() as u32);
+    newline();
+}
+
+                                                                            
+                                                                         
+fun receiveRequests(bp: ref broad.BroadPhase, update: ref broad.PairUpdateResult) -> () = {
+    var i: i64 = 0i64;
+    while (i < update.requests.length()) {
+        let request: broad.ContactRequest = update.requests.at(i);
+        let already: bool = table.b2AddKey(&bp.pairSet, table.B2_SHAPE_PAIR_KEY(request.shapeIndexA, request.shapeIndexB));
+        if (already) invalid("powtorzone zadanie kontaktu.");
+        i = i + 1i64;
+    }
+}
+
+fun hasIncidentPair(bp: ref broad.BroadPhase, n: i32) -> bool = {
+    var i: i32 = 0i32;
+    while (i < bp.pairSet.capacity) {
+        let item: table.SetItem = bp.pairSet.items.at(i as i64);
+        if (item.hash != 0u32 and (item.key.low == (n as u32) or item.key.high == (n as u32))) return true;
+        i = i + 1i32;
+    }
+    return false;
+}
+
+fun runSetCase(record: ref BroadCase) -> bool = {
+    var set: table.HashSet = table.b2CreateSet(record.initialCapacity);
+    var i: i64 = 0i64;
+    while (i < record.operations.length() and inputOk) {
+        let op: Operation = record.operations.at(i);
+        var result: bool = false;
+        if (op.kind == 0u32) result = table.b2AddKey(&set, op.key);
+        else if (op.kind == 1u32) result = table.b2RemoveKey(&set, op.key);
+        else if (op.kind == 2u32) result = table.b2ContainsKey(&set, op.key);
+        else table.b2ClearSet(&set);
+        let k: u32 = (i + 1i64) as u32;
+        prefix("O", record.id, k);
+        outOperation(op, record.mode);
+        if (op.kind <= 2u32) outWord(result as u32);
+        newline();
+        if (record.dumpEvery or i + 1i64 == record.operations.length()) outHashSet(&set, record.id, k, 2u32);
+        i = i + 1i64;
+    }
+    table.b2DestroySet(&set);
+    return inputOk;
+}
+
+fun runBroadCase(record: ref BroadCase) -> bool = {
+    var bp = broad.BroadPhase();
+    broad.b2CreateBroadPhase(&bp);
+    var i: i64 = 0i64;
+    while (i < record.operations.length() and inputOk) {
+        let op: Operation = record.operations.at(i);
+        var proxyKey: i32 = -1i32;
+        var otherKey: i32 = -1i32;
+        if (op.kind <= 4u32 or op.kind == 7u32 or op.kind == 8u32 or op.kind == 9u32) {
+            if (not validShape(&record.world, op.n)) {
+                invalid("nieznany ksztalt operacji.");
+                return false;
+            }
+            let shape: broad.ShapeView = record.world.shapes.at(op.n as i64);
+            proxyKey = shape.proxyKey;
+            if ((op.kind == 0u32 and proxyKey != -1i32) or (op.kind != 0u32 and proxyKey == -1i32)) {
+                invalid("E18ea6f66fee8 E1a5e497a2bfa E1241936d4dd3 E6e548997f3f2.");
+                return false;
+            }
+        }
+        if (op.kind == 7u32 or op.kind == 9u32) {
+            if (not validShape(&record.world, op.m)) {
+                invalid("nieznany drugi ksztalt operacji.");
+                return false;
+            }
+            let other: broad.ShapeView = record.world.shapes.at(op.m as i64);
+            otherKey = other.proxyKey;
+            if (otherKey == -1i32) { invalid("martwy drugi proxy."); return false; }
+        }
+        if (op.kind == 1u32 and hasIncidentPair(&bp, op.n)) {
+            invalid("DESTROY przed usunieciem incydentnych par.");
+            return false;
+        }
+        if (op.kind == 3u32) {
+            let proxyType: i32 = broad.B2_PROXY_TYPE(proxyKey);
+            if (proxyType == 0i32 or tree.b2AABB_Contains(tree.b2DynamicTree_GetAABB(&bp.trees[proxyType], broad.B2_PROXY_ID(proxyKey)), op.aabb)) {
+                invalid("niedopuszczalne powiekszenie proxy.");
+                return false;
+            }
+        }
+        var result: i32 = 0i32;
+        var update = broad.PairUpdateResult();
+        var query = broad.QueryTrace();
+        if (op.kind == 0u32) {
+            let createdShape: broad.ShapeView = record.world.shapes.at(op.n as i64);
+            let createdBody: broad.BodyView = record.world.bodies.at(createdShape.bodyId as i64);
+            result = broad.b2BroadPhase_CreateProxy(&bp, createdBody.bodyType, op.aabb, createdShape.filter.categoryBits, op.n, op.force);
+            record.world.shapes.at(op.n as i64).proxyKey = result;
+        } else if (op.kind == 1u32) {
+            broad.b2BroadPhase_DestroyProxy(&bp, proxyKey);
+            record.world.shapes.at(op.n as i64).proxyKey = -1i32;
+        } else if (op.kind == 2u32) {
+            broad.b2BroadPhase_MoveProxy(&bp, proxyKey, op.aabb);
+        } else if (op.kind == 3u32) {
+            broad.b2BroadPhase_EnlargeProxy(&bp, proxyKey, op.aabb);
+        } else if (op.kind == 4u32) {
+            broad.b2BufferMove(&bp, proxyKey);
+        } else if (op.kind == 5u32) {
+            update = broad.b2UpdateBroadPhasePairs(&bp, &record.world);
+            receiveRequests(&bp, &update);
+        } else if (op.kind == 6u32) {
+            broad.b2BroadPhase_RebuildTrees(&bp);
+        } else if (op.kind == 7u32) {
+            result = broad.b2BroadPhase_TestOverlap(&bp, proxyKey, otherKey) as i32;
+        } else if (op.kind == 8u32) {
+            result = broad.b2BroadPhase_GetShapeIndex(&bp, proxyKey);
+        } else if (op.kind == 9u32) {
+            # Box2D 8c661469, src/contact.c:337-341. Only the client releases pairs.
+            let removed: bool = table.b2RemoveKey(&bp.pairSet, table.B2_SHAPE_PAIR_KEY(op.n, op.m));
+            if (not removed) { invalid("RELEASE nieistniejacej pary."); return false; }
+        } else {
+            query.treeType = op.n;
+            query.result = tree.b2DynamicTree_Query(&bp.trees[op.n], op.aabb, op.bits);
+        }
+        let k: u32 = (i + 1i64) as u32;
+        prefix("O", record.id, k);
+        outOperation(op, record.mode);
+        if (op.kind == 0u32 or op.kind == 7u32 or op.kind == 8u32) outInt(result);
+        newline();
+        if (op.kind == 5u32) outUpdate(&bp, &update, record.id, k);
+        if (op.kind == 10u32) outQuery(&query, record.id, k, 0u32);
+        if (record.dumpEvery or i + 1i64 == record.operations.length()) outDump(&bp, &record.world, record.id, k);
+        i = i + 1i64;
+    }
+    broad.b2DestroyBroadPhase(&bp);
+    return inputOk;
+}
+
+fun main() -> i64 = {
+    if (not checkTransport()) return 2i64;
+    var cases: List[BroadCase];
+    var expectedId: u32 = 1u32;
+    while (not inputEnded and inputOk) {
+        let id: u32 = readWord(true);
+        if (not inputEnded and inputOk) {
+            if (id != expectedId) { invalid("identyfikatory kolejno od 1."); return 3i64; }
+            var record: BroadCase = readCase(id);
+            if (not inputOk) return 3i64;
+            cases.push(move record);
+            expectedId = expectedId + 1u32;
+        }
+    }
+    if (not inputOk or cases.length() == 0i64) return 3i64;
+    io.writeStr("PORT5");
+    outWord(cases.length() as u32);
+    newline();
+    var i: i64 = 0i64;
+    while (i < cases.length()) {
+        outInitial(cases.at(i));
+        let mode: u32 = cases.at(i).mode;
+        if (mode == 1u32) {
+            if (not runSetCase(cases.at(i))) return 3i64;
+        } else {
+            if (not runBroadCase(cases.at(i))) return 3i64;
+        }
+        i = i + 1i64;
+    }
+    io.writeStr("END");
+    outWord(cases.length() as u32);
+    newline();
+    return 0i64;
+}

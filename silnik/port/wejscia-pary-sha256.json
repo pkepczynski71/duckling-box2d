@@ -1,0 +1,26 @@
+{
+  "przypadki-pary.csv": {
+    "bytes": 361887,
+    "sha256": "6970cf25845de117ae77fd7ffab9a6de99f78650586e4baa45081f1d2bceec1b",
+    "N": 448,
+    "records": 1345
+  },
+  "przypadki-pary-stdin.csv": {
+    "bytes": 140619,
+    "sha256": "aa0e802275497d02d0fb580e323740a7147ceb5d483bbfe8096b1eda7cde607a",
+    "N": 448,
+    "records": 1345
+  },
+  "proba-pary.csv": {
+    "bytes": 5651,
+    "sha256": "4c2e454e9782bada54278115e7770b804b550e9578fc4b45f9bfefec770c7118",
+    "N": 7,
+    "records": 22
+  },
+  "proba-pary-stdin.csv": {
+    "bytes": 2001,
+    "sha256": "e5109960c5ad58a3c6e30d126f4e84274e6dbc992f532c2219bbdbcba53f7e63",
+    "N": 7,
+    "records": 22
+  }
+}

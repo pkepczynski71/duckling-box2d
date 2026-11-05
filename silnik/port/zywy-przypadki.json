@@ -1,0 +1,5293 @@
+{
+  "wersja": "KONTRAKT-12/1",
+  "status": "SPECYFIKACJA CZESCI 1 - E283ada7088c2 Efaccf01e1792 E6e548997f3f2 Ede7d1b721a1e E283ada7088c2 Eb63e47faf17f E33d277cf0ef5",
+  "kontrakt": "silnik/port/KONTRAKT-12.md",
+  "programDuckling": "silnik/port/zywy-swiata.dk",
+  "bazaDrzewa": "a7e77a7a",
+  "N": 160,
+  "prefiksyOdbioru": {
+    "12a": 72,
+    "12b": 136,
+    "12c": 160
+  },
+  "dopuszczalneNProbki": "kazdy calkowity prefiks 1..N odebranej czesci",
+  "sumaKrokowDodatnich": 64800,
+  "sumaOpMax": 108192,
+  "krokiPoCzesci": {
+    "12a": 28800,
+    "12b": 50400,
+    "12c": 64800
+  },
+  "limityRejestrow": {
+    "W": 16,
+    "B": 256,
+    "S": 512,
+    "C": 256,
+    "K8": 4,
+    "K9": 4,
+    "K12": 4,
+    "zyweSwiaty": 2
+  },
+  "historia": "E248f83619166 B/S/C E91d6a5318f0c E21e5fef671cd Eb30f81d83447 Ee2971bee9914 E9a66a83d4b45; Ea343f28597de Ede7d1b721a1e Ef8fe6a08083b Ed3b48c621169 E909abbcb3833 Ed64c7c1f7f02; Ecd5b158f21b7 E4cf6829aa937 E130700c5dcd3 Ee0d2e2b4638f",
+  "limityDodatkowe": {
+    "component": {
+      "fixtureMax": 32,
+      "opMax": 64,
+      "B": 8,
+      "S": 16,
+      "C": 24,
+      "H": 128,
+      "R": 16
+    },
+    "guard": {
+      "fixtureMax": 160,
+      "opMax": 16,
+      "B": 4,
+      "S": 8,
+      "C": 8,
+      "H": 16,
+      "R": 16
+    },
+    "parser": {
+      "wejsciaMax": 256,
+      "wczesniejszeOpMax": 16
+    }
+  },
+  "sufityWyjsciaBajty": {
+    "A": 29253808128,
+    "B": 24663945216,
+    "C": 159821568000,
+    "razemNaProgram": 213739321344
+  },
+  "podpisyHakow": "DO PROBY - KONTRAKT-12 sekcja 9; zadnego programu proby w czesci 1",
+  "przypadki": [
+    {
+      "id": 1,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 2,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 3,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 4,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 5,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 6,
+      "rodzina": "A1",
+      "czesc": "12a",
+      "opis": "typ i TransferBody",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-TRANSFER",
+        "M-NOOP",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 7,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 8,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 9,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 10,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 11,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 12,
+      "rodzina": "A2",
+      "czesc": "12a",
+      "opis": "disable i enable",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-DISABLE",
+        "M-ENABLE",
+        "M-TRANSFER",
+        "M-REMOVESWAP",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 13,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 14,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 15,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 16,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 17,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 18,
+      "rodzina": "A3",
+      "czesc": "12a",
+      "opis": "filtr64 i reset proxy",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY",
+        "M-BUFFER-MOVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 19,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 20,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 21,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 22,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 23,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 24,
+      "rodzina": "A4",
+      "czesc": "12a",
+      "opis": "geometria i masa",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-RESET-PROXY",
+        "M-APPLY-MASS",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 25,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 26,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 27,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 28,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 29,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 30,
+      "rodzina": "A5",
+      "czesc": "12a",
+      "opis": "masa COM i density",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 621632,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA",
+        "M-APPLY-MASS",
+        "M-COM-VELOCITY",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 31,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 32,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 33,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 34,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 35,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 36,
+      "rodzina": "A6",
+      "czesc": "12a",
+      "opis": "damping rotation target",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE",
+        "M-FIXED-ROTATION",
+        "M-TARGET",
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 37,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 38,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 39,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 40,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 41,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 42,
+      "rodzina": "A7",
+      "czesc": "12a",
+      "opis": "E3268fef5c876 E283ada7088c2 E8e6a6cca7aae",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 43,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 44,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 45,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 46,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 47,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 48,
+      "rodzina": "A8",
+      "czesc": "12a",
+      "opis": "numery i obie strony end",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1093760,
+      "oslony": [
+        "G1",
+        "G6",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-REMOVESWAP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 49,
+      "rodzina": "A9",
+      "czesc": "12a",
+      "opis": "ten sam typ i disabled no-op",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-NOOP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 50,
+      "rodzina": "A10",
+      "czesc": "12a",
+      "opis": "szesc kierunkow typu bez Step",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-TYPE",
+        "M-PROXY-TYPE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 51,
+      "rodzina": "A11",
+      "czesc": "12a",
+      "opis": "powtorne Disable",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-NOOP",
+        "M-DISABLE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 52,
+      "rodzina": "A12",
+      "czesc": "12a",
+      "opis": "powtorne Enable",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-NOOP",
+        "M-ENABLE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 53,
+      "rodzina": "A13",
+      "czesc": "12a",
+      "opis": "RemoveSwap ostatni srodkowy jedyny",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-REMOVESWAP",
+        "M-TRANSFER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 54,
+      "rodzina": "A14",
+      "czesc": "12a",
+      "opis": "transfer sleeping i aktualny set po wake",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-TRANSFER",
+        "M-WAKE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 55,
+      "rodzina": "A15",
+      "czesc": "12a",
+      "opis": "filtr identyczny low high group",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-FILTER64",
+        "M-FILTER-GROUP",
+        "M-RESET-PROXY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 56,
+      "rodzina": "A16",
+      "czesc": "12a",
+      "opis": "surface material bez wake i bez refresh kontaktu",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 57,
+      "rodzina": "A17",
+      "czesc": "12a",
+      "opis": "raw krotka kapsula i zmiana typu shape",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G4"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-LOCAL-CENTROID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 58,
+      "rodzina": "A18",
+      "czesc": "12a",
+      "opis": "polygon count hull radius",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G4"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 59,
+      "rodzina": "A19",
+      "czesc": "12a",
+      "opis": "SetMass surowe zero inverses i missing korekty v",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-MASS-DATA"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 60,
+      "rodzina": "A20",
+      "czesc": "12a",
+      "opis": "ApplyMass i korekta COM",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G5",
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-COM-VELOCITY",
+        "M-APPLY-MASS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 61,
+      "rodzina": "A21",
+      "czesc": "12a",
+      "opis": "damping i gravityScale ze znakiem",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-DAMPING",
+        "M-GRAVITY-SCALE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 62,
+      "rodzina": "A22",
+      "czesc": "12a",
+      "opis": "fixedRotation zmiana i no-op",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3",
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-FIXED-ROTATION"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 63,
+      "rodzina": "A23",
+      "czesc": "12a",
+      "opis": "target raw dt0 ujemny static",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-TARGET"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 64,
+      "rodzina": "A24",
+      "czesc": "12a",
+      "opis": "target disabled asleep prog mniejszy rowny wiekszy",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-TARGET"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 65,
+      "rodzina": "A25",
+      "czesc": "12a",
+      "opis": "punkty wektory lokalne i swiatowe",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-POINT-VELOCITY",
+        "M-ATAN2"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 66,
+      "rodzina": "A26",
+      "czesc": "12a",
+      "opis": "zycie owner obu polowek i reuse",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-TICKET-LIFE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 67,
+      "rodzina": "A27",
+      "czesc": "12a",
+      "opis": "liczby i wyliczony target",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-TARGET",
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 68,
+      "rodzina": "A28",
+      "czesc": "12a",
+      "opis": "geometria kazdego rodzaju",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G4"
+      ],
+      "klasyMutacji": [
+        "M-GEOMETRY",
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 69,
+      "rodzina": "A29",
+      "czesc": "12a",
+      "opis": "S12 kazdej nowej drogi",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G5"
+      ],
+      "klasyMutacji": [
+        "M-S12",
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 70,
+      "rodzina": "A30",
+      "czesc": "12a",
+      "opis": "atomowosc przed destrukcja i alokacja",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G6"
+      ],
+      "klasyMutacji": [
+        "M-ATOMIC-PREFLIGHT"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 71,
+      "rodzina": "A31",
+      "czesc": "12a",
+      "opis": "bilety 9b i bloki 10 po zmianie",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BATCH-TICKET",
+        "M-BLOCK-UPPER",
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 72,
+      "rodzina": "A32",
+      "czesc": "12a",
+      "opis": "masa jako wygoda i rowna density",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G8"
+      ],
+      "klasyMutacji": [
+        "M-APPLY-MASS",
+        "M-DENSITY-EQUAL"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 73,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 74,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 75,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 76,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 77,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 78,
+      "rodzina": "B1",
+      "czesc": "12b",
+      "opis": "ustawienia swiata",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 484736,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS",
+        "M-WARM-CACHE",
+        "M-THRESHOLD"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 79,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 80,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 81,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 82,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 83,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 84,
+      "rodzina": "B2",
+      "czesc": "12b",
+      "opis": "filtr par",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 687168,
+      "oslony": [
+        "G1",
+        "G2",
+        "G7",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK",
+        "M-HOOK-ORDER",
+        "M-RULE-LIFE",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 85,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 86,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 87,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 88,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 89,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 90,
+      "rodzina": "B3",
+      "czesc": "12b",
+      "opis": "preSolve",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 12,
+        "C": 16,
+        "H": 64,
+        "R": 16
+      },
+      "qBajty": 550272,
+      "oslony": [
+        "G1",
+        "G2",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-HOOK-ORDER",
+        "M-CACHED-FLAGS",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 91,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 92,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 93,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 94,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 95,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 96,
+      "rodzina": "B4",
+      "czesc": "12b",
+      "opis": "mieszanie materialow",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-CREATE",
+        "M-MIX-UPDATE",
+        "M-MIX-DEFAULT",
+        "M-MATERIAL-SLEEP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 97,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 98,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 99,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 100,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 101,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 102,
+      "rodzina": "B5",
+      "czesc": "12b",
+      "opis": "flagi i zdarzenia",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 8,
+        "S": 16,
+        "C": 24,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 752704,
+      "oslony": [
+        "G1",
+        "G2",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH",
+        "M-BODY-EVENT-FLAGS",
+        "M-END-SIDE",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 103,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 104,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 105,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 106,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 107,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 108,
+      "rodzina": "B6",
+      "czesc": "12b",
+      "opis": "kontakty nazwy kopie",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 800,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G9",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS",
+        "M-OWNED-COPY",
+        "M-NAME",
+        "M-OBJECT-ID"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 109,
+      "rodzina": "B7",
+      "czesc": "12b",
+      "opis": "nazwa pusta i jeden bajt",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 110,
+      "rodzina": "B8",
+      "czesc": "12b",
+      "opis": "nazwa 30 i 31 bajtow",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 111,
+      "rodzina": "B9",
+      "czesc": "12b",
+      "opis": "nazwa 32 bytes",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 112,
+      "rodzina": "B10",
+      "czesc": "12b",
+      "opis": "wewnetrzny NUL",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 113,
+      "rodzina": "B11",
+      "czesc": "12b",
+      "opis": "pelny i niepelny UTF-8",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 114,
+      "rodzina": "B12",
+      "czesc": "12b",
+      "opis": "raw NULL i 32 czytelne bytes",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G9"
+      ],
+      "klasyMutacji": [
+        "M-NAME"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 115,
+      "rodzina": "B13",
+      "czesc": "12b",
+      "opis": "swiat zero progow i no-op",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 116,
+      "rodzina": "B14",
+      "czesc": "12b",
+      "opis": "raw ujemne clamp i game PARAM",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-WORLD-SETTINGS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 117,
+      "rodzina": "B15",
+      "czesc": "12b",
+      "opis": "finite wszystkich ustawien swiata",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G3"
+      ],
+      "klasyMutacji": [
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 118,
+      "rodzina": "B16",
+      "czesc": "12b",
+      "opis": "rejestracja wymiana wylaczenie filtra",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-FILTER-HOOK"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 119,
+      "rodzina": "B17",
+      "czesc": "12b",
+      "opis": "rejestracja wymiana wylaczenie pre",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 120,
+      "rodzina": "B18",
+      "czesc": "12b",
+      "opis": "rejestracja mieszania friction restitution",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-MIX-DEFAULT"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 121,
+      "rodzina": "B19",
+      "czesc": "12b",
+      "opis": "normalna zastepcza i jej prog",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 122,
+      "rodzina": "B20",
+      "czesc": "12b",
+      "opis": "liczby regul i wynik materialu",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-RULE-VALIDATE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 123,
+      "rodzina": "B21",
+      "czesc": "12b",
+      "opis": "first dopasowanie i missing dopasowania",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-RULE-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 124,
+      "rodzina": "B22",
+      "czesc": "12b",
+      "opis": "zycie i strony pary w regule",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-RULE-LIFE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 125,
+      "rodzina": "B23",
+      "czesc": "12b",
+      "opis": "dwie wlasne kopie i mutacja",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G11"
+      ],
+      "klasyMutacji": [
+        "M-OWNED-COPY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 126,
+      "rodzina": "B24",
+      "czesc": "12b",
+      "opis": "owner stale shapeContacts i reguly",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1"
+      ],
+      "klasyMutacji": [
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 127,
+      "rodzina": "B25",
+      "czesc": "12b",
+      "opis": "LOCKED wszystkie drogi i reentrant Step",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G2"
+      ],
+      "klasyMutacji": [
+        "M-LOCKED"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 128,
+      "rodzina": "B26",
+      "czesc": "12b",
+      "opis": "objectId world body shape i historia motion",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-OBJECT-ID",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 129,
+      "rodzina": "B27",
+      "czesc": "12b",
+      "opis": "flagi przed i po utworzeniu kontaktu",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-CACHED-FLAGS",
+        "M-HIT-REFRESH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 130,
+      "rodzina": "B28",
+      "czesc": "12b",
+      "opis": "Body flag i pozniejszy nowy shape",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BODY-EVENT-FLAGS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 131,
+      "rodzina": "B29",
+      "czesc": "12b",
+      "opis": "shape capacity zero jeden pelna",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G11"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 132,
+      "rodzina": "B30",
+      "czesc": "12b",
+      "opis": "touching i zywy non-touching",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G11"
+      ],
+      "klasyMutacji": [
+        "M-SHAPE-CONTACTS"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 133,
+      "rodzina": "B31",
+      "czesc": "12b",
+      "opis": "getter i kopia po destroy swiata",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-OWNED-COPY"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 134,
+      "rodzina": "B32",
+      "czesc": "12b",
+      "opis": "context obie polowki i kolejnosc trace",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-HOOK-CONTEXT",
+        "M-HOOK-ORDER"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 135,
+      "rodzina": "B33",
+      "czesc": "12b",
+      "opis": "raw legalna edycja dwoch punktow i false",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-PRE-SOLVE",
+        "M-WARM-MATCH"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 136,
+      "rodzina": "B34",
+      "czesc": "12b",
+      "opis": "pelne metadane odmowy i no-op",
+      "wariant": null,
+      "liczbaKrokowDodatnich": 0,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 96,
+      "maksima": {
+        "B": 16,
+        "S": 24,
+        "C": 48,
+        "H": 128,
+        "R": 16
+      },
+      "qBajty": 1224832,
+      "oslony": [
+        "G1",
+        "G2",
+        "G9",
+        "G10"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-GUARD-ROUTE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 137,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 138,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 139,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 140,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 141,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 142,
+      "rodzina": "C1",
+      "czesc": "12c",
+      "opis": "drzewa w publicznym swiecie",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 2603264,
+      "oslony": [
+        "G1",
+        "G6",
+        "G7",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-REMOVESWAP",
+        "M-EVENT-STAMP"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 143,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 144,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 145,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 146,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 147,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 148,
+      "rodzina": "C2",
+      "czesc": "12c",
+      "opis": "mala gesta i rozlegla siatka",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 128,
+        "S": 256,
+        "C": 512,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 10038272,
+      "oslony": [
+        "G1",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "klasyMutacji": [
+        "M-BUFFER-MOVE",
+        "M-ENLARGE",
+        "M-TYPE",
+        "M-DISABLE",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 149,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 150,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 151,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 152,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 153,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 154,
+      "rodzina": "C3",
+      "czesc": "12c",
+      "opis": "stos podpora sen split",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 24,
+        "S": 48,
+        "C": 96,
+        "H": 0,
+        "R": 16
+      },
+      "qBajty": 1988864,
+      "oslony": [
+        "G1",
+        "G5",
+        "G6",
+        "G8",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-WAKE-ORDER",
+        "M-REMOVESWAP",
+        "M-APPLY-MASS",
+        "M-MATERIAL-SLEEP",
+        "M-PUBLIC-COLLIDE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 155,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 0,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 156,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 1,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 157,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 2,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 0,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 158,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 3,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 1,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 159,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 4,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 4,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    },
+    {
+      "id": 160,
+      "rodzina": "C4",
+      "czesc": "12c",
+      "opis": "zmiany w srodku historii",
+      "wariant": 5,
+      "liczbaKrokowDodatnich": 600,
+      "podkroki": 8,
+      "warm": 1,
+      "dtH": "3c888889",
+      "opMax": 1500,
+      "maksima": {
+        "B": 32,
+        "S": 64,
+        "C": 128,
+        "H": 512,
+        "R": 16
+      },
+      "qBajty": 3127552,
+      "oslony": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+        "G11",
+        "G12"
+      ],
+      "klasyMutacji": [
+        "M-SNAPSHOT",
+        "M-RULE-LIFE",
+        "M-END-SIDE",
+        "M-EVENT-STAMP",
+        "M-OWNED-COPY",
+        "M-FILTER-ONCE"
+      ],
+      "dowod": "ZOBOWIAZANIE CZESCI 2 - niezliczone galezie i niewykonane mutacje",
+      "roleSwiadka": "integracja + osobna fixture GUARD for niebezpiecznych granic"
+    }
+  ]
+}

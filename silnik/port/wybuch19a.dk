@@ -1,0 +1,2901 @@
+                                                                                        
+                                                                                                                            
+                                                                                     
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+
+                                                                                                 
+
+import fizyka.kola as math2;
+
+import fizyka.kola as geo;
+
+import fizyka.swiat as raw;
+
+import fizyka.odleglosc as distance;
+
+import fizyka.gra as game;
+
+import fizyka.zbior as words64;
+
+import fizyka.szeroka as broad;
+
+import fizyka.drzewo as tree;
+
+import fizyka.wielokaty as poly;
+
+import fizyka.ruch as mass2;
+
+import fizyka.bitset as bits;
+
+import fizyka.solverwide as wmath;
+
+import core.builtins as builtins;
+
+import core.primitive_io as io;
+
+
+extern("C") { fundecl write(fd: i32, buffer: cptr char, count: u64) -> i64; }
+# Box2D 8c661469, src/world.c:100.                                                                     
+                                                                                           
+
+var profile13C: i32 = 0i32;
+
+var initialC13: bool = false;
+
+var groupError13: str = "";
+
+var initialRow13: bool = true; var initialA13: bool = false; var initialTagged13: bool = false;
+
+var chainZ13: i32[18] = zeroChainZ13(); var chainI13: i32[6] = zeroChainI13();
+
+fun zeroChainZ13() -> i32[18] = { var values: i32[18]; return values; }
+
+fun zeroChainI13() -> i32[6] = { var values: i32[6]; return values; }
+
+class SavedChain13 { saved: bool = false; number: game.ChainNumber = game.ChainNumber(); owner: game.WorldNumber = game.WorldNumber(); id: raw.ChainId = raw.ChainId(); }
+
+class SavedChainCopy13 { saved: bool = false; value: game.ChainView = game.ChainView(); id: raw.ChainId = raw.ChainId(); children: List[broad.ShapeId] = emptyRawChildren13(); }
+
+fun emptyRawChildren13() -> List[broad.ShapeId] = { var values: List[broad.ShapeId]; return values; }
+
+fun zeroChains13() -> SavedChain13[16] = { var values: SavedChain13[16]; return values; }
+
+fun zeroChainCopies13() -> SavedChainCopy13[4] = { var values: SavedChainCopy13[4]; return values; }
+
+fun chainRaw13(id: raw.ChainId) -> () = { outHex(id.index1 as u32); outHex(id.world0 as u32); outHex(id.generation as u32); }
+
+fun chainNumber13(number: game.ChainNumber) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+
+fun bodyNumber13(number: game.BodyNumber) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+
+fun shapeNumber13(number: game.ShapeNumber) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+
+fun childRaw13(id: broad.ShapeId) -> () = { outHex(id.index1 as u32); outHex(id.world0 as u32); outHex(id.generation as u32); }
+
+fun zeros13(count: i32) -> () = { var i: i32 = 0i32; while (i < count) { outHex(0u32); i = i+1i32; } }
+
+fun chainLegacyReason13(reg: ref Registers, op: Operation, status: i32) -> i32 = {
+    if (status == game.LOCKED) return 1i32;
+    if (status != game.PARAM) return 0i32;
+    if (op.opcode == 80i32 and op.mode == 1i32 and op.kind == 0i32 and game.bodyStatus(reg.worlds[op.a].number,reg.bodies[op.b].number) == game.OK) {
+        if (raw.worlds.at(reg.worlds[op.a].number.slot as i64).bodies.at(reg.bodies[op.b].number.slot as i64).headChainId != -1i32 and op.words[4] != 0u32) return 80i32;
+    }
+    if ((op.opcode == 18i32 or op.opcode == 19i32 or (op.opcode == 81i32 and op.mode == 1i32)) and game.shapeStatus(reg.worlds[op.a].number,reg.shapes[op.b].number) == game.OK) {
+        if (raw.worlds.at(reg.worlds[op.a].number.slot as i64).shapes.at(reg.shapes[op.b].number.slot as i64).shapeType == 4i32) return 81i32;
+    }
+    return 0i32;
+}
+
+fun materialOut13(material: raw.SurfaceMaterial) -> () = { outFloat(material.friction); outFloat(material.restitution); outFloat(material.rollingResistance); outFloat(material.tangentSpeed); outHex(material.userMaterialId as u32); outHex(material.customColor); }
+
+fun outChainPublic13(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    var ci: i32 = 0i32; var live: i32 = 0i32; var saved: i32 = 0i32;
+    while (ci < 16i32) {
+        if (reg.chains13[ci].saved) {
+            saved = saved+1i32; prefix("CN13",id,seq); outDec(ci); chainRaw13(reg.chains13[ci].id); chainNumber13(reg.chains13[ci].number); newline(); chainZ13[1] = chainZ13[1]+1i32;
+        } ci = ci+1i32;
+    }
+    ci = 0i32;
+    while (ci < 16i32) {
+        if (reg.chains13[ci].saved) {
+            prefix("V13",id,seq); outDec(ci); outHex(raw.b2Chain_IsValid(reg.chains13[ci].id) as u32);
+            outHex((game.chainStatus(reg.chains13[ci].owner,reg.chains13[ci].number) == game.OK) as u32); newline(); chainZ13[16] = chainZ13[16]+1i32;
+        } ci = ci+1i32;
+    }
+    if (op.opcode == 102i32) {
+        prefix("CQ13",id,seq); outDec(op.b); outHex(execution.status as u32); chainZ13[2] = 1i32;
+        if (execution.status != game.OK) { zeros13(18i32); newline(); }
+        else {
+            let owner: game.WorldNumber = reg.worlds[op.a].number; var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+            let number: game.ChainNumber = reg.chains13[op.b].number; let rawId: raw.ChainId = raw.b2MakeChainId(world,number.slot);
+            let worldId: raw.WorldId = raw.b2Chain_GetWorld(rawId); outHex(worldId.index1 as u32); outHex(0u32); outHex(worldId.generation as u32); outHex(owner.slot as u32); outPair(owner.birthTicket); zeros13(2i32);
+            let bodySlot: i32 = world.chainShapes.at(number.slot as i64).bodyId; bodyNumber13(game.BodyNumber(bodySlot,world.bodies.at(bodySlot as i64).birthTicket,owner.birthTicket));
+            let count: i32 = raw.b2Chain_GetSegmentCount(rawId);
+            var children: List[broad.ShapeId]; var checked = game.ShapeList();
+            if (op.mode == 0i32) children = raw.b2Chain_GetSegments(rawId,op.words[3] as i32);
+            else { checked = game.chainSegments(owner,number); var ix: i64 = 0i64; while (ix < checked.values.length()) { children.push(raw.b2MakeShapeId(world,checked.values.at(ix).slot)); ix = ix+1i64; } }
+            outHex(count as u32); outHex(children.length() as u32); outFloat(raw.b2Chain_GetFriction(rawId)); outFloat(raw.b2Chain_GetRestitution(rawId)); outHex(raw.b2Chain_GetMaterial(rawId) as u32); newline();
+            var j: i64 = 0i64; while (j < children.length()) {
+                let child: broad.ShapeId = children.at(j); prefix("QL13",id,seq); outDec(op.b); outDec(j as i32); childRaw13(child);
+                var childNumber: game.ShapeNumber = game.ShapeNumber(child.index1-1i32,world.shapes.at((child.index1-1i32) as i64).birthTicket,owner.birthTicket);
+                if (op.mode == 1i32) childNumber = checked.values.at(j);
+                shapeNumber13(childNumber); newline(); chainZ13[3] = chainZ13[3]+1i32; j = j+1i64;
+            }
+        }
+    }
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world2: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64); var si: i64 = 0i64;
+            live = live+world2.chainIdPool.nextIndex-world2.chainIdPool.freeCount;
+            while (si < world2.shapes.length()) {
+                if (world2.shapes.at(si).id != -1i32 and world2.shapes.at(si).shapeType == 4i32) {
+                    let segment: raw.ChainSegment = raw.b2Shape_GetChainSegment(raw.b2MakeShapeId(world2,si as i32));
+                    prefix("CS13",id,seq); outDec(wi); outDec(si as i32); outFloat(segment.ghost1.x); outFloat(segment.ghost1.y);
+                    outFloat(segment.segment.point1.x); outFloat(segment.segment.point1.y); outFloat(segment.segment.point2.x); outFloat(segment.segment.point2.y);
+                    outFloat(segment.ghost2.x); outFloat(segment.ghost2.y); outHex(segment.chainId as u32); newline(); chainZ13[4] = chainZ13[4]+1i32;
+                } si = si+1i64;
+            }
+        } wi = wi+1i32;
+    }
+    if (op.opcode == 104i32) {
+        prefix("PC13",id,seq); outDec(op.b); outHex(execution.status as u32); chainZ13[5] = 1i32;
+        if (execution.status != game.OK) zeros13(9i32);
+        else {
+            let result: game.ParentChainResult = game.parentChain(reg.worlds[op.a].number,reg.shapes[op.b].number); outHex(result.hasParent as u32);
+            if (result.hasParent) { chainRaw13(raw.b2MakeChainId(raw.worlds.at(reg.worlds[op.a].number.slot as i64),result.number.slot)); chainNumber13(result.number); }
+            else zeros13(8i32);
+        } newline();
+    }
+    var ki: i32 = 0i32;
+    while (ki < 4i32) {
+        if (reg.chainCopies13[ki].saved) {
+            outChainCopy13(&reg.chainCopies13[ki],id,seq,ki,0i32);
+            if (op.opcode == 108i32 and op.a == ki) {
+                var changed = SavedChainCopy13(); changed.saved = true; changed.id = reg.chainCopies13[ki].id;
+                changed.value = game.cloneChainView(&reg.chainCopies13[ki].value); changed.children = copy reg.chainCopies13[ki].children;
+                changed.value.segments.at(op.words[1] as i64).slot = op.words[2] as i32;
+                outChainCopy13(&changed,id,seq,ki,1i32); outChainCopy13(&reg.chainCopies13[ki],id,seq,ki,2i32);
+            }
+        } ki = ki+1i32;
+    }
+    chainZ13[10] = saved; chainZ13[11] = live;
+}
+
+fun outChainCopy13(saved: ref SavedChainCopy13, id: u32, seq: u32, registerSlot: i32, phase: i32) -> () = {
+    prefix("COPY13",id,seq); outDec(registerSlot); outDec(phase); newline(); chainZ13[6] = chainZ13[6]+1i32;
+    prefix("CV13",id,seq); outDec(registerSlot); outDec(phase); chainRaw13(saved.id); chainNumber13(saved.value.number); bodyNumber13(saved.value.body); outHex(saved.value.segments.length() as u32); newline(); chainZ13[7] = chainZ13[7]+1i32;
+    var j: i64 = 0i64; while (j < saved.value.segments.length()) {
+        prefix("CE13",id,seq); outDec(registerSlot); outDec(phase); outDec(j as i32); childRaw13(saved.children.at(j)); shapeNumber13(saved.value.segments.at(j)); newline(); chainZ13[8] = chainZ13[8]+1i32; j = j+1i64;
+    }
+    prefix("ENDCOPY13",id,seq); outDec(registerSlot); outDec(phase); newline(); chainZ13[9] = chainZ13[9]+1i32;
+}
+
+fun outChainPrivate13(reg: ref Registers, id: u32, seq: u32) -> () = {
+    var group: i32 = 0i32;
+    while (group < 6i32) {
+        var wi: i32 = 0i32;
+        while (wi < 16i32) {
+            if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+                var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+                if (group == 3i32) {
+                    var bi: i64 = 0i64; while (bi < world.bodies.length()) { if (world.bodies.at(bi).id != -1i32) { prefix("BH13",id,seq); outDec(wi); outDec(bi as i32); outHex(world.bodies.at(bi).headChainId as u32); newline(); chainI13[3] = chainI13[3]+1i32; } bi = bi+1i64; }
+                } else if (group == 4i32) {
+                    prefix("IP13",id,seq); outDec(wi); outHex(world.chainIdPool.nextIndex as u32); outHex(world.chainIdPool.freeCount as u32);
+                    var fi: i32 = 0i32; while (fi < world.chainIdPool.freeCount) { let freed: i32 = world.chainIdPool.freeArray.at(fi as i64); outHex(freed as u32); fi = fi+1i32; } newline(); chainI13[4] = chainI13[4]+1i32;
+                } else {
+                    var ci: i32 = 0i32; while (ci < world.chainIdPool.nextIndex) {
+                        var chain: ref raw.ChainShape = world.chainShapes.at(ci as i64); let alive: bool = chain.id != -1i32;
+                        if (group == 0i32) {
+                            prefix("CH13",id,seq); outDec(wi); outDec(ci); outHex(alive as u32);
+                            if (alive) { outHex(chain.bodyId as u32); outHex(chain.nextChainId as u32); outHex(chain.count as u32); outHex(chain.materialCount as u32); } else zeros13(4i32);
+                            newline(); chainI13[0] = chainI13[0]+1i32;
+                        } else if (group == 1i32 and alive) {
+                            var sj: i32 = 0i32; while (sj < chain.count) { let slot: i32 = chain.shapeIndices.at(sj as i64); prefix("CI13",id,seq); outDec(wi); outDec(ci); outDec(sj);
+                                childRaw13(raw.b2MakeShapeId(world,slot)); shapeNumber13(game.ShapeNumber(slot,world.shapes.at(slot as i64).birthTicket,world.birthTicket)); newline(); chainI13[1] = chainI13[1]+1i32; sj = sj+1i32; }
+                        } else if (group == 2i32 and alive) {
+                            var mj: i32 = 0i32; while (mj < chain.materialCount) { prefix("CM13",id,seq); outDec(wi); outDec(ci); outDec(mj); materialOut13(chain.materials.at(mj as i64)); newline(); chainI13[2] = chainI13[2]+1i32; mj = mj+1i32; }
+                        } else if (group == 5i32) { prefix("CG13",id,seq); outDec(wi); outDec(ci); outHex(alive as u32); outHex(chain.generation as u32); outPair(chain.birthTicket); outPair(chain.ownerTicket); newline(); chainI13[5] = chainI13[5]+1i32; }
+                        ci = ci+1i32;
+                    }
+                }
+            } wi = wi+1i32;
+        } group = group+1i32;
+    }
+}
+
+fun outChainCounters13(id: u32, seq: u32) -> () = {
+    prefix("I13",id,seq); var i: i32 = 0i32; while (i < 6i32) { outHex(chainI13[i] as u32); i = i+1i32; } newline();
+    chainZ13[12] = completedPositiveSteps as i32; chainZ13[13] = seq as i32;
+                                                                                 
+    prefix("Z13",id,seq); var j: i32 = 0i32; while (j < 17i32) { outHex(chainZ13[j] as u32); j = j+1i32; } outHex(chainZ13[17] as u32); newline();
+}
+
+var inputOk: bool = true;
+
+var guardSeedApplied: bool = false;
+
+# Box2D 8c661469, include/box2d/types.h:172. Bit transport, no C algorithm.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun fromBits(word: u32) -> f32 = {
+    var value: u32 = word;
+    let result: f32 = (&value as cptr f32)[0];
+    return result;
+}
+# Box2D 8c661469, include/box2d/types.h:172. Bit transport.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun toBits(value: f32) -> u32 = {
+    var rawValue: f32 = value;
+    let result: u32 = (&rawValue as cptr u32)[0];
+    return result;
+}
+# Box2D 8c661469, src/body.c:177. Invalid transport terminates, never a game status.
+
+fun sameText13(left: str, right: str) -> bool = {
+    if (left.length() != right.length()) return false;
+    let lp: cptr char = builtins.ptr_from_slice[char](left) as cptr char; let rp: cptr char = builtins.ptr_from_slice[char](right) as cptr char;
+    var ti: i64 = 0i64; while (ti < left.length()) { if (lp[ti] != rp[ti]) return false; ti = ti+1i64; } return true;
+}
+
+fun invalid(message: str) -> () = {
+    if (not inputOk) return;
+    if (profileB14) {
+        var translatedB: char[128]; var selectedB: str = message;
+        if (groupError13.length() != 0i64 and (sameText13(message,"PORT19A: INPUT_ARITY\n") or sameText13(message,"PORT19A: INPUT_ID\n") or sameText13(message,"PORT19A: INPUT_SEQ\n") or sameText13(message,"PORT19A: INPUT_SEQUENCE\n"))) selectedB = groupError13;
+        let originalB: cptr char = builtins.ptr_from_slice[char](selectedB) as cptr char;
+        var mbi: i64 = 0i64; while (mbi < selectedB.length()) { translatedB[mbi] = originalB[mbi]; mbi = mbi+1i64; }
+        translatedB[6] = 'B'; inputOk = false; write(2i32,&translatedB as cptr char,selectedB.length() as u64); return;
+    }
+    if (initialC13) {
+        var translatedC: char[128]; var selectedC: str = message;
+        if (groupError13.length() != 0i64 and (sameText13(message,"PORT19A: INPUT_ARITY\n") or sameText13(message,"PORT19A: INPUT_ID\n") or sameText13(message,"PORT19A: INPUT_SEQ\n") or sameText13(message,"PORT19A: INPUT_SEQUENCE\n"))) selectedC = groupError13;
+        let originalC: cptr char = builtins.ptr_from_slice[char](selectedC) as cptr char;
+        var mc: i64 = 0i64; while (mc < selectedC.length()) { translatedC[mc] = originalC[mc]; mc = mc+1i64; }
+        translatedC[6] = 'C'; inputOk = false; write(2i32,&translatedC as cptr char,selectedC.length() as u64); return;
+    }
+    if (initialA13) {
+        var translated: char[128]; let original: cptr char = builtins.ptr_from_slice[char](message) as cptr char;
+        var mi: i64 = 0i64; while (mi < message.length()) { translated[mi] = original[mi]; mi = mi+1i64; }
+        translated[6] = 'A'; inputOk = false; write(2i32,&translated as cptr char,message.length() as u64); return;
+    }
+    if (groupError13.length() != 0i64 and (sameText13(message,"PORT19A: INPUT_ARITY\n") or sameText13(message,"PORT19A: INPUT_ID\n") or sameText13(message,"PORT19A: INPUT_SEQ\n") or sameText13(message,"PORT19A: INPUT_SEQUENCE\n"))) {
+        inputOk = false; write(2i32,builtins.ptr_from_slice[char](groupError13) as cptr char,groupError13.length() as u64); return;
+    }
+    inputOk = false;
+    write(2i32, builtins.ptr_from_slice[char](message) as cptr char, message.length() as u64);
+}
+# Box2D 8c661469, include/box2d/types.h:81. Transport: kontrola-swiat.c:106-120.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroWords() -> u32[64] = { var values: u32[64]; return values; }
+
+class Operation {
+    manifold: math2.Manifold = math2.Manifold();
+    cache: distance.SimplexCache = distance.SimplexCache();
+    solverParameters: game.SolverWorldParameters = game.SolverWorldParameters();
+    words: u32[64] = zeroWords();
+    d: i32 = 0i32;
+    opcode: i32 = 0i32;
+    a: i32 = 0i32;
+    b: i32 = 0i32;
+    c: i32 = 0i32;
+    capacity: i32 = 0i32;
+    kind: i32 = 0i32;
+    gravity: math2.Vec2 = math2.Vec2();
+    maximumLinearSpeed: f32 = 0.0f32;
+    def: raw.BodyDef = raw.BodyDef();
+    position: math2.Vec2 = math2.Vec2();
+    rotation: math2.Rot = math2.Rot();
+    source: raw.ShapeRecord = raw.ShapeRecord();
+    tag: i32 = 0i32;
+    updateMass: bool = false;
+    invoke: bool = false;
+    geometryGood: bool = true;
+    halfWidth: f32 = 0.0f32;
+    halfHeight: f32 = 0.0f32;
+    localCenter: math2.Vec2 = math2.Vec2();
+    localRotation: math2.Rot = math2.Rot();
+    radius: f32 = 0.0f32;
+    mode: i32 = 0i32;
+    dt: f32 = 0.0f32;
+    subStepCount: i32 = 0i32;
+    copySlot: i32 = 0i32;
+    value: math2.Vec2 = math2.Vec2();
+    point: math2.Vec2 = math2.Vec2();
+    wake: bool = false;
+    mutateCopy: bool = false;
+    liveMass: mass2.MassData = mass2.MassData();
+    liveMaterial: raw.SurfaceMaterial = raw.SurfaceMaterial();
+}
+
+# Box2D 8c661469, include/box2d/types.h:307-408. Reject each invalid boolean at its field.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+class SavedWorld {
+    saved: bool = false;
+    number: game.WorldNumber = game.WorldNumber();
+    id: raw.WorldId = raw.WorldId();
+    functionIds12: u32[4] = zeroFunctionIds12();
+}
+
+class SavedBody {
+    saved: bool = false;
+    number: game.BodyNumber = game.BodyNumber();
+    owner: game.WorldNumber = game.WorldNumber();
+    id: raw.BodyId = raw.BodyId();
+}
+# Box2D 8c661469, include/box2d/id.h:52. Historical identity, no geometry cached here.
+
+class SavedShape {
+    saved: bool = false;
+    number: game.ShapeNumber = game.ShapeNumber();
+    owner: game.WorldNumber = game.WorldNumber();
+    id: broad.ShapeId = broad.ShapeId();
+}
+# Box2D 8c661469, include/box2d/id.h:52. Explicit array initialization, guide rule 22.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroShapeRegisters() -> SavedShape[512] = {
+    var values: SavedShape[512]; var i: i32 = 0i32;
+    while (i < 512i32) { values[i] = SavedShape(); i = i + 1i32; }
+    return values;
+}
+# Box2D 8c661469, include/box2d/id.h:36. Guide rule 22, explicit initialization.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroWorldRegisters() -> SavedWorld[16] = {
+    var values: SavedWorld[16];
+    var i: i32 = 0i32;
+    while (i < 16i32) { values[i] = SavedWorld(); i = i + 1i32; }
+    return values;
+}
+# Box2D 8c661469, include/box2d/id.h:44. Guide rule 22.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroBodyRegisters() -> SavedBody[256] = {
+    var values: SavedBody[256];
+    var i: i32 = 0i32;
+    while (i < 256i32) { values[i] = SavedBody(); i = i + 1i32; }
+    return values;
+}
+# Box2D 8c661469, include/box2d/types.h:1126-1154. Transport retains game-owned values only.
+
+class SavedCopy { saved: bool = false; values: List[game.BodyMove] = game.emptyBodyMoves(); }
+# Box2D 8c661469, src/array.h:49-115. Guide rule 22.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroCopies() -> SavedCopy[4] = { var values: SavedCopy[4]; return values; }
+# Box2D 8c661469, src/world.c:1491-1503.                                                   
+# Box2D 8c661469, src/world.c:357. Per-operation counters.
+
+fun zeroN9() -> i32[20] = { var values: i32[20]; return values; }
+
+class Execution {
+    readShape12: i32 = -1i32;
+    contactList12: game.ContactList = game.ContactList();
+    mutateList12: i32 = -1i32;
+    liveReason: i32 = 0i32;
+    liveKind: i32 = 0i32;
+    liveRegister: i32 = 0i32;
+    liveVector: game.VectorResult = game.VectorResult();
+    taskCount: i32 = 0i32;
+    n10: i32[6] = zeroN10();
+    z10: i32[4] = zeroZ10();
+    contact: game.ContactLookup = game.ContactLookup();
+    contactList: game.ContactList = game.ContactList();
+    pairs: game.ContactPairs = game.ContactPairs();
+    n9: i32[20] = zeroN9();
+    z9: i32[10] = zeroI8();
+    status: i32 = 0i32;
+    rawStep: raw.StepResult = raw.StepResult();
+    gameStep: game.StepResult = game.StepResult();
+    moves: List[raw.BodyMoveEvent] = raw.emptyMoves();
+    shapes: game.ShapeList = game.ShapeList();
+    parent: game.BodyResult = game.BodyResult();
+}
+# Box2D 8c661469, src/world.c:357. Snapshot counters are observer-only.
+
+fun zeroI8() -> i32[10] = { var values: i32[10]; return values; }
+
+class SavedContact { saved: bool = false; number: game.ContactNumber = game.ContactNumber(); }
+# Box2D 8c661469, src/array.h:49.
+
+fun zeroContacts() -> SavedContact[256] = { var values: SavedContact[256]; return values; }
+
+class SavedEvents { saved: bool = false; values: game.ContactEvents = game.ContactEvents(); }
+# Box2D 8c661469, src/array.h:49.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun zeroEvents() -> SavedEvents[4] = { var values: SavedEvents[4]; return values; }
+
+class Registers {
+    chains13: SavedChain13[16] = zeroChains13();
+    chainCopies13: SavedChainCopy13[4] = zeroChainCopies13();
+    totalChainSlots13: i32 = 0i32;
+    contactCopies12: SavedList12[4] = zeroSavedLists12();
+    phase: i32 = 0i32;
+    phaseOwner: i32 = 0i32;
+    completedSteps: u32 = 0u32;
+    contacts: SavedContact[256] = zeroContacts();
+    events: SavedEvents[4] = zeroEvents();
+    regI8: i32[10] = zeroI8();
+    totalBodySlots: i32 = 0i32;
+    totalShapeSlots: i32 = 0i32;
+    totalContactSlots: i32 = 0i32;
+    worlds: SavedWorld[16] = zeroWorldRegisters();
+    bodies: SavedBody[256] = zeroBodyRegisters();
+    shapes: SavedShape[512] = zeroShapeRegisters();
+    copies: SavedCopy[4] = zeroCopies();
+}
+
+# Box2D 8c661469, include/box2d/id.h:93. Decimal control tokens.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outUnsigned(x: u64) -> () = {
+    if (x >= 10u64) outUnsigned(x / 10u64);
+    outputChar14(('0' as u64 + x % 10u64) as char);
+}
+# Box2D 8c661469, include/box2d/id.h:93. Control token.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outDec(x: i32) -> () = { outputChar14(' '); outUnsigned(x as u64); }
+# Box2D 8c661469, include/box2d/id.h:93. All non-control words: exactly eight hex digits.
+# Box2D 8c661469, src/world.c:100. Transport representation adapter, no separate C algorithm.
+
+fun outHex(word: u32) -> () = {
+    outputChar14(' ');
+    var shift: i32 = 28i32;
+    while (shift >= 0i32) {
+        let digit: u32 = (word >> (shift as u32)) & 15u32;
+        if (digit < 10u32) outputChar14((48u32 + digit) as char);
+        else outputChar14((97u32 + digit - 10u32) as char);
+        shift = shift - 4i32;
+    }
+}
+# Box2D 8c661469, include/box2d/types.h:172. Exact binary32.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outFloat(value: f32) -> () = { outHex(toBits(value)); }
+# Box2D 8c661469, include/box2d/id.h:106. low32, high32.
+# Box2D 8c661469, src/world.c:100. Transport representation adapter, no separate C algorithm.
+
+fun outPair(value: words64.Key64) -> () = { outHex(value.low); outHex(value.high); }
+# Box2D 8c661469, include/box2d/id.h:93. Record framing.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun newline() -> () = { outputChar14('\n'); }
+# Box2D 8c661469, include/box2d/id.h:93. Record prefix.
+# Box2D 8c661469, src/world.c:100. Transport representation adapter, no separate C algorithm.
+
+fun prefix(tag: str, id: u32, seq: u32) -> () = {
+    currentOutputRank14 = legacyOutputRank14(tag);
+    outputString14(tag); outDec(id as i32); outDec(seq as i32);
+}
+# Box2D 8c661469, include/box2d/id.h:36,93.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outWorldId(id: raw.WorldId) -> () = {
+    outHex(id.index1 as u32); outHex(0u32); outHex(id.generation as u32);
+    outHex(raw.b2StoreWorldId(id)); outHex(0u32);
+}
+# Box2D 8c661469, include/box2d/id.h:44,106.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outBodyId(id: raw.BodyId) -> () = {
+    outHex(id.index1 as u32); outHex(id.world0 as u32); outHex(id.generation as u32);
+    outPair(raw.b2StoreBodyId(id));
+}
+# Box2D 8c661469, include/box2d/id.h:36. Game ticket metadata follows raw ID.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outBodyHandle(saved: SavedBody) -> () = {
+    outBodyId(saved.id); outPair(saved.number.ownerTicket); outPair(saved.number.birthTicket);
+}
+
+# Box2D 8c661469, include/box2d/id.h:52,118.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outShapeId(id: broad.ShapeId) -> () = {
+    outHex(id.index1 as u32); outHex(id.world0 as u32); outHex(id.generation as u32); outPair(raw.b2StoreShapeId(id));
+}
+# Box2D 8c661469, include/box2d/id.h:52. Historical handle including both lifetime tickets.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outShapeHandle(saved: SavedShape) -> () = {
+    outShapeId(saved.id); outPair(saved.number.ownerTicket); outPair(saved.number.birthTicket);
+}
+# Box2D 8c661469, include/box2d/id.h:36,44,52. Null result payload.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outNull() -> () = { var i: i32 = 0i32; while (i < 9i32) { outHex(0u32); i = i + 1i32; } }
+# Box2D 8c661469, src/body.                                 
+
+fun outObject(present: bool, value: words64.Key64) -> () = { outHex(present as u32); outPair(value); }
+# Box2D 8c661469, include/box2d/math_functions.h:58.
+# Box2D 8c661469, src/world.c:100. Transport representation adapter, no separate C algorithm.
+
+fun outAABB(value: tree.AABB) -> () = {
+    outFloat(value.lowerBound.x); outFloat(value.lowerBound.y); outFloat(value.upperBound.x); outFloat(value.upperBound.y);
+}
+# Box2D 8c661469, include/box2d/collision.h:91-101.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outMass(value: mass2.MassData) -> () = {
+    outFloat(value.mass); outFloat(value.center.x); outFloat(value.center.y); outFloat(value.rotationalInertia);
+}
+# Box2D 8c661469, include/box2d/types.h:249-281.
+# Box2D 8c661469, src/world.                                                               
+
+fun outShapeState(saved: SavedShape, id: u32, seq: u32, slot: i32) -> () = {
+    var world: ref raw.World = raw.worlds.at(saved.id.world0 as i64);
+    var shape: raw.ShapeRecord = world.shapes.at((saved.id.index1-1i32) as i64);
+    let body: raw.BodyId = raw.b2MakeBodyId(world, shape.bodyId);
+    let worldId: raw.WorldId = raw.WorldId((world.worldId+1u16) as u16, world.generation);
+    prefix("S", id, seq); outDec(slot); outShapeHandle(saved);
+    outHex(body.index1 as u32); outHex(body.world0 as u32); outHex(body.generation as u32);
+    outHex(worldId.index1 as u32); outHex(0u32); outHex(worldId.generation as u32);
+    outHex(shape.shapeType as u32); outFloat(shape.density);
+    outFloat(shape.friction); outFloat(shape.restitution); outFloat(shape.rollingResistance); outFloat(shape.tangentSpeed);
+    outHex(shape.userMaterialId as u32); outHex(shape.customColor);
+    outHex(shape.filter.categoryBits as u32); outHex(((shape.filter.categoryBits as u64) >> 32u64) as u32);
+    outHex(shape.filter.maskBits as u32); outHex(((shape.filter.maskBits as u64) >> 32u64) as u32); outHex(shape.filter.groupIndex as u32);
+    outHex((shape.sensorIndex != -1i32) as u32); outMass(raw.b2ComputeShapeMass(&shape)); outAABB(shape.aabb); outObject(shape.hasObjectId, shape.objectId); newline();
+}
+# Box2D 8c661469, src/shape.c:1339-1384.                                                           
+
+fun outGeometry(saved: SavedShape, id: u32, seq: u32, slot: i32) -> () = {
+    let shape: raw.ShapeRecord = raw.worlds.at(saved.id.world0 as i64).shapes.at((saved.id.index1-1i32) as i64);
+    var h: u32[40]; var z: i32 = 0i32;
+    while (z < 40i32) { h[z] = 0u32; z = z + 1i32; }
+    h[0] = shape.shapeType as u32;
+    if (shape.shapeType == 0i32) {
+        h[1] = 1u32; h[2] = toBits(shape.circle.radius); h[5] = toBits(shape.circle.center.x); h[6] = toBits(shape.circle.center.y);
+    } else if (shape.shapeType == 1i32) {
+        h[1] = 2u32; h[2] = toBits(shape.capsule.radius);
+        h[5] = toBits(shape.capsule.center1.x); h[6] = toBits(shape.capsule.center1.y);
+        h[7] = toBits(shape.capsule.center2.x); h[8] = toBits(shape.capsule.center2.y);
+    } else if (shape.shapeType == 2i32) {
+        h[1] = 2u32; h[5] = toBits(shape.segment.point1.x); h[6] = toBits(shape.segment.point1.y);
+        h[7] = toBits(shape.segment.point2.x); h[8] = toBits(shape.segment.point2.y);
+    } else if (shape.shapeType == 4i32) {
+        h[1] = 2u32; h[5] = toBits(shape.chainSegment.segment.point1.x); h[6] = toBits(shape.chainSegment.segment.point1.y); h[7] = toBits(shape.chainSegment.segment.point2.x); h[8] = toBits(shape.chainSegment.segment.point2.y);
+    } else {
+        h[1] = shape.polygon.count as u32; h[2] = toBits(shape.polygon.radius);
+        h[3] = toBits(shape.polygon.centroid.x); h[4] = toBits(shape.polygon.centroid.y);
+        var i: i32 = 0i32;
+        while (i < shape.polygon.count) {
+            h[5i32+2i32*i] = toBits(shape.polygon.vertices[i].x); h[6i32+2i32*i] = toBits(shape.polygon.vertices[i].y);
+            h[21i32+2i32*i] = toBits(shape.polygon.normals[i].x); h[22i32+2i32*i] = toBits(shape.polygon.normals[i].y); i = i + 1i32;
+        }
+    }
+    prefix("G", id, seq); outDec(slot); z = 0i32;
+    while (z < 40i32) { outHex(h[z]); z = z + 1i32; } newline();
+}
+# Box2D 8c661469, src/body.c:1811-1828. Values come from the actual linked list.
+
+fun outShapeList(body: raw.BodyId, capacity: i32) -> () = {
+    var shapes: List[broad.ShapeId] = raw.b2Body_GetShapes(body, capacity);
+    var i: i64 = 0i64;
+    while (i < shapes.length()) {
+        let shape: broad.ShapeId = shapes.at(i);
+        outHex(shape.index1 as u32); outHex(shape.world0 as u32); outHex(shape.generation as u32); i = i + 1i64;
+    }
+}
+# Box2D 8c661469, src/table.                                                                
+
+fun outSet(set: ref words64.HashSet, id: u32, seq: u32, slot: i32, kind: i32) -> () = {
+    prefix("H", id, seq); outDec(slot); outDec(kind); outHex(set.capacity as u32); outHex(set.count as u32);
+    var i: i32 = 0i32;
+    while (i < set.capacity) {
+        let item: words64.SetItem = set.items.at(i as i64); outPair(item.key); outHex(item.hash); i = i + 1i32;
+    }
+    newline();
+}
+# Box2D 8c661469, src/body.                                                      
+                                                                                         
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outPrivate(reg: ref Registers, id: u32, seq: u32) -> () = {
+    var nX: i32 = 0i32; var nP: i32 = 0i32; var nT: i32 = 0i32;
+    var nF: i32 = 0i32; var nU: i32 = 0i32; var nH: i32 = 0i32;
+    var bi: i32 = 0i32;
+    while (bi < 256i32) {
+        if (reg.bodies[bi].saved and game.bodyStatus(reg.bodies[bi].owner, reg.bodies[bi].number) == game.OK) {
+            var bw: ref raw.World = raw.worlds.at(reg.bodies[bi].id.world0 as i64);
+            let body: raw.BodyRecord = bw.bodies.at(reg.bodies[bi].number.slot as i64);
+            var set: ref raw.SolverSet = raw.b2GetSolverSet(bw, body.setIndex);
+            let sim: raw.BodySim = set.bodySims.at(body.localIndex as i64);
+            prefix("X", id, seq); outDec(bi); outFloat(sim.invMass); outFloat(sim.invInertia);
+            outFloat(sim.minExtent); outFloat(sim.maxExtent); outFloat(sim.center0.x); outFloat(sim.center0.y);
+            outFloat(sim.rotation0.c); outFloat(sim.rotation0.s); newline(); nX = nX + 1i32;
+        }
+        bi = bi + 1i32;
+    }
+    var si: i32 = 0i32;
+    while (si < 512i32) {
+        if (reg.shapes[si].saved and game.shapeStatus(reg.shapes[si].owner, reg.shapes[si].number) == game.OK) {
+            let shape: raw.ShapeRecord = raw.worlds.at(reg.shapes[si].id.world0 as i64).shapes.at(reg.shapes[si].number.slot as i64);
+            prefix("P", id, seq); outDec(si); outHex(shape.id as u32); outHex(shape.bodyId as u32);
+            outHex(shape.prevShapeId as u32); outHex(shape.nextShapeId as u32); outHex(shape.proxyKey as u32);
+            outFloat(shape.localCentroid.x); outFloat(shape.localCentroid.y); outAABB(shape.fatAABB); outHex(shape.enlargedAABB as u32);
+            newline(); nP = nP + 1i32;
+        }
+        si = si + 1i32;
+    }
+    si = 0i32;
+    while (si < 512i32) {
+        if (reg.shapes[si].saved and game.shapeStatus(reg.shapes[si].owner, reg.shapes[si].number) == game.OK) {
+            var sw: ref raw.World = raw.worlds.at(reg.shapes[si].id.world0 as i64);
+            let leafShape: raw.ShapeRecord = sw.shapes.at(reg.shapes[si].number.slot as i64);
+            if (leafShape.proxyKey != -1i32) {
+                let treeType: i32 = broad.B2_PROXY_TYPE(leafShape.proxyKey);
+                let proxyId: i32 = broad.B2_PROXY_ID(leafShape.proxyKey);
+                var actualTree: ref tree.DynamicTree = &sw.broadPhase.trees[treeType];
+                let category: i64 = tree.b2DynamicTree_GetCategoryBits(actualTree, proxyId);
+                let userData: i64 = tree.b2DynamicTree_GetUserData(actualTree, proxyId);
+                prefix("T", id, seq); outDec(si); outHex(treeType as u32); outHex(proxyId as u32);
+                outAABB(tree.b2DynamicTree_GetAABB(actualTree, proxyId));
+                outHex(category as u32); outHex(((category as u64) >> 32u64) as u32);
+                outHex(userData as u32); outHex(((userData as u64) >> 32u64) as u32); newline(); nT = nT + 1i32;
+            }
+        }
+        si = si + 1i32;
+    }
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            prefix("F", id, seq); outDec(wi); outHex(world.broadPhase.moveArray.length() as u32);
+            outHex(world.broadPhase.trees[0].proxyCount as u32); outHex(world.broadPhase.trees[1].proxyCount as u32);
+            outHex(world.broadPhase.trees[2].proxyCount as u32); outHex(world.broadPhase.pairSet.count as u32); newline(); nF = nF + 1i32;
+        }
+        wi = wi + 1i32;
+    }
+    wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var moveWorld: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            var j: i64 = 0i64;
+            while (j < moveWorld.broadPhase.moveArray.length()) {
+                let key: i32 = moveWorld.broadPhase.moveArray.at(j);
+                prefix("U", id, seq); outDec(wi); outDec(j as i32); outHex(key as u32); newline(); nU = nU + 1i32; j = j + 1i64;
+            }
+        }
+        wi = wi + 1i32;
+    }
+    wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var hashWorld: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            outSet(&hashWorld.broadPhase.moveSet, id, seq, wi, 0i32); outSet(&hashWorld.broadPhase.pairSet, id, seq, wi, 1i32); nH = nH + 2i32;
+        }
+        wi = wi + 1i32;
+    }
+    var nY: i32 = 0i32; var nDN: i32 = 0i32; var nRT: i32 = 0i32; var nJW: i32 = 0i32;
+    var yi: i32 = 0i32;
+    while (yi < 256i32) {
+        if (liveBody(reg, yi)) {
+            var yw: ref raw.World = raw.worlds.at(reg.bodies[yi].owner.slot as i64);
+            let record: raw.BodyRecord = yw.bodies.at(reg.bodies[yi].number.slot as i64);
+            var ys: ref raw.SolverSet = raw.b2GetSolverSet(yw, record.setIndex);
+            let simY: raw.BodySim = ys.bodySims.at(record.localIndex as i64);
+            var stateY = raw.BodyState(); if (record.setIndex == 2i32) stateY = ys.bodyStates.at(record.localIndex as i64);
+            prefix("Y", id, seq); outDec(yi);
+            outFloat(simY.force.x); outFloat(simY.force.y); outFloat(simY.torque);
+            outFloat(stateY.deltaPosition.x); outFloat(stateY.deltaPosition.y);
+            outFloat(stateY.deltaRotation.c); outFloat(stateY.deltaRotation.s);
+            outHex(simY.isSpeedCapped as u32); outHex(record.isSpeedCapped as u32); outHex(record.bodyMoveIndex as u32);
+            outHex(record.setIndex as u32); outHex(record.localIndex as u32);
+            outFloat(simY.linearDamping); outFloat(simY.angularDamping); outFloat(simY.gravityScale);
+            outHex(simY.allowFastRotation as u32); outHex(simY.isFast as u32); newline(); nY = nY + 1i32;
+        }
+        yi = yi + 1i32;
+    }
+    var di: i32 = 0i32;
+    while (di < 16i32) {
+        if (reg.worlds[di].saved and game.worldStatus(reg.worlds[di].number) == game.OK) {
+            var dw: ref raw.World = raw.worlds.at(reg.worlds[di].number.slot as i64);
+            var dense: i32 = 0i32;
+            while (dense < raw.b2GetSolverSet(dw, 2i32).bodyCount) {
+                let denseId: raw.BodyId = raw.b2MakeBodyId(dw, raw.b2GetSolverSet(dw, 2i32).bodySims.at(dense as i64).bodyId);
+                prefix("DN", id, seq); outDec(di); outDec(dense);
+                outHex(denseId.index1 as u32); outHex(denseId.world0 as u32); outHex(denseId.generation as u32); newline();
+                nDN = nDN + 1i32; dense = dense + 1i32;
+            }
+        }
+        di = di + 1i32;
+    }
+    var ri: i32 = 0i32;
+    while (ri < 16i32) {
+        if (reg.worlds[ri].saved and game.worldStatus(reg.worlds[ri].number) == game.OK) {
+            var rw: ref raw.World = raw.worlds.at(reg.worlds[ri].number.slot as i64);
+            var tt: i32 = 0i32;
+            while (tt < 3i32) {
+                var rt: ref tree.DynamicTree = &rw.broadPhase.trees[tt];
+                prefix("RT", id, seq); outDec(ri); outDec(tt);
+                outHex(rt.root as u32); outHex(rt.nodeCount as u32); outHex(rt.nodeCapacity as u32); outHex(rt.freeList as u32);
+                outHex(rt.proxyCount as u32); outHex(tree.b2DynamicTree_GetHeight(rt) as u32);
+                outFloat(tree.b2DynamicTree_GetAreaRatio(rt)); outAABB(tree.b2DynamicTree_GetRootBounds(rt)); newline();
+                nRT = nRT + 1i32; tt = tt + 1i32;
+            }
+        }
+        ri = ri + 1i32;
+    }
+    var ji: i32 = 0i32;
+    while (ji < 16i32) {
+        if (reg.worlds[ji].saved and game.worldStatus(reg.worlds[ji].number) == game.OK) {
+            var jw: ref raw.World = raw.worlds.at(reg.worlds[ji].number.slot as i64);
+            prefix("JW", id, seq); outDec(ji); outPair(jw.stepIndex); outFloat(jw.inv_h); outHex(jw.locked as u32);
+            outHex(jw.endEventArrayIndex as u32); outHex(jw.bodyMoveEvents.length() as u32);
+            outHex(jw.broadPhase.movePairCapacity as u32); outHex(jw.broadPhase.movePairIndex as u32); newline(); nJW = nJW + 1i32;
+        }
+        ji = ji + 1i32;
+    }
+    reg.regI8[0] = nX;
+    reg.regI8[1] = nP;
+    reg.regI8[2] = nT;
+    reg.regI8[3] = nF;
+    reg.regI8[4] = nU;
+    reg.regI8[5] = nH;
+    reg.regI8[6] = nY;
+    reg.regI8[7] = nDN;
+    reg.regI8[8] = nRT;
+    reg.regI8[9] = nJW;
+}
+
+# Box2D 8c661469, src/body.c:1811-1828. Actual game return values, in each requested phase.
+
+fun outGameShapes(values: ref List[game.ShapeNumber], owner: game.WorldNumber, id: u32, seq: u32, phase: i32) -> () = {
+    prefix("QGN", id, seq); outDec(phase); outHex(values.length() as u32); newline();
+    var i: i64 = 0i64;
+    while (i < values.length()) {
+        let number: game.ShapeNumber = values.at(i);
+        var world: ref raw.World = raw.worlds.at(owner.slot as i64);
+        let saved: SavedShape = SavedShape(true, number, owner, raw.b2MakeShapeId(world, number.slot));
+        prefix("QG", id, seq); outDec(phase); outDec(i as i32); outShapeHandle(saved); newline(); i = i + 1i64;
+    }
+}
+
+# Box2D 8c661469, include/box2d/types.h:1126-1154. Historical copy: no current-world lookup.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outCopy(saved: ref SavedCopy, id: u32, seq: u32, copySlot: i32) -> () = {
+    prefix("MCN", id, seq); outDec(copySlot); outHex(saved.values.length() as u32); newline();
+    var i: i64 = 0i64;
+    while (i < saved.values.length()) {
+        let value: game.BodyMove = saved.values.at(i);
+        prefix("MC", id, seq); outDec(copySlot); outDec(i as i32);
+        outHex(value.number.slot as u32); outPair(value.number.birthTicket); outPair(value.number.ownerTicket);
+        outFloat(value.transform.p.x); outFloat(value.transform.p.y); outFloat(value.transform.q.c); outFloat(value.transform.q.s);
+        outObject(value.hasObjectId, value.objectId); outHex(value.fellAsleep as u32); newline(); i = i + 1i64;
+    }
+}
+
+# Box2D 8c661469, src/world.c:1491-1503. Only the result of a successful executed Step is read.
+
+fun outStep(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    prefix("K", id, seq); outDec(op.a); outFloat(op.dt); outHex(op.subStepCount as u32);
+    outHex(execution.rawStep.effectiveSubSteps as u32); outHex(execution.rawStep.didSolve as u32); outHex(execution.moves.length() as u32); newline();
+    var i: i64 = 0i64;
+    while (i < execution.moves.length()) {
+        let event: raw.BodyMoveEvent = execution.moves.at(i);
+        prefix("M", id, seq); outDec(op.a); outDec(i as i32);
+        outHex(event.bodyId.index1 as u32); outHex(event.bodyId.world0 as u32); outHex(event.bodyId.generation as u32);
+        outFloat(event.transform.p.x); outFloat(event.transform.p.y); outFloat(event.transform.q.c); outFloat(event.transform.q.s);
+        outObject(event.hasObjectId, event.objectId); outHex(event.fellAsleep as u32); newline(); i = i + 1i64;
+    }
+}
+
+# Box2D 8c661469, src/world.                                               
+
+fun outState(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+
+    var savedWorlds: i32 = 0i32;
+    var savedBodies: i32 = 0i32;
+    var savedShapes: i32 = 0i32;
+    var liveShapes: i32 = 0i32;
+    var liveWorlds: i32 = 0i32;
+    var liveBodies: i32 = 0i32;
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved) {
+            savedWorlds = savedWorlds + 1i32;
+            prefix("V", id, seq); outDec(1i32); outDec(wi);
+            outHex(raw.b2World_IsValid(reg.worlds[wi].id) as u32);
+            outHex((game.worldStatus(reg.worlds[wi].number) == game.OK) as u32); newline();
+        }
+        wi = wi + 1i32;
+    }
+    var bi: i32 = 0i32;
+    while (bi < 256i32) {
+        if (reg.bodies[bi].saved) {
+            savedBodies = savedBodies + 1i32;
+            prefix("V", id, seq); outDec(2i32); outDec(bi);
+            outHex(raw.b2Body_IsValid(reg.bodies[bi].id) as u32);
+            outHex((game.bodyStatus(observedBodyOwner14(reg.bodies[bi].owner), reg.bodies[bi].number) == game.OK) as u32); newline();
+        }
+        bi = bi + 1i32;
+    }
+    var si: i32 = 0i32;
+    while (si < 512i32) {
+        if (reg.shapes[si].saved) {
+            savedShapes = savedShapes + 1i32;
+            prefix("V", id, seq); outDec(3i32); outDec(si);
+            outHex(raw.b2Shape_IsValid(reg.shapes[si].id) as u32);
+            outHex((game.shapeStatus(reg.shapes[si].owner, reg.shapes[si].number) == game.OK) as u32); newline();
+        }
+        si = si + 1i32;
+    }
+    wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            liveWorlds = liveWorlds + 1i32;
+            let world: game.WorldLookup = game.lookupWorld(reg.worlds[wi].number);
+            prefix("W", id, seq); outDec(wi); outWorldId(reg.worlds[wi].id);
+            outPair(if observingGuard14 and physicalWorldSaved14 and wi == 0i32 then observedWorld14.number.birthTicket else reg.worlds[wi].number.birthTicket);
+            outFloat(world.value.gravity.x); outFloat(world.value.gravity.y);
+            outFloat(world.value.maximumLinearSpeed);
+            outHex(world.value.bodyCount as u32); outHex(world.value.shapeCount as u32);
+            outHex(world.value.islandCount as u32); newline();
+        }
+        wi = wi + 1i32;
+    }
+    bi = 0i32;
+    while (bi < 256i32) {
+        if (reg.bodies[bi].saved and game.bodyStatus(reg.bodies[bi].owner, reg.bodies[bi].number) == game.OK) {
+            liveBodies = liveBodies + 1i32;
+            let body: game.BodyLookup = game.lookupBody(reg.bodies[bi].owner, reg.bodies[bi].number);
+            prefix("B", id, seq); outDec(bi); outBodyHandle(reg.bodies[bi]);
+            outHex(body.value.bodyType as u32);
+            outFloat(body.value.transform.p.x); outFloat(body.value.transform.p.y);
+            outFloat(body.value.transform.q.c); outFloat(body.value.transform.q.s);
+            outFloat(body.value.center.x); outFloat(body.value.center.y);
+            outFloat(body.value.linearVelocity.x); outFloat(body.value.linearVelocity.y);
+            outFloat(body.value.angularVelocity); outFloat(body.value.mass); outFloat(body.value.inertia);
+            outFloat(body.value.localCenter.x); outFloat(body.value.localCenter.y);
+            outHex(body.value.shapeCount as u32); outHex(body.value.isAwake as u32);
+            outHex(body.value.isEnabled as u32); outHex(body.value.fixedRotation as u32);
+            outObject(body.value.hasObjectId, body.value.objectId); newline();
+        }
+        bi = bi + 1i32;
+    }
+    si = 0i32;
+    while (si < 512i32) {
+        if (reg.shapes[si].saved and game.shapeStatus(reg.shapes[si].owner, reg.shapes[si].number) == game.OK) {
+            liveShapes = liveShapes + 1i32;
+            outShapeState(reg.shapes[si], id, seq, si);
+        }
+        si = si + 1i32;
+    }
+    si = 0i32;
+    while (si < 512i32) {
+        if (reg.shapes[si].saved and game.shapeStatus(reg.shapes[si].owner, reg.shapes[si].number) == game.OK) outGeometry(reg.shapes[si], id, seq, si);
+        si = si + 1i32;
+    }
+    bi = 0i32;
+    while (bi < 256i32) {
+        if (reg.bodies[bi].saved and game.bodyStatus(reg.bodies[bi].owner, reg.bodies[bi].number) == game.OK) {
+            let bodyId: raw.BodyId = reg.bodies[bi].id;
+            let bodyCount: i32 = raw.worlds.at(bodyId.world0 as i64).bodies.at((bodyId.index1-1i32) as i64).shapeCount;
+            prefix("L", id, seq); outDec(bi); outHex(bodyCount as u32); outShapeList(bodyId, bodyCount); newline();
+            prefix("A", id, seq); outDec(bi); outAABB(raw.b2Body_ComputeAABB(bodyId)); newline();
+        }
+        bi = bi + 1i32;
+    }
+    var nQ: i32 = 0i32;
+    if (op.opcode == 21i32 and game.bodyStatus(reg.worlds[op.a].number, reg.bodies[op.b].number) == game.OK) {
+        nQ = 1i32;
+        let qId: raw.BodyId = reg.bodies[op.b].id;
+        var qValues: List[broad.ShapeId] = raw.b2Body_GetShapes(qId, op.capacity);
+        prefix("Q", id, seq); outDec(op.b); outHex(op.capacity as u32); outHex(qValues.length() as u32);
+        var qi: i64 = 0i64;
+        while (qi < qValues.length()) {
+            let qShape: broad.ShapeId = qValues.at(qi);
+            outHex(qShape.index1 as u32); outHex(qShape.world0 as u32); outHex(qShape.generation as u32); qi = qi + 1i64;
+        }
+        newline();
+    }
+    var nQGN: i32 = 0i32; var nQG: i32 = 0i32; var nSB: i32 = 0i32;
+    if (op.opcode == 38i32) {
+        outGameShapes(&execution.shapes.values, reg.worlds[op.a].number, id, seq, 0i32);
+        nQGN = 1i32; nQG = execution.shapes.values.length() as i32;
+        if (execution.status == game.OK and op.mutateCopy) {
+            if (execution.shapes.values.length() >= 1i64) {
+                let first: game.ShapeNumber = execution.shapes.values.at(0i64); execution.shapes.values.push(first);
+                if (nQG >= 2i32) {
+                    let second: game.ShapeNumber = execution.shapes.values.at(1i64);
+                    execution.shapes.values.at(0i64) = second; execution.shapes.values.at(1i64) = first;
+                }
+            }
+            outGameShapes(&execution.shapes.values, reg.worlds[op.a].number, id, seq, 1i32);
+            nQG = nQG + execution.shapes.values.length() as i32;
+            var again: game.ShapeList = game.getShapes(reg.worlds[op.a].number, reg.bodies[op.b].number);
+            outGameShapes(&again.values, reg.worlds[op.a].number, id, seq, 2i32);
+            nQG = nQG + again.values.length() as i32; nQGN = 3i32;
+        }
+    }
+    if (op.opcode == 39i32) {
+        prefix("SB", id, seq); outHex(execution.parent.status as u32); outHex((execution.parent.status == game.OK) as u32);
+        if (execution.parent.status == game.OK) outBodyHandle(SavedBody(true, execution.parent.number, reg.worlds[op.a].number, execution.parent.id));
+        else outNull(); newline(); nSB = 1i32;
+    }
+    let nK: i32 = if op.opcode == 31i32 or op.opcode == 32i32 or execution.rawStep.didSolve then 1i32 else 0i32;
+    if (nK == 1i32) outStep(reg, id, seq, op, execution);
+    var nMCN: i32 = 0i32; var nMC: i32 = 0i32;
+    if (op.opcode == 37i32 or (op.opcode == 32i32 and execution.status == game.OK)) {
+        outCopy(&reg.copies[op.copySlot], id, seq, op.copySlot);
+        nMCN = 1i32; nMC = reg.copies[op.copySlot].values.length() as i32;
+    }
+    outContactPublic(reg, id, seq, op, execution);
+    outHitPublic(reg, id, seq, op, execution);
+    outSleepPublic(reg, id, seq, op);
+    outLivePublic(reg, id, seq, op, execution);
+    outChainPublic13(reg,id,seq,op,execution);
+    outJointPublic14(reg,id,seq,op);
+    outPrivate(reg, id, seq);
+    outContactPrivate(reg, id, seq, op, execution);
+    outSolverPrivate(reg, id, seq, execution);
+    outSleepPrivate(reg, id, seq);
+    outLivePrivate(reg, id, seq);
+    outChainPrivate13(reg,id,seq);
+    outJointPrivate14(reg,id,seq,op);
+    prefix("I8", id, seq);
+    var i8index: i32 = 0i32;
+    while (i8index < 10i32) { outHex(reg.regI8[i8index] as u32); i8index = i8index + 1i32; }
+    newline();
+    prefix("I9", id, seq);
+    var i9index: i32 = 0i32;
+    while (i9index < 20i32) { outHex(execution.n9[i9index] as u32); i9index = i9index + 1i32; }
+    newline();
+    prefix("I10", id, seq);
+    var ni: i32 = 0i32; while (ni < 6i32) { outHex(execution.n10[ni] as u32); ni = ni + 1i32; } newline();
+    prefix("I11", id, seq); var n11Index: i32 = 0i32; while (n11Index < 11i32) { outHex(sleepCounts[n11Index] as u32); n11Index = n11Index + 1i32; } newline();
+    prefix("Z8", id, seq);
+    outHex(savedWorlds as u32); outHex(savedBodies as u32); outHex(savedShapes as u32);
+    outHex(liveWorlds as u32); outHex(liveBodies as u32); outHex(liveShapes as u32);
+    outHex(chainZ13[17] as u32); outHex(if chainZ13[17] == 0i32 then 0u32 else (if op.opcode == 16i32 then 2u32 else (if op.opcode >= 80i32 and op.opcode != 90i32 then 0u32 else 1u32)));
+    outHex((execution.status == game.UNSUPPORTED_PAIR) as u32);
+    outHex((savedWorlds + savedBodies + savedShapes) as u32); outHex(liveWorlds as u32); outHex(liveBodies as u32);
+    outHex(liveShapes as u32); outHex(liveShapes as u32); outHex(liveBodies as u32); outHex(liveBodies as u32);
+    outHex(nQ as u32); outHex(nK as u32); outHex(execution.moves.length() as u32); outHex(nMCN as u32); outHex(nMC as u32);
+    outHex(nQGN as u32); outHex(nQG as u32); outHex(nSB as u32); outPair(game.lastIssued); newline();
+    outZ9(reg, id, seq, op, execution);
+    prefix("Z10", id, seq);
+    var zi: i32 = 0i32; while (zi < 4i32) { outHex(execution.z10[zi] as u32); zi = zi + 1i32; } outHex(reg.completedSteps); newline();
+    prefix("Z11", id, seq); outHex(sleepPublicWorlds as u32); outHex(sleepPublicBodies as u32); outHex(completedPositiveSteps); newline();
+    outLiveCounters(id, seq);
+    outChainCounters13(id,seq);
+}
+
+# Box2D 8c661469, src/world.                                                                    
+
+fun liveBody(reg: ref Registers, slot: i32) -> bool = {
+    return reg.bodies[slot].saved and game.bodyStatus(reg.bodies[slot].owner, reg.bodies[slot].number) == game.OK;
+}
+# Box2D 8c661469, src/world.c:1614-1644.
+
+fun liveShape(reg: ref Registers, slot: i32) -> bool = {
+    return reg.shapes[slot].saved and game.shapeStatus(reg.shapes[slot].owner, reg.shapes[slot].number) == game.OK;
+}
+# Box2D 8c661469, src/world.                                                                           
+
+fun cleanup(reg: ref Registers) -> () = {
+    var i: i32 = 0i32;
+    while (i < 16i32) {
+        if (reg.worlds[i].saved and game.worldStatus(reg.worlds[i].number) == game.OK) game.destroyWorld(reg.worlds[i].number);
+        i = i + 1i32;
+    }
+}
+
+# Box2D 8c661469, include/box2d/types.h:81. Bit-cast smoke check from step 5.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outManifold(value: math2.Manifold) -> () = {
+    outFloat(value.normal.x); outFloat(value.normal.y); outFloat(value.rollingImpulse); outHex(value.pointCount as u32);
+    var i: i32 = 0i32; var local: math2.Manifold = value;
+    while (i < 2i32) {
+        let point: math2.ManifoldPoint = raw.manifoldPoint(&local, i);
+        outFloat(point.point.x); outFloat(point.point.y); outFloat(point.anchorA.x); outFloat(point.anchorA.y);
+        outFloat(point.anchorB.x); outFloat(point.anchorB.y); outFloat(point.separation);
+        outFloat(point.normalImpulse); outFloat(point.tangentImpulse); outFloat(point.totalNormalImpulse); outFloat(point.normalVelocity);
+        outHex(point.id as u32); outHex(point.persisted as u32); i = i + 1i32;
+    }
+}
+# Box2D 8c661469, src/contact.h:41. Number5 is game guard metadata.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outContactNumber(number: game.ContactNumber) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+# Box2D 8c661469, src/shape.h:13. Historical Number5, distinct from raw ShapeId.
+
+fun outShapeNumber(number: game.ShapeNumber) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+# Box2D 8c661469, include/box2d/id.h:52.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outRawShape(number: broad.ShapeId) -> () = { outHex(number.index1 as u32); outHex(number.world0 as u32); outHex(number.generation as u32); }
+# Box2D 8c661469, src/contact.c:453.
+
+fun outContactValue(value: game.ContactValue) -> () = {
+    outContactNumber(value.number); outShapeNumber(value.shapeA); outShapeNumber(value.shapeB);
+    outHex(value.touching as u32); outManifold(value.manifold);
+}
+# Box2D 8c661469, src/body.c:460-495. A fresh returned list for every phase.
+
+fun outContactList(list: ref game.ContactList, id: u32, seq: u32, phase: i32) -> i32 = {
+    prefix("GL", id, seq); outDec(phase); outDec(0i32); outDec(0i32);
+    outHex(list.status as u32); outHex(list.values.length() as u32); newline();
+    var i: i64 = 0i64;
+    while (i < list.values.length()) {
+        let value: game.ContactValue = list.values.at(i);
+        prefix("GL", id, seq); outDec(phase); outDec(1i32); outDec(i as i32); outContactValue(value); newline(); i = i + 1i64;
+    }
+    return 1i32 + list.values.length() as i32;
+}
+# Box2D 8c661469, src/world.c:1529-1555. GE/GC same copied values, independent lists.
+
+fun outContactEvents(tag: str, events: ref game.ContactEvents, id: u32, seq: u32, slot: i32, phase: i32) -> i32 = {
+    prefix(tag, id, seq); outDec(slot); outDec(phase); outDec(0i32); outDec(0i32);
+    outHex(events.status as u32); outHex(events.begin.length() as u32); outHex(events.end.length() as u32); outHex(events.hitCount as u32); newline();
+    var i: i64 = 0i64;
+    while (i < events.begin.length()) {
+        let begin: game.ContactBegin = events.begin.at(i);
+        prefix(tag, id, seq); outDec(slot); outDec(phase); outDec(1i32); outDec(i as i32);
+        outShapeNumber(begin.shapeA); outShapeNumber(begin.shapeB); outManifold(begin.manifold); newline(); i = i + 1i64;
+    }
+    var j: i64 = 0i64;
+    while (j < events.end.length()) {
+        let end: game.ContactEnd = events.end.at(j);
+        prefix(tag, id, seq); outDec(slot); outDec(phase); outDec(2i32); outDec(j as i32);
+        outShapeNumber(end.shapeA); outShapeNumber(end.shapeB); newline(); j = j + 1i64;
+    }
+    return 1i32 + events.begin.length() as i32 + events.end.length() as i32;
+}
+# Box2D 8c661469, src/world.c:1529-1555. Mutation belongs to the returned copy only.
+
+fun mutateEvents(events: ref game.ContactEvents) -> () = {
+    if (events.begin.length() > 0i64) {
+        events.begin.at(0i64).shapeA.birthTicket.low = events.begin.at(0i64).shapeA.birthTicket.low ^ 1u32;
+        events.begin.at(0i64).manifold.normal.x = fromBits(toBits(events.begin.at(0i64).manifold.normal.x) ^ 2147483648u32);
+    } else if (events.end.length() > 0i64) events.end.at(0i64).shapeA.birthTicket.low = events.end.at(0i64).shapeA.birthTicket.low ^ 1u32;
+    let count: i64 = events.hits.length();
+    if (count > 0i64) {
+        let first: game.ContactHit = events.hits.at(0i64); events.hits.push(first);
+        if (count >= 2i64) {
+            let second: game.ContactHit = events.hits.at(1i64); events.hits.at(0i64) = second; events.hits.at(1i64) = first;
+        }
+        events.hits.at(0i64).shapeA.birthTicket.low = events.hits.at(0i64).shapeA.birthTicket.low ^ 1u32;
+        events.hits.at(0i64).point.x = fromBits(toBits(events.hits.at(0i64).point.x) ^ 2147483648u32);
+    }
+    events.hitCount = events.hits.length() as i32;
+}
+# Box2D 8c661469, src/body.                                                       
+
+fun outContactPublic(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            var bi: i32 = 0i32;
+            while (bi < world.bodyIdPool.nextIndex) {
+                if (world.bodies.at(bi as i64).id != -1i32) {
+                    let bodyId: raw.BodyId = raw.b2MakeBodyId(world, bi);
+                    let capacity: i32 = raw.b2Body_GetContactCapacity(bodyId);
+                    var data: List[raw.ContactData] = raw.b2Body_GetContactData(bodyId, capacity);
+                    prefix("CD", id, seq); outDec(wi); outDec(bi); outDec(0i32); outDec(0i32); outHex(capacity as u32); outHex(data.length() as u32); newline();
+                    execution.z9[5] = execution.z9[5] + 1i32;
+                    var di: i64 = 0i64;
+                    while (di < data.length()) {
+                        let item: raw.ContactData = data.at(di);
+                        prefix("CD", id, seq); outDec(wi); outDec(bi); outDec(1i32); outDec(di as i32);
+                        outRawShape(item.shapeA); outRawShape(item.shapeB); outManifold(item.manifold); newline();
+                        execution.z9[5] = execution.z9[5] + 1i32; di = di + 1i64;
+                    }
+                }
+                bi = bi + 1i32;
+            }
+        }
+        wi = wi + 1i32;
+    }
+    var ci: i32 = 0i32;
+    while (ci < 256i32) {
+        if (reg.contacts[ci].saved) {
+            prefix("NC9", id, seq); outDec(ci); outContactNumber(reg.contacts[ci].number); newline(); execution.z9[3] = execution.z9[3] + 1i32;
+        }
+        ci = ci + 1i32;
+    }
+    if (op.opcode == 46i32 or op.opcode == 47i32) {
+        prefix("RC9", id, seq); outHex(execution.contact.status as u32); outHex(execution.contact.has as u32);
+        if (op.opcode == 47i32) outContactNumber(reg.contacts[op.b].number);
+        else outContactNumber(execution.contact.value.number);
+        newline(); execution.z9[4] = 1i32;
+    }
+    if (op.opcode == 47i32 and execution.contact.status == game.OK) {
+        prefix("GV", id, seq); outDec(0i32); outHex(0u32); outContactValue(execution.contact.value); newline(); execution.z9[6] = 1i32;
+        if (op.mutateCopy) {
+            var changed: game.ContactValue = execution.contact.value;
+            changed.manifold.normal.x = fromBits(toBits(changed.manifold.normal.x) ^ 2147483648u32);
+            prefix("GV", id, seq); outDec(1i32); outHex(0u32); outContactValue(changed); newline();
+            let again: game.ContactLookup = game.lookupContact(reg.worlds[op.a].number, reg.contacts[op.b].number);
+            prefix("GV", id, seq); outDec(2i32); outHex(again.status as u32); outContactValue(again.value); newline(); execution.z9[6] = 3i32;
+        }
+    }
+    if (op.opcode == 48i32) {
+        execution.z9[7] = outContactList(&execution.contactList, id, seq, 0i32);
+        if (execution.contactList.status == game.OK and op.mutateCopy) {
+            var changedList: game.ContactList = game.contacts(reg.worlds[op.a].number, reg.bodies[op.b].number);
+            let count: i64 = changedList.values.length();
+            if (count > 0i64) {
+                let first: game.ContactValue = changedList.values.at(0i64); changedList.values.push(first);
+                if (count >= 2i64) {
+                    let second: game.ContactValue = changedList.values.at(1i64);
+                    changedList.values.at(0i64) = second; changedList.values.at(1i64) = first;
+                }
+                changedList.values.at(0i64).manifold.normal.x = fromBits(toBits(changedList.values.at(0i64).manifold.normal.x) ^ 2147483648u32);
+            }
+            execution.z9[7] = execution.z9[7] + outContactList(&changedList, id, seq, 1i32);
+            var fresh: game.ContactList = game.contacts(reg.worlds[op.a].number, reg.bodies[op.b].number);
+            execution.z9[7] = execution.z9[7] + outContactList(&fresh, id, seq, 2i32);
+        }
+    }
+    var ew: i32 = 0i32;
+    while (ew < 16i32) {
+        if (reg.worlds[ew].saved and game.worldStatus(reg.worlds[ew].number) == game.OK) {
+            var current: game.ContactEvents = game.copyContactEvents(reg.worlds[ew].number);
+            execution.z9[8] = execution.z9[8] + outContactEvents("GE", &current, id, seq, ew, 0i32);
+        } else if (op.opcode == 49i32 and ew == op.a) {
+            var failed: game.ContactEvents = game.copyContactEvents(reg.worlds[ew].number);
+            execution.z9[8] = execution.z9[8] + outContactEvents("GE", &failed, id, seq, ew, 0i32);
+        }
+        ew = ew + 1i32;
+    }
+    var ki: i32 = 0i32;
+    while (ki < 4i32) {
+        if (reg.events[ki].saved) {
+            execution.z9[9] = execution.z9[9] + outContactEvents("GC", &reg.events[ki].values, id, seq, ki, 0i32);
+            if (op.opcode == 50i32 and op.a == ki and op.mutateCopy) {
+                var mutated: game.ContactEvents = game.cloneContactEvents(&reg.events[ki].values); mutateEvents(&mutated);
+                execution.z9[9] = execution.z9[9] + outContactEvents("GC", &mutated, id, seq, ki, 1i32);
+                var reread: game.ContactEvents = game.cloneContactEvents(&reg.events[ki].values);
+                execution.z9[9] = execution.z9[9] + outContactEvents("GC", &reread, id, seq, ki, 2i32);
+            }
+        }
+        ki = ki + 1i32;
+    }
+}
+# Box2D 8c661469, src/world.c:1529. Public counters, no private index leaks.
+
+fun outZ9(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    var saved: i32 = 0i32; var copies: i32 = 0i32; var live: i32 = 0i32;
+    var ci: i32 = 0i32;
+    while (ci < 256i32) { if (reg.contacts[ci].saved) saved = saved + 1i32; ci = ci + 1i32; }
+    var ki: i32 = 0i32;
+    while (ki < 4i32) { if (reg.events[ki].saved) copies = copies + 1i32; ki = ki + 1i32; }
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            live = live + world.contactIdPool.nextIndex - world.contactIdPool.freeCount;
+        }
+        wi = wi + 1i32;
+    }
+    prefix("Z9", id, seq); outHex(saved as u32); outHex(live as u32); outHex(copies as u32);
+    var counter: i32 = 3i32;
+    while (counter < 10i32) { outHex(execution.z9[counter] as u32); counter = counter + 1i32; }
+                                                                                           
+    outHex(seq); outHex(seq); outHex(14u32); outHex(fixture14 as u32); outPair(game.lastIssued); newline();
+}
+
+# Box2D 8c661469, src/contact.h:95-131.                                                         
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outContactSim(sim: raw.ContactSim) -> () = {
+    outHex(sim.contactId as u32); outHex(sim.bodySimIndexA as u32); outHex(sim.bodySimIndexB as u32);
+    outHex(sim.shapeIdA as u32); outHex(sim.shapeIdB as u32);
+    outFloat(sim.invMassA); outFloat(sim.invIA); outFloat(sim.invMassB); outFloat(sim.invIB);
+    outFloat(sim.friction); outFloat(sim.restitution);
+    if (sim.rollingDefined) outFloat(sim.rollingResistance); else outHex(0u32);
+    outFloat(sim.tangentSpeed); outHex(sim.simFlags); outHex(sim.cache.count as u32);
+    var i: i32 = 0i32;
+    while (i < 3i32) { outHex(sim.cache.indexA[i] as u32); i = i + 1i32; }
+    var j: i32 = 0i32;
+    while (j < 3i32) { outHex(sim.cache.indexB[j] as u32); j = j + 1i32; }
+    outManifold(sim.manifold); outHex(sim.rollingDefined as u32);
+}
+# Box2D 8c661469, src/bitset.h:12-17. Logical blocks, low then high.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outBitSet(set: ref bits.BitSet) -> () = {
+    outHex(set.blockCount as u32); outHex(set.blockCapacity as u32);
+    var i: i32 = 0i32;
+    while (i < set.blockCount) { let blk: words64.Key64 = set.bits.at(i as i64); outPair(blk); i = i + 1i32; }
+}
+# Box2D 8c661469, src/contact.h:41-71. Free slot canonicalization avoids unowned fields.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outContactRecord(record: raw.ContactRecord) -> () = {
+    let alive: bool = record.contactId != -1i32;
+    outHex(alive as u32);
+    if (not alive) {
+        var i: i32 = 1i32;
+        while (i < 20i32) { outHex(if i <= 4i32 then 4294967295u32 else 0u32); i = i + 1i32; }
+        return;
+    }
+    outHex(record.contactId as u32); outHex(record.setIndex as u32); outHex(record.colorIndex as u32); outHex(record.localIndex as u32);
+    outHex(record.shapeIdA as u32); outHex(record.shapeIdB as u32);
+    outHex(record.edgeA.bodyId as u32); outHex(record.edgeA.prevKey as u32); outHex(record.edgeA.nextKey as u32);
+    outHex(record.edgeB.bodyId as u32); outHex(record.edgeB.prevKey as u32); outHex(record.edgeB.nextKey as u32);
+    outHex(record.islandId as u32); outHex(record.islandPrev as u32); outHex(record.islandNext as u32);
+    outHex(record.flags); outHex(record.isMarked as u32); outPair(record.birthTicket);
+}
+# Box2D 8c661469, src/island.h:27-58. Free slot canonicalization, no stale list traversal.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun outIsland(island: raw.Island) -> () = {
+    let alive: bool = island.islandId != -1i32; outHex(alive as u32);
+    if (not alive) {
+        var i: i32 = 1i32;
+        while (i < 15i32) { outHex(if i <= 3i32 then 4294967295u32 else 0u32); i = i + 1i32; }
+        return;
+    }
+    outHex(island.setIndex as u32); outHex(island.localIndex as u32); outHex(island.islandId as u32);
+    outHex(island.headBody as u32); outHex(island.tailBody as u32); outHex(island.bodyCount as u32);
+    outHex(island.headContact as u32); outHex(island.tailContact as u32); outHex(island.contactCount as u32);
+    outHex(island.headJoint as u32); outHex(island.tailJoint as u32); outHex(island.jointCount as u32);
+    outHex(island.parentIsland as u32); outHex(island.constraintRemoveCount as u32);
+}
+# Box2D 8c661469, src/world.                                                                     
+
+fun outContactPrivate(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    var group: i32 = 0i32;
+    while (group < 17i32) {
+        var wi: i32 = 0i32;
+        while (wi < 16i32) {
+            if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+                var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+                var lines: i32 = 0i32;
+                if (group == 0i32 and (op.opcode == 31i32 or op.opcode == 32i32 or op.opcode == 42i32) and wi == op.a) {
+                    var ri: i64 = 0i64;
+                    while (ri < execution.pairs.prepared.requests.length()) {
+                        let request: broad.ContactRequest = execution.pairs.prepared.requests.at(ri);
+                        let typeA: i32 = world.shapes.at(request.shapeIndexA as i64).shapeType;
+                        let typeB: i32 = world.shapes.at(request.shapeIndexB as i64).shapeType;
+                        let entry: raw.ContactRegister = raw.contactRegisters[5i32 * typeA + typeB];
+                        var actual: i32 = -1i32;
+                        if (ri < execution.pairs.created.length()) actual = execution.pairs.created.at(ri);
+                        var canonicalA: i32 = -1i32; var canonicalB: i32 = -1i32;
+                        if (entry.kind != -1i32) {
+                            canonicalA = if entry.primary then request.shapeIndexA else request.shapeIndexB;
+                            canonicalB = if entry.primary then request.shapeIndexB else request.shapeIndexA;
+                        }
+                                                                                                       
+                        prefix("RQ", id, seq); outDec(wi); outDec(ri as i32);
+                        outHex(request.moveIndex as u32); outHex(request.shapeIndexA as u32); outHex(request.shapeIndexB as u32);
+                        outHex(entry.kind as u32); outHex(entry.primary as u32); outHex((actual != -1i32) as u32);
+                        outHex(actual as u32); outHex(canonicalA as u32); outHex(canonicalB as u32); newline(); lines = lines + 1i32; ri = ri + 1i64;
+                    }
+                } else if (group == 1i32) {
+                    prefix("CP", id, seq); outDec(wi); outHex(world.contactIdPool.nextIndex as u32); outHex(world.contactIdPool.freeCount as u32);
+                    outHex((world.contactIdPool.nextIndex - world.contactIdPool.freeCount) as u32); newline(); lines = 1i32;
+                } else if (group == 2i32) {
+                    var free: i32 = 0i32;
+                    while (free < world.contactIdPool.freeCount) {
+                        let value: i32 = world.contactIdPool.freeArray.at(free as i64);
+                        prefix("CF", id, seq); outDec(wi); outDec(free); outHex(value as u32); newline(); lines = lines + 1i32; free = free + 1i32;
+                    }
+                } else if (group == 3i32) {
+                    var ci: i32 = 0i32;
+                    while (ci < world.contactIdPool.nextIndex) {
+                        let record: raw.ContactRecord = world.contacts.at(ci as i64);
+                        prefix("CT", id, seq); outDec(wi); outDec(ci); outContactRecord(record); newline(); lines = lines + 1i32; ci = ci + 1i32;
+                    }
+                } else if (group == 4i32 or group == 5i32) {
+                    var domain: i32 = 0i32;
+                    while (domain < 2i32) {
+                        let limit: i32 = if domain == 0i32 then world.solverSetIdPool.nextIndex else 12i32;
+                        var index: i32 = 0i32;
+                        while (index < limit) {
+                            var count: i32 = 0i32;
+                            if (domain == 0i32) count = raw.b2GetSolverSet(world, index).contactCount;
+                            if (domain == 1i32) count = world.constraintGraph.colors[index].contactCount;
+                            if (group == 4i32) {
+                                prefix("CA", id, seq); outDec(wi); outDec(domain); outDec(index); outHex(count as u32); newline(); lines = lines + 1i32;
+                            } else {
+                                var local: i32 = 0i32;
+                                while (local < count) {
+                                    var sim = raw.ContactSim();
+                                    if (domain == 0i32) sim = raw.b2GetSolverSet(world, index).contactSims.at(local as i64);
+                                    else sim = world.constraintGraph.colors[index].contactSims.at(local as i64);
+                                    prefix("CS", id, seq); outDec(wi); outDec(domain); outDec(index); outDec(local); outContactSim(sim); newline();
+                                    lines = lines + 1i32; local = local + 1i32;
+                                }
+                            }
+                            index = index + 1i32;
+                        }
+                        domain = domain + 1i32;
+                    }
+                } else if (group == 6i32) {
+                    var color: i32 = 0i32;
+                    while (color < 12i32) {
+                        prefix("GB", id, seq); outDec(wi); outDec(color); outHex((color != 11i32) as u32);
+                        outBitSet(&world.constraintGraph.colors[color].bodySet); newline(); lines = lines + 1i32; color = color + 1i32;
+                    }
+                } else if (group == 7i32) {
+                    prefix("CB", id, seq); outDec(wi); outDec(0i32); outBitSet(&world.contactStateBitSet); newline(); lines = 1i32;
+                } else if (group == 8i32) {
+                    var bi: i32 = 0i32;
+                    while (bi < world.bodyIdPool.nextIndex) {
+                        let body: raw.BodyRecord = world.bodies.at(bi as i64);
+                        if (body.id != -1i32) {
+                            prefix("BL9", id, seq); outDec(wi); outDec(bi);
+                            outHex(body.headContactKey as u32); outHex(body.contactCount as u32); outHex(body.islandId as u32);
+                            outHex(body.islandPrev as u32); outHex(body.islandNext as u32);
+                            var key: i32 = body.headContactKey;
+                            while (key != -1i32) {
+                                outHex((key >> 1i32) as u32); outHex((key & 1i32) as u32);
+                                key = raw.contactEdge(world.contacts.at((key >> 1i32) as i64), key & 1i32).nextKey;
+                            }
+                            newline(); lines = lines + 1i32;
+                        }
+                        bi = bi + 1i32;
+                    }
+                } else if (group == 9i32) {
+                    prefix("IP", id, seq); outDec(wi); outHex(world.islandIdPool.nextIndex as u32); outHex(world.islandIdPool.freeCount as u32);
+                    outHex((world.islandIdPool.nextIndex - world.islandIdPool.freeCount) as u32); newline(); lines = 1i32;
+                } else if (group == 10i32) {
+                    var fi: i32 = 0i32;
+                    while (fi < world.islandIdPool.freeCount) {
+                        let freed: i32 = world.islandIdPool.freeArray.at(fi as i64);
+                        prefix("IF", id, seq); outDec(wi); outDec(fi); outHex(freed as u32); newline(); lines = lines + 1i32; fi = fi + 1i32;
+                    }
+                } else if (group == 11i32) {
+                    var ii: i32 = 0i32;
+                    while (ii < world.islandIdPool.nextIndex) {
+                        let island: raw.Island = world.islands.at(ii as i64);
+                        prefix("IS", id, seq); outDec(wi); outDec(ii); outIsland(island); newline(); lines = lines + 1i32; ii = ii + 1i32;
+                    }
+                } else if (group == 12i32) {
+                    var setOwner: i32 = 0i32;
+                    while (setOwner < world.solverSetIdPool.nextIndex) {
+                        var dense: i32 = 0i32;
+                        while (dense < raw.b2GetSolverSet(world, setOwner).islandCount) {
+                            let islandId: i32 = raw.b2GetSolverSet(world, setOwner).islandSims.at(dense as i64);
+                            prefix("IL", id, seq); outDec(wi); outDec(0i32); outDec(setOwner); outDec(dense); outHex(islandId as u32); newline(); lines = lines + 1i32; dense = dense + 1i32;
+                        }
+                        setOwner = setOwner + 1i32;
+                    }
+                    var kind: i32 = 1i32;
+                    while (kind <= 2i32) {
+                        var owner: i32 = 0i32;
+                        while (owner < world.islandIdPool.nextIndex) {
+                            let listIsland: raw.Island = world.islands.at(owner as i64);
+                            if (listIsland.islandId != -1i32) {
+                                var item: i32 = if kind == 1i32 then listIsland.headBody else listIsland.headContact;
+                                var ordinal: i32 = 0i32;
+                                while (item != -1i32) {
+                                    prefix("IL", id, seq); outDec(wi); outDec(kind); outDec(owner); outDec(ordinal); outHex(item as u32); newline(); lines = lines + 1i32;
+                                    if (kind == 1i32) item = world.bodies.at(item as i64).islandNext;
+                                    else item = world.contacts.at(item as i64).islandNext;
+                                    ordinal = ordinal + 1i32;
+                                }
+                            }
+                            owner = owner + 1i32;
+                        }
+                        kind = kind + 1i32;
+                    }
+                } else if (group == 13i32) {
+                    var ei: i64 = 0i64;
+                    while (ei < world.contactBeginEvents.length()) {
+                        let begin: raw.ContactBeginEvent = world.contactBeginEvents.at(ei);
+                        prefix("EB", id, seq); outDec(wi); outDec(ei as i32); outRawShape(begin.shapeA); outRawShape(begin.shapeB); outManifold(begin.manifold); newline();
+                        lines = lines + 1i32; ei = ei + 1i64;
+                    }
+                } else if (group == 14i32 or group == 15i32) {
+                    var endIndex: i64 = 0i64;
+                    let endCount: i64 = if group == 14i32 then world.contactEndEvents0.length() else world.contactEndEvents1.length();
+                    while (endIndex < endCount) {
+                        var end = raw.ContactEndEvent();
+                        if (group == 14i32) end = world.contactEndEvents0.at(endIndex);
+                        else end = world.contactEndEvents1.at(endIndex);
+                        prefix(if group == 14i32 then "EE0" else "EE1", id, seq); outDec(wi); outDec(endIndex as i32); outRawShape(end.shapeA); outRawShape(end.shapeB); newline();
+                        lines = lines + 1i32; endIndex = endIndex + 1i64;
+                    }
+                } else if (group == 16i32) {
+                    prefix("EN9", id, seq); outDec(wi); outHex(world.contactBeginEvents.length() as u32); outHex(world.contactEndEvents0.length() as u32);
+                    outHex(world.contactEndEvents1.length() as u32); outHex(world.endEventArrayIndex as u32); outHex(world.contactHitEvents.length() as u32); newline(); lines = 1i32;
+                }
+                execution.n9[group] = execution.n9[group] + lines;
+            }
+            wi = wi + 1i32;
+        }
+        group = group + 1i32;
+    }
+    execution.n9[19] = seq as i32;
+}
+
+# Box2D 8c661469, src/contact.h:43-65. Destination collision checks its actual owning world.
+# Box2D 8c661469, src/world.c:100.                                                           
+
+fun clearSolverObservations() -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 128i32) {
+        if (raw.worlds.at(wi as i64).inUse) {
+            raw.worlds.at(wi as i64).solverTrace = raw.SolverContext();
+            raw.worlds.at(wi as i64).stepRequests.clear(); raw.worlds.at(wi as i64).stepCreated.clear();
+        }
+        wi = wi + 1i32;
+    }
+}
+# Box2D 8c661469, src/solver.h:76-138. Snapshot counters, no physics inputs.
+
+fun zeroN10() -> i32[6] = { var values: i32[6]; return values; }
+# Box2D 8c661469, src/world.c:1529-1555.
+
+fun zeroZ10() -> i32[4] = { var values: i32[4]; return values; }
+# Box2D 8c661469, include/box2d/types.                                   
+
+fun outHitCopy(events: ref game.ContactEvents, id: u32, seq: u32, slot: i32, phase: i32, execution: ref Execution) -> () = {
+    prefix("HC10", id, seq); outDec(slot); outDec(phase); outHex(events.status as u32); outHex(events.hits.length() as u32); newline();
+    execution.z10[2] = execution.z10[2] + 1i32;
+    var j: i64 = 0i64;
+    while (j < events.hits.length()) {
+        let hit: game.ContactHit = events.hits.at(j);
+        prefix("HG10", id, seq); outDec(slot); outDec(phase); outDec(j as i32);
+        outShapeNumber(hit.shapeA); outShapeNumber(hit.shapeB);
+        outFloat(hit.point.x); outFloat(hit.point.y); outFloat(hit.normal.x); outFloat(hit.normal.y); outFloat(hit.approachSpeed); newline();
+        execution.z10[3] = execution.z10[3] + 1i32; j = j + 1i64;
+    }
+}
+# Box2D 8c661469, src/world.c:1529-1555. HN/HR grouped before all retained hit copies.
+
+fun outHitPublic(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            prefix("HN10", id, seq); outDec(wi); outHex(world.contactHitEvents.length() as u32); newline(); execution.z10[0] = execution.z10[0] + 1i32;
+            var j: i64 = 0i64;
+            while (j < world.contactHitEvents.length()) {
+                let hit: raw.ContactHitEvent = world.contactHitEvents.at(j);
+                prefix("HR10", id, seq); outDec(wi); outDec(j as i32); outRawShape(hit.shapeA); outRawShape(hit.shapeB);
+                outFloat(hit.point.x); outFloat(hit.point.y); outFloat(hit.normal.x); outFloat(hit.normal.y); outFloat(hit.approachSpeed); newline();
+                execution.z10[1] = execution.z10[1] + 1i32; j = j + 1i64;
+            }
+        }
+        wi = wi + 1i32;
+    }
+    var ki: i32 = 0i32;
+    while (ki < 4i32) {
+        if (op.opcode == 49i32 and op.b == ki and execution.status != game.OK) {
+                                                                                       
+            var failed = game.ContactEvents(); failed.status = execution.status; outHitCopy(&failed, id, seq, ki, 0i32, execution);
+        } else if (reg.events[ki].saved) {
+            outHitCopy(&reg.events[ki].values, id, seq, ki, 0i32, execution);
+            if (op.opcode == 50i32 and op.a == ki and op.mutateCopy) {
+                var changed: game.ContactEvents = game.cloneContactEvents(&reg.events[ki].values); mutateEvents(&changed);
+                outHitCopy(&changed, id, seq, ki, 1i32, execution);
+                var fresh: game.ContactEvents = game.cloneContactEvents(&reg.events[ki].values); outHitCopy(&fresh, id, seq, ki, 2i32, execution);
+            }
+        }
+        ki = ki + 1i32;
+    }
+}
+# Box2D 8c661469, src/solver.h:19-24.
+
+fun outSoftness(value: raw.Softness) -> () = { outFloat(value.biasRate); outFloat(value.massScale); outFloat(value.impulseScale); }
+# Box2D 8c661469, src/solver.                              
+
+fun outSolverContext(context: ref raw.SolverContext, world: i32, id: u32, seq: u32) -> () = {
+    prefix("CX10", id, seq); outDec(world);
+    outFloat(context.dt); outFloat(context.inv_dt); outFloat(context.h); outFloat(context.inv_h); outHex(context.subStepCount as u32);
+    outSoftness(context.contactSoftness); outSoftness(context.staticSoftness);
+    outFloat(context.restitutionThreshold); outFloat(context.maxLinearVelocity); outHex(context.enableWarmStarting as u32); newline();
+}
+# Box2D 8c661469, src/contact_solver.                                                                  
+
+fun outConstraintPoint(point: raw.ContactConstraintPoint) -> () = {
+    outFloat(point.anchorA.x); outFloat(point.anchorA.y); outFloat(point.anchorB.x); outFloat(point.anchorB.y);
+    outFloat(point.baseSeparation); outFloat(point.relativeVelocity); outFloat(point.normalImpulse); outFloat(point.tangentImpulse);
+    outFloat(point.totalNormalImpulse); outFloat(point.normalMass); outFloat(point.tangentMass);
+}
+# Box2D 8c661469, src/contact_solver.c:24-153,1449-1663.                                                 
+
+fun outConstraint(c: raw.ContactConstraint, overflow: bool) -> () = {
+    if (overflow and c.pointCount == 1i32) { outHex(1073741823u32); outHex(0u32); }
+    else { outHex(4294967295u32); outHex(511u32); }
+    outHex(c.contactId as u32); outHex(c.indexA as u32); outHex(c.indexB as u32); outHex(c.pointCount as u32);
+    outFloat(c.normal.x); outFloat(c.normal.y); outFloat(c.invMassA); outFloat(c.invIA); outFloat(c.invMassB); outFloat(c.invIB);
+    outFloat(c.friction); outFloat(c.restitution); outFloat(c.tangentSpeed);
+    outFloat(c.rollingResistance); outFloat(c.rollingMass); outFloat(c.rollingImpulse); outSoftness(c.softness);
+    outConstraintPoint(c.point0);
+    if (overflow and c.pointCount == 1i32) { var j: i32 = 0i32; while (j < 11i32) { outHex(0u32); j = j + 1i32; } }
+    else outConstraintPoint(c.point1);
+}
+# Box2D 8c661469, src/solver.                                                                                           
+
+fun outSolverTrace(context: ref raw.SolverContext, world: ref raw.World, slot: i32, id: u32, seq: u32, sub: i32, phase: i32, group: i32, execution: ref Execution) -> () = {
+    if (group == 1i32) { outSolverContext(context, slot, id, seq); execution.n10[1] = execution.n10[1] + 1i32; }
+    else if (group == 2i32) {
+        var bi: i64 = 0i64; var ordinal: i32 = 0i32;
+        while (bi < context.blocks.length()) {
+            let blk: raw.SolverBlock = context.blocks.at(bi);
+            prefix("SB10", id, seq); outDec(slot); outDec(sub); outDec(phase); outDec(ordinal);
+            outHex(blk.blockType as u32); outHex(blk.colorIndex as u32); outHex(blk.startIndex as u32); outHex(blk.count as u32); newline();
+            execution.n10[2] = execution.n10[2] + 1i32; ordinal = ordinal + 1i32; bi = bi + 1i64;
+        }
+    } else if (group == 3i32 or group == 4i32) {
+        var pi: i64 = 0i64;
+        while (pi < context.packets.length()) {
+            var packet: ref raw.ContactPacket = context.packets.at(pi);
+            var lane: i32 = 0i32;
+            while (lane < 4i32) {
+                let c: raw.ContactConstraint = raw.packetLane(packet, lane);
+                if (group == 3i32) {
+                    prefix("PK10", id, seq); outDec(slot); outDec(packet.colorIndex); outDec(packet.packetIndex); outDec(lane);
+                    outHex(c.contactId as u32); outHex(c.indexA as u32); outHex(c.indexB as u32); execution.n10[3] = execution.n10[3] + 1i32;
+                } else {
+                    prefix("SC10", id, seq); outDec(slot); outDec(sub); outDec(phase); outDec(packet.colorIndex); outDec(packet.packetIndex); outDec(lane);
+                    outConstraint(c, false); execution.n10[4] = execution.n10[4] + 1i32;
+                }
+                newline(); lane = lane + 1i32;
+            }
+            pi = pi + 1i64;
+        }
+        var oi: i64 = 0i64;
+        while (oi < context.overflow.length()) {
+            let over: raw.ContactConstraint = context.overflow.at(oi);
+            if (group == 3i32) {
+                prefix("PK10", id, seq); outDec(slot); outDec(11i32); outDec(oi as i32); outDec(0i32);
+                outHex(over.contactId as u32); outHex(over.indexA as u32); outHex(over.indexB as u32); execution.n10[3] = execution.n10[3] + 1i32;
+            } else {
+                prefix("SC10", id, seq); outDec(slot); outDec(sub); outDec(phase); outDec(11i32); outDec(oi as i32); outDec(0i32);
+                outConstraint(over, true); execution.n10[4] = execution.n10[4] + 1i32;
+            }
+            newline(); oi = oi + 1i64;
+        }
+    } else if (group == 5i32) {
+        var bodyId: i32 = 0i32;
+        while (bodyId < world.bodyIdPool.nextIndex) {
+            var savedIndex: i64 = -1i64;
+            var denseIndex: i64 = 0i64;
+            while (denseIndex < context.bodyIds.length()) {
+                let savedId: i32 = context.bodyIds.at(denseIndex);
+                if (savedId == bodyId) savedIndex = denseIndex;
+                denseIndex = denseIndex + 1i64;
+            }
+            if (savedIndex != -1i64) {
+                let state: raw.BodyState = context.bodies.at(savedIndex);
+                prefix("BV10", id, seq); outDec(slot); outDec(sub); outDec(phase); outDec(bodyId);
+                outFloat(state.linearVelocity.x); outFloat(state.linearVelocity.y); outFloat(state.angularVelocity);
+                outFloat(state.deltaPosition.x); outFloat(state.deltaPosition.y); outFloat(state.deltaRotation.c); outFloat(state.deltaRotation.s); newline();
+                execution.n10[5] = execution.n10[5] + 1i32;
+            }
+            bodyId = bodyId + 1i32;
+        }
+    }
+}
+# Box2D 8c661469, src/world.                                                                          
+
+fun outSolverPrivate(reg: ref Registers, id: u32, seq: u32, execution: ref Execution) -> () = {
+    var group: i32 = 0i32;
+    while (group < 6i32) {
+        var wi: i32 = 0i32;
+        while (wi < 16i32) {
+            if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+                var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+                if (group == 0i32) {
+                    prefix("W10", id, seq); outDec(wi); outFloat(world.contactHertz); outFloat(world.contactDampingRatio); outFloat(world.maxContactPushSpeed);
+                    outFloat(world.restitutionThreshold); outFloat(world.hitEventThreshold); outFloat(world.contactSpeed);
+                    outHex(world.enableWarmStarting as u32); outHex(world.enableSpeculative as u32); newline(); execution.n10[0] = execution.n10[0] + 1i32;
+                } else if (world.solverTrace.hasTask) outSolverTrace(&world.solverTrace, world, wi, id, seq, 0i32, 7i32, group, execution);
+            }
+            wi = wi + 1i32;
+        }
+        group = group + 1i32;
+    }
+}
+
+# Box2D 8c661469, src/world.c:100. Strict framing shared by separately compiled fixture entries.
+
+fun clearSleepObservations() -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 128i32) {
+        if (raw.worlds.at(wi as i64).inUse) {
+            raw.worlds.at(wi as i64).sleepTrace.clear();
+            raw.worlds.at(wi as i64).hasFinalizeSnapshot = false;
+        }
+        wi = wi + 1i32;
+    }
+}
+# Box2D 8c661469, src/world.                                                        
+
+var sleepPublicWorlds: i32 = 0i32;
+
+var sleepPublicBodies: i32 = 0i32;
+
+var completedPositiveSteps: u32 = 0u32;
+
+var sleepCounts: i32[11];
+# Box2D 8c661469, src/world.                                                                      
+
+fun outSleepPublic(reg: ref Registers, id: u32, seq: u32, op: Operation) -> () = {
+    sleepPublicWorlds = 0i32; sleepPublicBodies = 0i32;
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved) {
+            let status: i32 = game.worldStatus(reg.worlds[wi].number);
+            var enabled: bool = false;
+            if (status == game.OK) enabled = raw.worlds.at(reg.worlds[wi].number.slot as i64).enableSleep;
+            prefix("SW11", id, seq); outDec(wi); outHex(status as u32); outHex(enabled as u32); newline(); sleepPublicWorlds = sleepPublicWorlds + 1i32;
+        }
+        wi = wi + 1i32;
+    }
+    var bi: i32 = 0i32;
+    while (bi < 256i32) {
+        if (reg.bodies[bi].saved) {
+            var owner: game.WorldNumber = observedBodyOwner14(reg.bodies[bi].owner);
+            if (op.opcode == 62i32 and bi == op.b) owner = reg.worlds[op.a].number;
+            let state: game.SleepState = game.getSleepState(owner, reg.bodies[bi].number);
+            prefix("GS11", id, seq); outDec(bi); outHex(state.status as u32);
+            outHex(state.number.slot as u32); outPair(state.number.birthTicket); outPair(state.number.ownerTicket);
+            outHex(state.isAwake as u32); outHex(state.isSleeping as u32); outHex(state.sleepEnabled as u32); outFloat(state.sleepThreshold); newline(); sleepPublicBodies = sleepPublicBodies + 1i32;
+        }
+        bi = bi + 1i32;
+    }
+}
+# Box2D 8c661469, src/body.h:120-159. Every logical BodySim field in SM11 order.
+
+fun outSleepSim(sim: raw.BodySim) -> () = {
+    outFloat(sim.transform.p.x); outFloat(sim.transform.p.y); outFloat(sim.transform.q.c); outFloat(sim.transform.q.s);
+    outFloat(sim.center.x); outFloat(sim.center.y); outFloat(sim.localCenter.x); outFloat(sim.localCenter.y);
+    outFloat(sim.rotation0.c); outFloat(sim.rotation0.s); outFloat(sim.center0.x); outFloat(sim.center0.y);
+    outFloat(sim.force.x); outFloat(sim.force.y); outFloat(sim.torque); outFloat(sim.invMass); outFloat(sim.invInertia);
+    outFloat(sim.minExtent); outFloat(sim.maxExtent); outFloat(sim.linearDamping); outFloat(sim.angularDamping); outFloat(sim.gravityScale);
+    outHex(sim.bodyId as u32); outHex(sim.isFast as u32); outHex(0u32); outHex(sim.isSpeedCapped as u32); outHex(sim.allowFastRotation as u32); outHex(0u32);
+}
+# Box2D 8c661469, src/world.                                                                      
+
+fun outSleepWorldPhase(world: ref raw.World, wi: i32, id: u32, seq: u32, phase: i32, bitRecord: bool) -> () = {
+    if (bitRecord) {
+        prefix("AB11", id, seq); outDec(wi); outDec(phase);
+        if (phase == 0i32) outBitSet(&world.finalizedAwakeIslandBitSet);
+        else outBitSet(&world.awakeIslandBitSet);
+    } else {
+        prefix("WS11", id, seq); outDec(wi); outDec(phase); outHex(world.enableSleep as u32);
+        if (phase == 0i32) { outHex(world.finalizedSplitIslandId as u32); outHex(world.finalizedTaskSplitIslandId as u32); outFloat(world.finalizedTaskSplitSleepTime); }
+        else {
+            outHex(world.splitIslandId as u32);
+                                                                                                 
+            if (world.hasEverFinalized) { outHex(world.taskSplitIslandId as u32); outFloat(world.taskSplitSleepTime); }
+            else { outHex(0u32); outHex(0u32); }
+        }
+    }
+    newline();
+}
+# Box2D 8c661469, src/solver_set.                                                                                 
+
+fun outSleepPrivate(reg: ref Registers, id: u32, seq: u32) -> () = {
+    var zeroIndex: i32 = 0i32; while (zeroIndex < 11i32) { sleepCounts[zeroIndex] = 0i32; zeroIndex = zeroIndex + 1i32; }
+    var group: i32 = 0i32;
+    while (group < 11i32) {
+        var wi: i32 = 0i32;
+        while (wi < 16i32) {
+            if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+                var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+                if (group == 0i32 or group == 5i32) {
+                    if (world.hasFinalizeSnapshot) { outSleepWorldPhase(world, wi, id, seq, 0i32, group == 5i32); sleepCounts[group] = sleepCounts[group] + 1i32; }
+                    outSleepWorldPhase(world, wi, id, seq, 1i32, group == 5i32); sleepCounts[group] = sleepCounts[group] + 1i32;
+                } else if (group == 1i32) {
+                    var bi: i32 = 0i32;
+                    while (bi < world.bodyIdPool.nextIndex) {
+                        let body: raw.BodyRecord = world.bodies.at(bi as i64);
+                        if (body.id != -1i32) {
+                            prefix("BS11", id, seq); outDec(wi); outDec(bi); outFloat(body.sleepThreshold); outFloat(body.sleepTime);
+                            outHex(body.enableSleep as u32); outHex(body.isMarked as u32); outHex(body.bodyMoveIndex as u32); outHex((body.setIndex == 2i32) as u32); newline(); sleepCounts[group] = sleepCounts[group] + 1i32;
+                        }
+                        bi = bi + 1i32;
+                    }
+                } else if (group >= 2i32 and group <= 4i32) {
+                    var si: i32 = 0i32;
+                    while (si < world.solverSetIdPool.nextIndex) {
+                        var set: ref raw.SolverSet = raw.b2GetSolverSet(world, si);
+                        if (group == 2i32) {
+                            prefix("SS11", id, seq); outDec(wi); outDec(si); outHex((set.setIndex != -1i32) as u32); outHex(set.setIndex as u32);
+                            outHex(set.bodyCount as u32); outHex((if si == 2i32 then set.bodyCount else 0i32) as u32); outHex(set.contactCount as u32); outHex(set.islandCount as u32); newline(); sleepCounts[group] = sleepCounts[group] + 1i32;
+                        } else if (set.setIndex != -1i32) {
+                            var local: i32 = 0i32;
+                            while (local < set.bodyCount) {
+                                let sim: raw.BodySim = set.bodySims.at(local as i64);
+                                prefix(if group == 3i32 then "SD11" else "SM11", id, seq); outDec(wi); outDec(si); outDec(local);
+                                if (group == 3i32) outHex(sim.bodyId as u32); else outSleepSim(sim);
+                                newline(); sleepCounts[group] = sleepCounts[group] + 1i32; local = local + 1i32;
+                            }
+                        }
+                        si = si + 1i32;
+                    }
+                } else if (group == 6i32) {
+                    var ti: i64 = 0i64;
+                    while (ti < world.sleepTrace.length()) {
+                        let trace: raw.SleepTransferTrace = world.sleepTrace.at(ti);
+                        prefix("TR11", id, seq); outDec(wi); outDec(ti as i32); outHex(trace.kind as u32); outHex(trace.objectId as u32);
+                        outHex(trace.sourceSet as u32); outHex(trace.targetSet as u32); outHex(trace.bodyCountBefore as u32); outHex(trace.contactCountBefore as u32); outHex(trace.didWork as u32); newline(); sleepCounts[group] = sleepCounts[group] + 1i32; ti = ti + 1i64;
+                    }
+                } else if (group == 7i32 or group == 9i32) {
+                    var pool: raw.IdPool = copy world.bodyIdPool;
+                    if (group == 7i32) pool = copy world.solverSetIdPool;
+                    prefix(if group == 7i32 then "SP11" else "BP11", id, seq); outDec(wi); outHex(pool.nextIndex as u32); outHex(pool.freeCount as u32); outHex((pool.nextIndex - pool.freeCount) as u32); newline(); sleepCounts[group] = sleepCounts[group] + 1i32;
+                } else if (group == 8i32 or group == 10i32) {
+                    var freePool: raw.IdPool = copy world.bodyIdPool;
+                    if (group == 8i32) freePool = copy world.solverSetIdPool;
+                    var fi: i32 = 0i32;
+                    while (fi < freePool.freeCount) {
+                        let freed: i32 = freePool.freeArray.at(fi as i64);
+                        prefix(if group == 8i32 then "SF11" else "BF11", id, seq); outDec(wi); outDec(fi); outHex(freed as u32); newline(); sleepCounts[group] = sleepCounts[group] + 1i32; fi = fi + 1i32;
+                    }
+                }
+            }
+            wi = wi + 1i32;
+        }
+        group = group + 1i32;
+    }
+}
+
+# Box2D 8c661469, src/world.c:357-428,548-568. Actual component task snapshot.
+
+fun zeroLiveCounts() -> i32[11] = { var values: i32[11]; return values; }
+
+var liveCounts: i32[11] = zeroLiveCounts();
+
+var privateNames: i32 = 0i32;
+# Box2D 8c661469, src/world.                                                      
+
+fun outLivePublic(reg: ref Registers, id: u32, seq: u32, op: Operation, execution: ref Execution) -> () = {
+    liveCounts = zeroLiveCounts(); privateNames = 0i32;
+    if (op.opcode >= 80i32 and op.opcode <= 92i32) {
+        let chainReason: i32 = chainLegacyReason13(reg,op,execution.status);
+        if (chainReason == 80i32 or chainReason == 81i32) execution.liveReason = 2i32;
+        if (attachedReason14(reg,op,execution.status)) execution.liveReason = 2i32;
+        prefix("AP12", id, seq); outHex(execution.status as u32); outHex(execution.liveReason as u32);
+        outHex(execution.liveKind as u32); outHex(execution.liveRegister as u32); newline(); liveCounts[0] = liveCounts[0] + 1i32;
+    }
+    var api: i64 = 0i64;
+    while (api < callbackAP12.length()) {
+        let ap: CallbackAP12 = callbackAP12.at(api); prefix("AP12",id,seq); outHex(ap.status as u32); outHex(if ap.status == game.LOCKED then 1u32 else 0u32);
+        outHex(ap.kind as u32); outHex(ap.reg as u32); newline(); liveCounts[0] = liveCounts[0]+1i32; api = api+1i64;
+    }
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            prefix("WS12", id, seq); outDec(wi); outFloat(world.gravity.x); outFloat(world.gravity.y); outFloat(world.maxLinearSpeed);
+            outFloat(world.contactHertz); outFloat(world.contactDampingRatio); outFloat(world.maxContactPushSpeed);
+            outFloat(world.restitutionThreshold); outFloat(world.hitEventThreshold); outHex(world.enableWarmStarting as u32); outHex(world.enableSleep as u32);
+            outHex(raw.b2GetSolverSet(world, 2i32).bodyCount as u32); newline(); liveCounts[1] = liveCounts[1] + 1i32;
+        }
+        wi = wi + 1i32;
+    }
+    var bi: i32 = 0i32;
+    while (bi < 256i32) {
+        if (liveBody(reg, bi)) {
+            let name: raw.NameValue = raw.b2Body_GetName(reg.bodies[bi].id);
+            prefix("NM12", id, seq); outDec(bi); outHex(name.length as u32);
+            var nb: i32 = 0i32; while (nb < 32i32) { outHex(name.bytes[nb] as u32); nb = nb + 1i32; } newline(); liveCounts[2] = liveCounts[2] + 1i32;
+        }
+        bi = bi + 1i32;
+    }
+    var target: i32 = 0i32;
+    while (target < 3i32) {
+        var ri: i32 = 0i32; let limit: i32 = if target == 0i32 then 16i32 else (if target == 1i32 then 256i32 else 512i32);
+        while (ri < limit) {
+            var alive: bool = false; var present: bool = false; var token = words64.Key64();
+            if (target == 0i32) {
+                alive = reg.worlds[ri].saved and game.worldStatus(reg.worlds[ri].number) == game.OK;
+                if (alive) { present = raw.worlds.at(reg.worlds[ri].number.slot as i64).hasObjectId; token = raw.worlds.at(reg.worlds[ri].number.slot as i64).objectId; }
+            }
+            else if (target == 1i32) {
+                alive = liveBody(reg, ri);
+                if (alive) {
+                    let body: raw.BodyRecord = raw.worlds.at(reg.bodies[ri].owner.slot as i64).bodies.at(reg.bodies[ri].number.slot as i64);
+                    present = body.hasObjectId; token = body.objectId;
+                }
+            } else {
+                alive = liveShape(reg, ri);
+                if (alive) {
+                    let shape: raw.ShapeRecord = raw.worlds.at(reg.shapes[ri].owner.slot as i64).shapes.at(reg.shapes[ri].number.slot as i64);
+                    present = shape.hasObjectId; token = shape.objectId;
+                }
+            }
+            if (alive) { prefix("UD12", id, seq); outDec(target); outDec(ri); outHex(present as u32); outPair(token); newline(); liveCounts[3] = liveCounts[3] + 1i32; }
+            ri = ri + 1i32;
+        }
+        target = target + 1i32;
+    }
+    var si: i32 = 0i32;
+    while (si < 512i32) {
+        if (liveShape(reg, si)) {
+            let flagShape: raw.ShapeRecord = raw.worlds.at(reg.shapes[si].owner.slot as i64).shapes.at(reg.shapes[si].number.slot as i64);
+            prefix("EF12", id, seq); outDec(si); outHex(flagShape.enableContactEvents as u32); outHex(flagShape.enableHitEvents as u32); outHex(flagShape.enablePreSolveEvents as u32); newline(); liveCounts[10] = liveCounts[10] + 1i32;
+        }
+        si = si + 1i32;
+    }
+    wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            prefix("HC12", id, seq); outDec(wi);
+            var hookWorld: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            let hooks: raw.RawCallbacks12 = hookWorld.callbacks12;
+            outHex((hooks.filterInstalled as u32) | ((hooks.preInstalled as u32) << 1u32) | ((hooks.frictionInstalled as u32) << 2u32) | ((hooks.restitutionInstalled as u32) << 3u32));
+            var hc: i32 = 0i32; while (hc < 4i32) { outHex(reg.worlds[wi].functionIds12[hc]); hc = hc + 1i32; }
+            outPair(hooks.filterContext); outPair(hooks.preContext);
+            outHex(hookWorld.pairRules12.length() as u32); outHex(hookWorld.preRules12.length() as u32); outHex(hookWorld.frictionRules12.length() as u32); outHex(hookWorld.restitutionRules12.length() as u32);
+            newline(); liveCounts[4] = liveCounts[4] + 1i32;
+        }
+        wi = wi + 1i32;
+    }
+    wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var ruleWorld: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64); outRules12(ruleWorld,wi,id,seq);
+        }
+        wi = wi+1i32;
+    }
+    outHookTraces12(reg,id,seq);
+    outLists12(reg,execution,id,seq);
+    if (op.opcode == 92i32) {
+        prefix("VR12", id, seq); outDec(op.b); outDec(op.kind); outHex(execution.liveVector.status as u32);
+        outFloat(execution.liveVector.value.x); outFloat(execution.liveVector.value.y); newline(); liveCounts[9] = 1i32;
+    }
+}
+# Box2D 8c661469, src/body.h:16. NP32 includes every occupied body, not only registered bodies.
+
+fun outLivePrivate(reg: ref Registers, id: u32, seq: u32) -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            var bi: i64 = 0i64;
+            while (bi < world.bodies.length()) {
+                let body: raw.BodyRecord = world.bodies.at(bi);
+                if (body.id != -1i32) {
+                    prefix("NP12", id, seq); outDec(wi); outDec(bi as i32);
+                    var ni: i32 = 0i32; while (ni < 32i32) { outHex(body.name[ni] as u32); ni = ni + 1i32; } newline(); privateNames = privateNames + 1i32;
+                }
+                bi = bi + 1i64;
+            }
+        }
+        wi = wi + 1i32;
+    }
+}
+# Box2D 8c661469, src/world.c:695-812. Transport counters, not physics state.
+
+fun outLiveCounters(id: u32, seq: u32) -> () = {
+    prefix("I12", id, seq); var i: i32 = 0i32;
+    while (i < 11i32) { outHex(liveCounts[i] as u32); i = i + 1i32; } newline();
+    prefix("IP12", id, seq); outHex(privateNames as u32); newline();
+    prefix("Z12", id, seq); outHex(completedPositiveSteps); outHex(seq); newline();
+}
+
+# Box2D 8c661469, src/math_functions.                                                 
+                                                                                         
+
+class SavedList12 { saved: bool = false; value: game.ContactList = game.ContactList(); }
+
+fun zeroSavedLists12() -> SavedList12[4] = { var values: SavedList12[4]; return values; }
+
+fun zeroFunctionIds12() -> u32[4] = { var values: u32[4]; return values; }
+
+# Box2D 8c661469, src/world.                                                         
+
+class CallbackAP12 { status: i32 = 0i32; kind: i32 = 0i32; reg: i32 = 0i32; }
+
+fun emptyCallbackAP12() -> List[CallbackAP12] = { var values: List[CallbackAP12]; return values; }
+
+var callbackAP12: List[CallbackAP12] = emptyCallbackAP12();
+
+var callbackWorld12: game.WorldNumber = game.WorldNumber();
+
+var callbackWreg12: i32 = 0i32;
+
+var callbackContext12: words64.Key64 = words64.Key64();
+
+var callbackShapes12: SavedShape[512] = zeroShapeRegisters();
+
+fun clearHookObservations12(reg: ref Registers,op: Operation) -> () = {
+    callbackAP12.clear(); var wi: i32 = 0i32;
+    while (wi < 16i32) { if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) raw.worlds.at(reg.worlds[wi].number.slot as i64).hookTrace12.clear(); wi = wi+1i32; }
+    if (op.opcode == 31i32 or op.opcode == 32i32) { callbackWorld12 = reg.worlds[op.a].number; callbackWreg12 = op.a; callbackShapes12 = reg.shapes;
+        if (game.worldStatus(callbackWorld12) == game.OK) callbackContext12 = raw.worlds.at(callbackWorld12.slot as i64).callbacks12.preContext; }
+}
+
+# Box2D 8c661469, src/broad_phase.                                                   
+
+fun outRuleNumber12(number: raw.RuleShape12) -> () = { outHex(number.slot as u32); outPair(number.birthTicket); outPair(number.ownerTicket); }
+
+fun outRules12(world: ref raw.World,wi: i32,id: u32,seq: u32) -> () = {
+    var kind: i32 = 0i32;
+    while (kind < 4i32) {
+        let count: i64 = if kind == 0i32 then world.pairRules12.length() else (if kind == 1i32 then world.preRules12.length() else (if kind == 2i32 then world.frictionRules12.length() else world.restitutionRules12.length()));
+        var j: i64 = 0i64;
+        while (j < count) {
+            prefix("HR12",id,seq); outDec(wi); outDec(kind); outDec(j as i32);
+            if (kind == 0i32) { let pair: raw.PairRule12 = world.pairRules12.at(j); outRuleNumber12(pair.a); outRuleNumber12(pair.b); outHex(pair.allow as u32); }
+            else if (kind == 1i32) {
+                let pre: raw.PreRule12 = world.preRules12.at(j); outRuleNumber12(pre.a); outRuleNumber12(pre.b); outHex(pre.allow as u32);
+                outFloat(pre.direction.x); outFloat(pre.direction.y); outFloat(pre.threshold); outHex(pre.replaceNormal as u32); outFloat(pre.normal.x); outFloat(pre.normal.y);
+            } else { let material: raw.MaterialRule12 = if kind == 2i32 then world.frictionRules12.at(j) else world.restitutionRules12.at(j); outHex(material.materialA as u32); outHex(material.materialB as u32); outFloat(material.value); }
+            newline(); liveCounts[5] = liveCounts[5]+1i32; j = j+1i64;
+        }
+        kind = kind+1i32;
+    }
+}
+# Box2D 8c661469, src/contact.c:318-326,501-517.                                                                              
+
+fun outHookTraces12(reg: ref Registers,id: u32,seq: u32) -> () = {
+    var wi: i32 = 0i32; var ordinal: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64); var j: i64 = 0i64;
+            while (j < world.hookTrace12.length()) {
+                let trace: raw.HookTrace12 = world.hookTrace12.at(j); prefix("HT12",id,seq); outDec(wi); outDec(ordinal); outDec(trace.kind);
+                if (trace.kind < 2i32) { outRawShape(trace.a); outRawShape(trace.b); outHex(trace.allowed as u32); if (trace.kind == 1i32) { outManifold(trace.before); outManifold(trace.after); } }
+                else { outFloat(trace.floatA); outHex(trace.materialA as u32); outFloat(trace.floatB); outHex(trace.materialB as u32); outFloat(trace.value); }
+                newline(); liveCounts[6] = liveCounts[6]+1i32; ordinal = ordinal+1i32; j = j+1i64;
+            }
+        }
+        wi = wi+1i32;
+    }
+}
+# Box2D 8c661469, src/shape.                                                      
+
+fun outList12(list: ref game.ContactList,kind: i32,registerSlot: i32,phase: i32,id: u32,seq: u32) -> () = {
+    prefix("CL12",id,seq); outDec(kind); outDec(registerSlot); outDec(phase); outHex(list.status as u32); outHex(list.values.length() as u32); newline(); liveCounts[7] = liveCounts[7]+1i32;
+    var j: i64 = 0i64;
+    while (j < list.values.length()) {
+        let value: game.ContactValue = list.values.at(j); prefix("CV12",id,seq); outDec(kind); outDec(registerSlot); outDec(phase); outDec(j as i32); outContactValue(value); newline(); liveCounts[8] = liveCounts[8]+1i32; j = j+1i64;
+    }
+}
+# Box2D 8c661469, src/shape.                                             
+
+fun outLists12(reg: ref Registers,execution: ref Execution,id: u32,seq: u32) -> () = {
+    if (execution.readShape12 >= 0i32) outList12(&execution.contactList12,1i32,execution.readShape12,0i32,id,seq);
+    var k: i32 = 0i32;
+    while (k < 4i32) {
+        if (reg.contactCopies12[k].saved) {
+            outList12(&reg.contactCopies12[k].value,2i32,k,0i32,id,seq);
+            if (execution.mutateList12 == k) {
+                var cloned: game.ContactList = game.cloneContactList(&reg.contactCopies12[k].value);
+                if (cloned.values.length() > 0i64) cloned.values.at(0i64).manifold.normal.x = 123.0f32;
+                if (cloned.values.length() >= 2i64) { let first: game.ContactValue = cloned.values.at(0i64); let second: game.ContactValue = cloned.values.at(1i64); cloned.values.at(0i64) = second; cloned.values.at(1i64) = first; }
+                outList12(&cloned,2i32,k,1i32,id,seq); outList12(&reg.contactCopies12[k].value,2i32,k,2i32,id,seq);
+            }
+        }
+        k = k+1i32;
+    }
+}
+
+# Box2D 8c661469, src/shape.                                                                                                    
+
+class SavedJoint14 { saved: bool = false; number: game.JointNumber = game.JointNumber(); owner: game.WorldNumber = game.WorldNumber(); id: raw.JointId = raw.JointId(); jointType: i32 = 0i32; }
+
+class Description14 { saved: bool = false; value: game.DistanceDescription = game.DistanceDescription(); jointType: i32 = 0i32; revolute: game.RevoluteDescription = game.RevoluteDescription(); prismatic: game.PrismaticDescription = game.PrismaticDescription(); }
+
+class Identity14 { words: u32[8] = zeroIdentity14(); }
+
+class Copy14 { saved: bool = false; isView: bool = false; parent: i32 = 0i32; identity: Identity14 = Identity14(); view: u32[51] = zeroView14(); jointType: i32 = 0i32; items: List[Identity14] = emptyIdentity14(); rawItems: List[raw.JointId] = raw.emptyJointIds(); }
+
+fun zeroIdentity14() -> u32[8] = { var values: u32[8]; return values; }
+
+fun zeroView14() -> u32[51] = { var values: u32[51]; return values; }
+
+fun emptyIdentity14() -> List[Identity14] = { var values: List[Identity14]; return values; }
+
+fun zeroJoints14() -> SavedJoint14[256] = { var values: SavedJoint14[256]; return values; }
+
+fun zeroDescriptions14() -> Description14[16] = { var values: Description14[16]; return values; }
+
+fun zeroCopies14() -> Copy14[4] = { var values: Copy14[4]; return values; }
+
+var joints14: SavedJoint14[256] = zeroJoints14(); var descriptions14: Description14[16] = zeroDescriptions14(); var copies14: Copy14[4] = zeroCopies14();
+
+var counts14: u32[20] = zeroCounts14();
+
+fun zeroCounts14() -> u32[20] = { var values: u32[20]; return values; }
+
+var reason14: i32 = 0i32; var query14: i32 = -1i32; var queryStatus14: i32 = 0i32; var valid14: i32 = -1i32;
+
+var queryData14: u32[51] = zeroView14();
+
+var list14: List[Identity14] = emptyIdentity14(); var hasList14: bool = false; var listWorld14: i32 = 0i32; var listBody14: i32 = 0i32;
+
+var fixture14: bool = false; var direct14: bool = false; var prepared14: bool = false; var context14: raw.SolverContext = raw.SolverContext();
+                                                                                
+
+const PORT14_PART_B: bool = false;
+
+var profile14: str = "PUBLIC"; var profileB14: bool = PORT14_PART_B; var fixtureTypeB14: i32 = 0i32;
+
+fun identity14(saved: SavedJoint14) -> Identity14 = {
+    var value = Identity14(); value.words[0] = saved.id.index1 as u32; value.words[1] = saved.id.world0 as u32; value.words[2] = saved.id.generation as u32;
+    value.words[3] = saved.number.slot as u32; value.words[4] = saved.number.birthTicket.low; value.words[5] = saved.number.birthTicket.high;
+    value.words[6] = saved.number.ownerTicket.low; value.words[7] = saved.number.ownerTicket.high; return value;
+}
+
+fun outIdentity14(value: Identity14) -> () = { var i: i32 = 0i32; while (i < 8i32) { outHex(value.words[i]); i = i+1i32; } }
+
+fun jp14(id: u32, seq: u32, source: i32, world: i32, slot: i32, group: i32, n: i32) -> () = {
+    prefix("J14",id,seq);
+    currentOutputRank14 = if group == 8i32 then 1200i32 else (if source != 0i32 then 700i32+3i32*source+(if group == 0i32 then 0i32 else 1i32) else (if group == 0i32 then 400i32 else (if group == 4i32 or group == 9i32 or group == 11i32 then 500i32 else 1000i32+group)));
+    outDec(source); outDec(world); outDec(slot); outDec(group); outDec(n);
+    if (group < 8i32) counts14[group] = counts14[group]+1u32;
+}
+
+fun lp14(id: u32, seq: u32, source: i32, world: i32, container: i32, parent: i32, n: i32) -> () = {
+    prefix("L14",id,seq);
+    currentOutputRank14 = if source != 0i32 then 702i32+3i32*source else (if container == 0i32 then 600i32 else 1100i32+container);
+    outDec(source); outDec(world); outDec(container); outDec(parent); outDec(n); counts14[8i32+container] = counts14[8i32+container]+1u32;
+}
+
+fun outDescription14(value: game.DistanceDescription) -> () = {
+    outHex(0u32); outFloat(value.localAnchorA.x); outFloat(value.localAnchorA.y); outFloat(value.localAnchorB.x); outFloat(value.localAnchorB.y);
+    outFloat(value.length); outHex(value.enableSpring as u32); outFloat(value.hertz); outFloat(value.dampingRatio); outHex(value.enableLimit as u32);
+    outFloat(value.minLength); outFloat(value.maxLength); outHex(value.enableMotor as u32); outFloat(value.maxMotorForce); outFloat(value.motorSpeed);
+    outHex(value.collideConnected as u32); outHex(value.hasObjectId as u32); outPair(value.objectId);
+}
+
+fun outViewWords14(words: ref u32[51], n: i32 = 50i32) -> () = { var i: i32 = 0i32; while (i < n) { outHex(words[i]); i = i+1i32; } }
+
+fun outJointPublic14(reg: ref Registers, id: u32, seq: u32, op: Operation) -> () = {
+    var j: i32 = 0i32;
+    while (j < 256i32) {
+        if (joints14[j].saved) { jp14(id,seq,0i32,joints14[j].id.world0 as i32,j,0i32,8i32); outIdentity14(identity14(joints14[j])); newline(); }
+        j = j+1i32;
+    }
+    if (query14 >= 0i32) { jp14(id,seq,0i32,joints14[query14].id.world0 as i32,query14,4i32,viewArityB14(joints14[query14].jointType)); outViewWords14(&queryData14,viewArityB14(joints14[query14].jointType)); newline(); }
+    if (special14) { jp14(id,seq,0i32,16i32,specialSlot14,11i32,4i32); var si: i32 = 0i32; while (si < 4i32) { outHex(specialWords14[si]); si = si+1i32; } newline(); }
+    if (valid14 >= 0i32) { jp14(id,seq,0i32,joints14[valid14].id.world0 as i32,valid14,9i32,2i32); outHex(raw.b2Joint_IsValid(joints14[valid14].id) as u32); outHex((game.jointStatus(joints14[valid14].owner,joints14[valid14].number) == game.OK) as u32); newline(); }
+    if (hasList14) {
+        lp14(id,seq,0i32,listWorld14,0i32,listBody14,(list14.length()*3i64) as i32);
+        var i: i64 = 0i64; while (i < list14.length()) { let item: Identity14 = list14.at(i); outHex(item.words[0]); outHex(item.words[1]); outHex(item.words[2]); i = i+1i64; } newline();
+    }
+    var k: i32 = 0i32;
+    while (k < 4i32) {
+        if (copies14[k].saved) {
+            if (copies14[k].isView) {
+                jp14(id,seq,k+1i32,16i32,0i32,0i32,8i32); outIdentity14(copies14[k].identity); newline();
+                jp14(id,seq,k+1i32,16i32,0i32,4i32,viewArityB14(copies14[k].jointType)); outViewWords14(&copies14[k].view,viewArityB14(copies14[k].jointType)); newline();
+            } else {
+                lp14(id,seq,k+1i32,16i32,0i32,copies14[k].parent,(copies14[k].rawItems.length()*3i64) as i32);
+                var li: i64 = 0i64; while (li < copies14[k].rawItems.length()) { let item: raw.JointId = copies14[k].rawItems.at(li); outHex(item.index1 as u32); outHex(item.world0 as u32); outHex(item.generation as u32); li = li+1i64; } newline();
+                li = 0i64; while (li < copies14[k].items.length()) { jp14(id,seq,k+1i32,16i32,li as i32,0i32,8i32); outIdentity14(copies14[k].items.at(li)); newline(); li = li+1i64; }
+            }
+            counts14[18] = counts14[18]+1u32;
+        } k = k+1i32;
+    }
+    var d: i32 = 0i32;
+    while (d < 16i32) { if (descriptions14[d].saved) { jp14(id,seq,5i32,16i32,d,6i32,1i32+descriptionArityB14(descriptions14[d].jointType));
+        if (descriptions14[d].jointType == 5i32) outDescriptionRevoluteB14(descriptions14[d].revolute);
+        else if (descriptions14[d].jointType == 4i32) outDescriptionPrismaticB14(descriptions14[d].prismatic);
+        else outDescription14(descriptions14[d].value); newline(); counts14[17] = counts14[17]+1u32; } d = d+1i32; }
+    if (mathResultCountB14 > 0i32) {
+        jp14(id,seq,0i32,16i32,0i32,12i32,mathResultCountB14); currentOutputRank14 = 550i32;
+        outFloat(mathResultB14.x); if (mathResultCountB14 == 2i32) outFloat(mathResultB14.y); newline();
+    }
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64); var ti: i64 = 0i64;
+            while (ti < world.jointCalls14.length()) {
+                let call: raw.JointCall14 = world.jointCalls14.at(ti);
+                prefix("T14",id,seq); outDec(call.sub); outDec(call.phase); if (call.color == -1i32) outputString14(" -1"); else outDec(call.color); outDec(call.ordinal); outDec(call.jointId); outDec(world.joints.at(call.jointId as i64).jointType); outDec((call.phase == 2i32) as i32); newline();
+                counts14[13] = counts14[13]+1u32; ti = ti+1i64;
+            }
+        } wi = wi+1i32;
+    }
+}
+
+fun outJointCommon14(joint: raw.JointRecord) -> () = {
+    outHex(joint.hasObjectId as u32); outPair(joint.objectId); outHex(joint.setIndex as u32); outHex(joint.colorIndex as u32); outHex(joint.localIndex as u32);
+    outHex(joint.edgeA.bodyId as u32); outHex(joint.edgeA.prevKey as u32); outHex(joint.edgeA.nextKey as u32);
+    outHex(joint.edgeB.bodyId as u32); outHex(joint.edgeB.prevKey as u32); outHex(joint.edgeB.nextKey as u32);
+    outHex(joint.jointId as u32); outHex(joint.islandId as u32); outHex(joint.islandPrev as u32); outHex(joint.islandNext as u32);
+    outFloat(joint.drawSize); outHex(joint.jointType as u32); outHex(joint.generation as u32); outHex(joint.isMarked as u32); outHex(joint.collideConnected as u32);
+}
+
+fun outJointSim14(sim: raw.JointSim) -> () = {
+    outHex(sim.jointId as u32); outHex(sim.bodyIdA as u32); outHex(sim.bodyIdB as u32); outHex(sim.jointType as u32);
+    outFloat(sim.localOriginAnchorA.x); outFloat(sim.localOriginAnchorA.y); outFloat(sim.localOriginAnchorB.x); outFloat(sim.localOriginAnchorB.y);
+    outFloat(sim.invMassA); outFloat(sim.invMassB); outFloat(sim.invIA); outFloat(sim.invIB); outFloat(sim.constraintHertz); outFloat(sim.constraintDampingRatio);
+    outFloat(sim.constraintSoftness.biasRate); outFloat(sim.constraintSoftness.massScale); outFloat(sim.constraintSoftness.impulseScale);
+}
+
+fun outDistance14(joint: raw.DistanceJoint) -> () = {
+    outFloat(joint.length); outFloat(joint.hertz); outFloat(joint.dampingRatio); outFloat(joint.minLength); outFloat(joint.maxLength); outFloat(joint.maxMotorForce); outFloat(joint.motorSpeed);
+    outFloat(joint.impulse); outFloat(joint.lowerImpulse); outFloat(joint.upperImpulse); outFloat(joint.motorImpulse); outHex(joint.indexA as u32); outHex(joint.indexB as u32);
+    outFloat(joint.anchorA.x); outFloat(joint.anchorA.y); outFloat(joint.anchorB.x); outFloat(joint.anchorB.y); outFloat(joint.deltaCenter.x); outFloat(joint.deltaCenter.y);
+    outFloat(joint.distanceSoftness.biasRate); outFloat(joint.distanceSoftness.massScale); outFloat(joint.distanceSoftness.impulseScale); outFloat(joint.axialMass);
+    outHex(joint.enableSpring as u32); outHex(joint.enableLimit as u32); outHex(joint.enableMotor as u32);
+}
+
+fun outJointPrivate14(reg: ref Registers, id: u32, seq: u32, op: Operation) -> () = {
+    if (compact14) { outCompactJoint14(reg,id,seq); return; }
+    var group: i32 = 1i32;
+    while (group <= 7i32) {
+        if (group != 4i32 and group != 6i32) {
+            var wi: i32 = 0i32;
+            while (wi < 16i32) {
+                if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+                    var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+                    if (group == 7i32) {
+                        var bi: i32 = 0i32; while (bi < world.bodyIdPool.nextIndex) { let body: raw.BodyRecord = world.bodies.at(bi as i64); if (body.id != -1i32) { jp14(id,seq,0i32,world.worldId as i32,bi,7i32,2i32); outHex(body.headJointKey as u32); outHex(body.jointCount as u32); newline(); } bi = bi+1i32; }
+                    } else {
+                        var ji: i32 = 0i32;
+                        while (ji < world.jointIdPool.nextIndex) {
+                            let joint: raw.JointRecord = world.joints.at(ji as i64); let alive: bool = joint.jointId != -1i32;
+                            if (group == 5i32) { jp14(id,seq,0i32,world.worldId as i32,ji,5i32,6i32); outHex(alive as u32); outHex(joint.generation as u32); outPair(joint.birthTicket); outPair(joint.ownerTicket); newline(); }
+                            else if (alive) {
+                                if (group == 1i32) { jp14(id,seq,0i32,world.worldId as i32,ji,1i32,21i32); outJointCommon14(joint); }
+                                else if (group == 2i32) { jp14(id,seq,0i32,world.worldId as i32,ji,2i32,17i32); outJointSim14(raw.b2GetJointSim(world,ji)); }
+                                else {
+                                    jp14(id,seq,0i32,world.worldId as i32,ji,3i32,payloadArityB14(joint.jointType));
+                                    if (joint.jointType == 5i32) outRevoluteB14(raw.b2GetJointSim(world,ji).revoluteJoint);
+                                    else if (joint.jointType == 4i32) outPrismaticB14(raw.b2GetJointSim(world,ji).prismaticJoint);
+                                    else outDistance14(raw.b2GetJointSim(world,ji).distanceJoint);
+                                }
+                                newline(); if (group == 1i32) counts14[16] = counts14[16]+1u32;
+                            }
+                            ji = ji+1i32;
+                        }
+                    }
+                } wi = wi+1i32;
+            }
+        } group = group+1i32;
+    }
+    var wi2: i32 = 0i32;
+    while (wi2 < 16i32) {
+        if (reg.worlds[wi2].saved and game.worldStatus(reg.worlds[wi2].number) == game.OK) {
+            var world2: ref raw.World = raw.worlds.at(reg.worlds[wi2].number.slot as i64);
+            var ii: i32 = 0i32;
+            while (ii < world2.islandIdPool.nextIndex) { let island: raw.Island = world2.islands.at(ii as i64); if (island.islandId != -1i32) {
+                lp14(id,seq,0i32,world2.worldId as i32,1i32,ii,island.jointCount); var ji: i32 = island.headJoint;
+                while (ji != -1i32) { outHex(ji as u32); ji = world2.joints.at(ji as i64).islandNext; } newline();
+            } ii = ii+1i32; }
+            var si: i32 = 0i32; while (si < world2.solverSetIdPool.nextIndex) { var set: ref raw.SolverSet = raw.b2GetSolverSet(world2,si); if (set.setIndex != -1i32) {
+                lp14(id,seq,0i32,world2.worldId as i32,2i32,si,set.jointCount); var ji: i32 = 0i32; while (ji < set.jointCount) { outHex(set.jointSims.at(ji as i64).jointId as u32); ji = ji+1i32; } newline();
+            } si = si+1i32; }
+            var ci: i32 = 0i32; while (ci < 12i32) {
+                lp14(id,seq,0i32,world2.worldId as i32,3i32,ci,world2.constraintGraph.colors[ci].jointCount);
+                var ji: i32 = 0i32; while (ji < world2.constraintGraph.colors[ci].jointCount) { outHex(world2.constraintGraph.colors[ci].jointSims.at(ji as i64).jointId as u32); ji = ji+1i32; } newline(); ci = ci+1i32;
+            }
+            lp14(id,seq,0i32,world2.worldId as i32,4i32,0i32,4i32+world2.jointIdPool.freeCount);
+            outHex(world2.jointIdPool.nextIndex as u32); outHex(world2.jointIdPool.freeCount as u32); outPair(game.lastIssued);
+            var fi: i32 = 0i32; while (fi < world2.jointIdPool.freeCount) { let freed: i32 = world2.jointIdPool.freeArray.at(fi as i64); outHex(freed as u32); fi = fi+1i32; } newline();
+        } wi2 = wi2+1i32;
+    }
+    if (op.opcode == 210i32 and op.words[0] == 0u32) {
+        jp14(id,seq,0i32,0i32,0i32,10i32,16i32); var world: ref raw.World = raw.worlds.at(joints14[0i32].owner.slot as i64);
+        let sim: raw.JointSim = raw.b2GetJointSim(world,0i32); var indexA: i32 = 0i32; var indexB: i32 = 0i32;
+        if (sim.jointType == 5i32) { indexA = sim.revoluteJoint.indexA; indexB = sim.revoluteJoint.indexB; }
+        else if (sim.jointType == 4i32) { indexA = sim.prismaticJoint.indexA; indexB = sim.prismaticJoint.indexB; }
+        else { indexA = sim.distanceJoint.indexA; indexB = sim.distanceJoint.indexB; }
+        outDirectState14(raw.solverState(world,indexA)); outDirectState14(raw.solverState(world,indexB)); newline();
+    }
+    counts14[14] = completedPositiveSteps; counts14[15] = seq; counts14[19] = fixture14 as u32;
+    jp14(id,seq,0i32,16i32,0i32,8i32,20i32); var co: i32 = 0i32; while (co < 20i32) { outHex(counts14[co]); co = co+1i32; } newline();
+}
+
+var special14: bool = false; var specialSlot14: i32 = 0i32; var specialWords14: u32[4] = zeroSpecial14();
+
+fun zeroSpecial14() -> u32[4] = { var values: u32[4]; return values; }
+
+fun clearOperation14() -> () = {
+    mathResultCountB14 = 0i32;
+    guardSeedApplied = false;
+    reason14 = 0i32; query14 = -1i32; queryStatus14 = 0i32; queryData14 = zeroView14(); valid14 = -1i32; hasList14 = false; list14.clear(); special14 = false;
+    counts14 = zeroCounts14(); chainZ13 = zeroChainZ13(); chainI13 = zeroChainI13();
+    var wi: i32 = 0i32; while (wi < 128i32) { if (raw.worlds.at(wi as i64).inUse) raw.worlds.at(wi as i64).jointCalls14.clear(); wi = wi+1i32; }
+}
+
+fun outDirectState14(state: raw.BodyState) -> () = {
+    outFloat(state.linearVelocity.x); outFloat(state.linearVelocity.y); outFloat(state.angularVelocity); outHex(state.flags);
+    outFloat(state.deltaPosition.x); outFloat(state.deltaPosition.y); outFloat(state.deltaRotation.c); outFloat(state.deltaRotation.s);
+}
+
+                                                                                      
+                                                                                                     
+
+fun legacyOutputRank14(tag: str) -> i32 = {
+    if (sameText13(tag,"E14")) return 0i32;
+    if (sameText13(tag,"A14")) return 200i32;
+    if (sameText13(tag,"T14")) return 800i32;
+    if (sameText13(tag,"E")) return 300i32;
+    if (sameText13(tag,"R")) return 101i32;
+    if (sameText13(tag,"V")) return 302i32;
+    if (sameText13(tag,"W")) return 303i32;
+    if (sameText13(tag,"B")) return 304i32;
+    if (sameText13(tag,"S")) return 305i32;
+    if (sameText13(tag,"G")) return 305i32;
+    if (sameText13(tag,"L")) return 306i32;
+    if (sameText13(tag,"A")) return 306i32;
+    if (sameText13(tag,"Q")) return 307i32;
+    if (sameText13(tag,"QGN")) return 308i32;
+    if (sameText13(tag,"QG")) return 308i32;
+    if (sameText13(tag,"SB")) return 309i32;
+    if (sameText13(tag,"K")) return 310i32;
+    if (sameText13(tag,"M")) return 310i32;
+    if (sameText13(tag,"MCN")) return 310i32;
+    if (sameText13(tag,"MC")) return 310i32;
+    if (sameText13(tag,"CD")) return 311i32;
+    if (sameText13(tag,"NC9")) return 312i32;
+    if (sameText13(tag,"RC9")) return 313i32;
+    if (sameText13(tag,"GV")) return 314i32;
+    if (sameText13(tag,"GL")) return 315i32;
+    if (sameText13(tag,"GE")) return 316i32;
+    if (sameText13(tag,"GC")) return 317i32;
+    if (sameText13(tag,"HN10")) return 318i32;
+    if (sameText13(tag,"HR10")) return 318i32;
+    if (sameText13(tag,"HC10")) return 319i32;
+    if (sameText13(tag,"HG10")) return 319i32;
+    if (sameText13(tag,"SW11")) return 320i32;
+    if (sameText13(tag,"GS11")) return 321i32;
+    if (sameText13(tag,"AP12")) return 122i32;
+    if (sameText13(tag,"WS12")) return 323i32;
+    if (sameText13(tag,"NM12")) return 324i32;
+    if (sameText13(tag,"UD12")) return 325i32;
+    if (sameText13(tag,"EF12")) return 326i32;
+    if (sameText13(tag,"HC12")) return 327i32;
+    if (sameText13(tag,"HR12")) return 128i32;
+    if (sameText13(tag,"HT12")) return 129i32;
+    if (sameText13(tag,"CL12")) return 330i32;
+    if (sameText13(tag,"CV12")) return 330i32;
+    if (sameText13(tag,"VR12")) return 331i32;
+    if (sameText13(tag,"CN13")) return 332i32;
+    if (sameText13(tag,"V13")) return 333i32;
+    if (sameText13(tag,"CQ13")) return 334i32;
+    if (sameText13(tag,"QL13")) return 334i32;
+    if (sameText13(tag,"CS13")) return 335i32;
+    if (sameText13(tag,"PC13")) return 336i32;
+    if (sameText13(tag,"COPY13")) return 337i32;
+    if (sameText13(tag,"CV13")) return 337i32;
+    if (sameText13(tag,"CE13")) return 337i32;
+    if (sameText13(tag,"ENDCOPY13")) return 337i32;
+    if (sameText13(tag,"X")) return 938i32;
+    if (sameText13(tag,"P")) return 939i32;
+    if (sameText13(tag,"T")) return 940i32;
+    if (sameText13(tag,"F")) return 941i32;
+    if (sameText13(tag,"U")) return 942i32;
+    if (sameText13(tag,"H")) return 943i32;
+    if (sameText13(tag,"Y")) return 944i32;
+    if (sameText13(tag,"DN")) return 945i32;
+    if (sameText13(tag,"RT")) return 946i32;
+    if (sameText13(tag,"JW")) return 947i32;
+    if (sameText13(tag,"RQ")) return 948i32;
+    if (sameText13(tag,"CP")) return 949i32;
+    if (sameText13(tag,"CF")) return 950i32;
+    if (sameText13(tag,"CT")) return 951i32;
+    if (sameText13(tag,"CA")) return 952i32;
+    if (sameText13(tag,"CS")) return 953i32;
+    if (sameText13(tag,"GB")) return 954i32;
+    if (sameText13(tag,"CB")) return 955i32;
+    if (sameText13(tag,"BL9")) return 956i32;
+    if (sameText13(tag,"IP")) return 957i32;
+    if (sameText13(tag,"IF")) return 958i32;
+    if (sameText13(tag,"IS")) return 959i32;
+    if (sameText13(tag,"IL")) return 960i32;
+    if (sameText13(tag,"EB")) return 961i32;
+    if (sameText13(tag,"EE0")) return 962i32;
+    if (sameText13(tag,"EE1")) return 963i32;
+    if (sameText13(tag,"EN9")) return 964i32;
+    if (sameText13(tag,"W10")) return 965i32;
+    if (sameText13(tag,"CX10")) return 966i32;
+    if (sameText13(tag,"SB10")) return 967i32;
+    if (sameText13(tag,"PK10")) return 968i32;
+    if (sameText13(tag,"SC10")) return 969i32;
+    if (sameText13(tag,"BV10")) return 970i32;
+    if (sameText13(tag,"WS11")) return 971i32;
+    if (sameText13(tag,"BS11")) return 972i32;
+    if (sameText13(tag,"SS11")) return 973i32;
+    if (sameText13(tag,"SD11")) return 974i32;
+    if (sameText13(tag,"SM11")) return 975i32;
+    if (sameText13(tag,"AB11")) return 976i32;
+    if (sameText13(tag,"TR11")) return 977i32;
+    if (sameText13(tag,"SP11")) return 978i32;
+    if (sameText13(tag,"SF11")) return 979i32;
+    if (sameText13(tag,"BP11")) return 980i32;
+    if (sameText13(tag,"BF11")) return 981i32;
+    if (sameText13(tag,"NP12")) return 982i32;
+    if (sameText13(tag,"CH13")) return 983i32;
+    if (sameText13(tag,"CI13")) return 984i32;
+    if (sameText13(tag,"CM13")) return 985i32;
+    if (sameText13(tag,"BH13")) return 986i32;
+    if (sameText13(tag,"IP13")) return 987i32;
+    if (sameText13(tag,"CG13")) return 988i32;
+    if (sameText13(tag,"I8")) return 1389i32;
+    if (sameText13(tag,"I9")) return 1390i32;
+    if (sameText13(tag,"I10")) return 1391i32;
+    if (sameText13(tag,"I11")) return 1392i32;
+    if (sameText13(tag,"Z8")) return 1393i32;
+    if (sameText13(tag,"Z9")) return 1394i32;
+    if (sameText13(tag,"Z10")) return 1395i32;
+    if (sameText13(tag,"Z11")) return 1396i32;
+    if (sameText13(tag,"I12")) return 1397i32;
+    if (sameText13(tag,"IP12")) return 1398i32;
+    if (sameText13(tag,"Z12")) return 1399i32;
+    if (sameText13(tag,"I13")) return 1400i32;
+    if (sameText13(tag,"Z13")) return 1401i32;
+    if (sameText13(tag,"A13")) return 99i32;
+    return 0i32;
+}
+
+fun emptyOutputChars14() -> List[char] = { var values: List[char]; return values; }
+
+class OutputRow14 { data: List[char] = emptyOutputChars14(); }
+
+fun emptyOutputRows14() -> List[OutputRow14] = { var values: List[OutputRow14]; return values; }
+
+class OutputBucket14 { rows: List[OutputRow14] = emptyOutputRows14(); }
+
+fun zeroOutputBuckets14() -> OutputBucket14[1500] = { var values: OutputBucket14[1500]; return values; }
+
+var outputBuckets14: OutputBucket14[1500] = zeroOutputBuckets14();
+
+var outputLine14: List[char] = emptyOutputChars14(); var capturingOutput14: bool = false;
+
+var currentOutputRank14: i32 = 0i32; var outputBytes14: i64 = 0i64;
+
+fun outputChar14(c: char) -> () = {
+    if (not capturingOutput14) { io.writeChar(c); return; }
+    if (not inputOk) return;
+    if (outputBytes14 >= 13833216i64) { invalid("PORT19A: INPUT_POPULATION\n"); return; }
+    outputBytes14 = outputBytes14+1i64; outputLine14.push(c);
+    if (c == '\n') {
+        var row = OutputRow14(); row.data = copy outputLine14;
+        outputBuckets14[currentOutputRank14].rows.push(move row); outputLine14.clear();
+    }
+}
+
+fun outputString14(value: str) -> () = {
+    if (not capturingOutput14) { io.writeStr(value); return; }
+    let chars: cptr char = builtins.ptr_from_slice[char](value) as cptr char; var i: i64 = 0i64;
+    while (i < value.length()) { outputChar14(chars[i]); i = i+1i64; }
+}
+
+fun discardOutput14() -> () = {
+    capturingOutput14 = false; var rank: i32 = 0i32;
+    while (rank < 1500i32) { outputBuckets14[rank].rows.clear(); rank = rank+1i32; }
+    outputLine14.clear(); outputBytes14 = 0i64;
+}
+
+fun beginOutput14() -> () = { discardOutput14(); capturingOutput14 = true; currentOutputRank14 = 0i32; }
+
+fun flushOutput14() -> () = {
+    capturingOutput14 = false; var rank: i32 = 0i32;
+    while (rank < 1500i32) {
+        var i: i64 = 0i64; while (i < outputBuckets14[rank].rows.length()) {
+            var row: ref OutputRow14 = outputBuckets14[rank].rows.at(i); var j: i64 = 0i64;
+            while (j < row.data.length()) { let c: char = row.data.at(j); io.writeChar(c); j = j+1i64; } i = i+1i64;
+        } rank = rank+1i32;
+    }
+    discardOutput14();
+}
+
+                                                                                         
+
+fun attachedReason14(reg: ref Registers, op: Operation, status: i32) -> bool = {
+    if (status != game.PARAM or op.opcode != 80i32 or op.mode != 1i32) return false;
+    if (game.bodyStatus(reg.worlds[op.a].number,reg.bodies[op.b].number) != game.OK) return false;
+    if (chainLegacyReason13(reg,op,status) == 80i32) return false;
+    let body: raw.BodyRecord = raw.worlds.at(reg.worlds[op.a].number.slot as i64).bodies.at(reg.bodies[op.b].number.slot as i64);
+    return body.jointCount > 0i32 and ((op.kind == 0i32 and body.bodyType != op.words[4] as i32) or (op.kind == 1i32 and op.words[4] == 0u32 and body.setIndex != 1i32));
+}
+
+                                                                             
+                                                                             
+
+var compact14: bool = false;
+
+var physicalWorld14: SavedWorld = SavedWorld(); var physicalWorldSaved14: bool = false;
+
+var observedWorld14: SavedWorld = SavedWorld(); var observingGuard14: bool = false;
+
+fun observedBodyOwner14(owner: game.WorldNumber) -> game.WorldNumber = {
+    if (observingGuard14 and physicalWorldSaved14 and owner.slot == observedWorld14.number.slot) return observedWorld14.number;
+    return owner;
+}
+
+fun outCompactJoint14(reg: ref Registers,id: u32,seq: u32) -> () = {
+    var wi: i32 = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            lp14(id,seq,0i32,world.worldId as i32,4i32,0i32,4i32+world.jointIdPool.freeCount);
+            outHex(world.jointIdPool.nextIndex as u32); outHex(world.jointIdPool.freeCount as u32); outPair(game.lastIssued);
+            var i: i32 = 0i32; while (i < world.jointIdPool.freeCount) { let freed: i32 = world.jointIdPool.freeArray.at(i as i64); outHex(freed as u32); i = i+1i32; } newline();
+            counts14[16] = counts14[16]+(world.jointIdPool.nextIndex-world.jointIdPool.freeCount) as u32;
+        } wi = wi+1i32;
+    }
+    counts14[14] = completedPositiveSteps; counts14[15] = seq; counts14[19] = fixture14 as u32;
+    jp14(id,seq,0i32,16i32,0i32,8i32,20i32); var c: i32 = 0i32; while (c < 20i32) { outHex(counts14[c]); c = c+1i32; } newline();
+}
+
+fun viewArityB14(jointType: i32) -> i32 = { return if jointType == 4i32 then 51i32 else 50i32; }
+
+fun payloadArityB14(jointType: i32) -> i32 = { if (jointType == 5i32) return 30i32; if (jointType == 4i32) return 34i32; return 26i32; }
+
+fun descriptionArityB14(jointType: i32) -> i32 = { if (jointType == 5i32) return 20i32; if (jointType == 4i32) return 21i32; return 18i32; }
+
+fun outDescriptionRevoluteB14(value: game.RevoluteDescription) -> () = {
+    outHex(5u32);
+    outFloat(value.localAnchorA.x);
+    outFloat(value.localAnchorA.y);
+    outFloat(value.localAnchorB.x);
+    outFloat(value.localAnchorB.y);
+    outFloat(value.referenceAngle);
+    outFloat(value.targetAngle);
+    outHex(value.enableSpring as u32);
+    outFloat(value.hertz);
+    outFloat(value.dampingRatio);
+    outHex(value.enableLimit as u32);
+    outFloat(value.lowerAngle);
+    outFloat(value.upperAngle);
+    outHex(value.enableMotor as u32);
+    outFloat(value.maxMotorTorque);
+    outFloat(value.motorSpeed);
+    outFloat(value.drawSize);
+    outHex(value.collideConnected as u32);
+    outHex(value.hasObjectId as u32);
+    outHex(value.objectId.low);
+    outHex(value.objectId.high);
+}
+
+fun outRevoluteB14(joint: raw.RevoluteJoint) -> () = {
+    outFloat(joint.linearImpulse.x);
+    outFloat(joint.linearImpulse.y);
+    outFloat(joint.springImpulse);
+    outFloat(joint.motorImpulse);
+    outFloat(joint.lowerImpulse);
+    outFloat(joint.upperImpulse);
+    outFloat(joint.hertz);
+    outFloat(joint.dampingRatio);
+    outFloat(joint.targetAngle);
+    outFloat(joint.maxMotorTorque);
+    outFloat(joint.motorSpeed);
+    outFloat(joint.referenceAngle);
+    outFloat(joint.lowerAngle);
+    outFloat(joint.upperAngle);
+    outHex(joint.indexA as u32);
+    outHex(joint.indexB as u32);
+    outFloat(joint.anchorA.x);
+    outFloat(joint.anchorA.y);
+    outFloat(joint.anchorB.x);
+    outFloat(joint.anchorB.y);
+    outFloat(joint.deltaCenter.x);
+    outFloat(joint.deltaCenter.y);
+    outFloat(joint.deltaAngle);
+    outFloat(joint.axialMass);
+    outFloat(joint.springSoftness.biasRate);
+    outFloat(joint.springSoftness.massScale);
+    outFloat(joint.springSoftness.impulseScale);
+    outHex(joint.enableSpring as u32);
+    outHex(joint.enableMotor as u32);
+    outHex(joint.enableLimit as u32);
+}
+
+fun outDescriptionPrismaticB14(value: game.PrismaticDescription) -> () = {
+    outHex(4u32);
+    outFloat(value.localAnchorA.x);
+    outFloat(value.localAnchorA.y);
+    outFloat(value.localAnchorB.x);
+    outFloat(value.localAnchorB.y);
+    outFloat(value.localAxisA.x);
+    outFloat(value.localAxisA.y);
+    outFloat(value.referenceAngle);
+    outFloat(value.targetTranslation);
+    outHex(value.enableSpring as u32);
+    outFloat(value.hertz);
+    outFloat(value.dampingRatio);
+    outHex(value.enableLimit as u32);
+    outFloat(value.lowerTranslation);
+    outFloat(value.upperTranslation);
+    outHex(value.enableMotor as u32);
+    outFloat(value.maxMotorForce);
+    outFloat(value.motorSpeed);
+    outHex(value.collideConnected as u32);
+    outHex(value.hasObjectId as u32);
+    outHex(value.objectId.low);
+    outHex(value.objectId.high);
+}
+
+fun outPrismaticB14(joint: raw.PrismaticJoint) -> () = {
+    outFloat(joint.localAxisA.x);
+    outFloat(joint.localAxisA.y);
+    outFloat(joint.impulse.x);
+    outFloat(joint.impulse.y);
+    outFloat(joint.springImpulse);
+    outFloat(joint.motorImpulse);
+    outFloat(joint.lowerImpulse);
+    outFloat(joint.upperImpulse);
+    outFloat(joint.hertz);
+    outFloat(joint.dampingRatio);
+    outFloat(joint.targetTranslation);
+    outFloat(joint.maxMotorForce);
+    outFloat(joint.motorSpeed);
+    outFloat(joint.referenceAngle);
+    outFloat(joint.lowerTranslation);
+    outFloat(joint.upperTranslation);
+    outHex(joint.indexA as u32);
+    outHex(joint.indexB as u32);
+    outFloat(joint.anchorA.x);
+    outFloat(joint.anchorA.y);
+    outFloat(joint.anchorB.x);
+    outFloat(joint.anchorB.y);
+    outFloat(joint.axisA.x);
+    outFloat(joint.axisA.y);
+    outFloat(joint.deltaCenter.x);
+    outFloat(joint.deltaCenter.y);
+    outFloat(joint.deltaAngle);
+    outFloat(joint.axialMass);
+    outFloat(joint.springSoftness.biasRate);
+    outFloat(joint.springSoftness.massScale);
+    outFloat(joint.springSoftness.impulseScale);
+    outHex(joint.enableSpring as u32);
+    outHex(joint.enableLimit as u32);
+    outHex(joint.enableMotor as u32);
+}
+
+var mathResultB14: math2.Vec2 = math2.Vec2(); var mathResultCountB14: i32 = 0i32;
+
+                                                                        
+const SCENE_INPUT19: str = "00000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000000000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c8888890000000000000000000000020000000300000000000000010000000100000000359fffff000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000035a00000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000035a00001000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c88888900000000000000000000000200000003000000000000000100000001000000003fc00000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040200000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040200001000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000010000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000020000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000000000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000001000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c8888890000000000000000000000020000000b0000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000000000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000008000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000100000001000000010000000040000000000000003f800000000000003f0000003f8000003f000000000000003f8000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000300000001000000010000000040000000000000003f800000000000003f0000003f8000003f000000000000003f8000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000300000003000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000110000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000000000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c8888890000000000000000000000020000000300000000000000010000000100000000359fffff000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000035a00000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000035a00001000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c88888900000000000000000000000200000003000000000000000100000001000000003fc00000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040200000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040200001000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000010000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000020000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000000000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000001000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c8888890000000000000000000000020000000b0000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000000000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000008000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000100000001000000010000000040000000000000003f800000000000003f0000003f8000003f000000000000003f8000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000300000001000000010000000040000000000000003f800000000000003f0000003f8000003f000000000000003f8000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000300000003000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000110000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000000000000000000013c888889000000000000000000000002000000030000000000000002000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000100000258000000013c888889000000000000000000000002000000130000000100000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000100000258000000043c888889000000000000000000000002000000030000000300000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000100000258000000013c888889000000000000000000000002000000130000000300000002000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f800000000000000000000100000258000000043c888889000000000000000000000002000000030000000000000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f8000000000000000000001000004b0000000013c888889000000000000000000000002000000130000000100000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f8000000000000000000001000004b0000000043c888889000000000000000000000002000000030000000300000002000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f8000000000000000000001000004b0000000013c888889000000000000000000000002000000130000000300000001000000010000000040000000000000003f800000000000003f0000003f8000003f00000000000000000000000000000000000000000000003f8000000000000000000001000004b0000000043c8888890000000000000000";
+fun sceneWords19(profile: i32, id: u32) -> u32[26] = {
+    var p: u32[26];
+    let source: cptr char = builtins.ptr_from_slice[char](SCENE_INPUT19) as cptr char;
+    let base: i32 = ((if profile == 1i32 then 48i32 else 0i32)+(id as i32)-1i32)*208i32;
+    var i: i32 = 0i32;
+    while (i < 26i32) {
+        var word: u32 = 0u32; var digit: i32 = 0i32;
+        while (digit < 8i32) {
+            let c: u32 = source[base+8i32*i+digit] as u32;
+            word = word*16u32+(if c <= 57u32 then c-48u32 else c-87u32); digit = digit+1i32;
+        }
+        p[i] = word; i = i+1i32;
+    }
+    return p;
+}
+                                                                                  
+extern("C") { fundecl exit(code: i32) -> (); fundecl getenv(name: cptr char) -> cptr char; }
+fun fail19(reason: str) -> () = {
+    let prefix19: str = "PORT19A: INPUT_"; let lf19: str = "\n";
+    write(2i32,builtins.ptr_from_slice[char](prefix19) as cptr char,prefix19.length() as u64);
+    write(2i32,builtins.ptr_from_slice[char](reason) as cptr char,reason.length() as u64);
+    write(2i32,builtins.ptr_from_slice[char](lf19) as cptr char,1u64); exit(2i32);
+}
+class Line19 { bytes: i32[2048]; starts: i32[80]; ends: i32[80]; count: i32 = 0i32; }
+fun read19() -> Line19 = {
+    var r: Line19; var n: i32 = 0i32; var cr: bool = false; var c: i32 = io.readCharCode();
+    if (c < 0i32) fail19("EOF");
+    while (c >= 0i32 and c != 10i32) {
+        if (cr) fail19("ASCII");
+        if (c == 13i32) cr = true;
+        else { if (c < 32i32 or c > 126i32) fail19("ASCII"); if (n == 2048i32) fail19("LINE_LENGTH"); r.bytes[n] = c; n = n+1i32; }
+        c = io.readCharCode();
+    }
+    if (cr and c != 10i32) fail19("ASCII");
+    if (n == 0i32 or r.bytes[0] == 32i32 or r.bytes[n-1i32] == 32i32) fail19("ASCII");
+    r.starts[0] = 0i32; r.count = 1i32; var i: i32 = 0i32;
+    while (i < n) {
+        if (r.bytes[i] == 32i32) {
+            if (r.bytes[i+1i32] == 32i32) fail19("ASCII");
+            r.ends[r.count-1i32] = i; if (r.count == 80i32) fail19("ARITY");
+            r.starts[r.count] = i+1i32; r.count = r.count+1i32;
+        }
+        i = i+1i32;
+    }
+    r.ends[r.count-1i32] = n; return r;
+}
+fun tag19(r: ref Line19, index: i32, text: str) -> bool = {
+    if (index >= r.count or r.ends[index]-r.starts[index] != text.length() as i32) return false;
+    let p: cptr char = builtins.ptr_from_slice[char](text) as cptr char;
+    var i: i32 = 0i32; while (i < text.length() as i32) { if (r.bytes[r.starts[index]+i] != p[i] as i32) return false; i = i+1i32; } return true;
+}
+fun number19(r: ref Line19, index: i32, payload: bool = false) -> u32 = {
+    if (index >= r.count) fail19("ARITY");
+    let start: i32 = r.starts[index]; let end: i32 = r.ends[index];
+    if (end-start > 1i32 and r.bytes[start] == 48i32) fail19(if payload then "WORD" else "NUMBER");
+    var value: u64 = 0u64; var i: i32 = start;
+    while (i < end) {
+        let c: i32 = r.bytes[i]; if (c < 48i32 or c > 57i32) fail19(if payload then "WORD" else "NUMBER");
+        value = value*10u64+(c-48i32) as u64; if (value > 4294967295u64) fail19(if payload then "WORD" else "NUMBER"); i = i+1i32;
+    }
+    return value as u32;
+}
+class Bank19 { saved: bool = false; view: raw.BodyView = raw.BodyView(); number: game.BodyNumber = game.BodyNumber(); }
+fun zeroBanks19() -> Bank19[2] = { var a: Bank19[2]; return a; }
+fun viewWords19(v: raw.BodyView) -> u32[14] = {
+    var p: u32[14]; p[0] = toBits(v.linearVelocity.x); p[1] = toBits(v.linearVelocity.y); p[2] = toBits(v.angularVelocity); p[3] = v.isAwake as u32;
+    p[4] = toBits(v.transform.p.x); p[5] = toBits(v.transform.p.y); p[6] = toBits(v.transform.q.c); p[7] = toBits(v.transform.q.s);
+    p[8] = toBits(v.center.x); p[9] = toBits(v.center.y); p[10] = toBits(v.mass); p[11] = toBits(v.inertia); p[12] = v.isEnabled as u32; p[13] = v.bodyType as u32; return p;
+}
+fun outView19(v: raw.BodyView) -> () = { var p: u32[14] = viewWords19(v); var i: i32 = 0i32; while (i < 14i32) { outHex(p[i]); i = i+1i32; } }
+fun outBank19(b: Bank19) -> () = { outView19(b.view); bodyNumber13(b.number); }
+fun save19(reg: ref Registers) -> Bank19 = {
+    let lookup: game.BodyLookup = game.lookupBody(reg.worlds[0].number,reg.bodies[0].number);
+    if (lookup.status != game.OK) fail19("DOMAIN"); return Bank19(true,lookup.value,reg.bodies[0].number);
+}
+fun edit19(b: ref Bank19, field: u32, word: u32) -> () = {
+    let f: f32 = fromBits(word);
+    if (field == 0u32) b.view.linearVelocity.x = f; else if (field == 1u32) b.view.linearVelocity.y = f; else if (field == 2u32) b.view.angularVelocity = f;
+    else if (field == 3u32) b.view.isAwake = word != 0u32; else if (field == 4u32) b.view.transform.p.x = f; else if (field == 5u32) b.view.transform.p.y = f;
+    else if (field == 6u32) b.view.transform.q.c = f; else if (field == 7u32) b.view.transform.q.s = f; else if (field == 8u32) b.view.center.x = f; else if (field == 9u32) b.view.center.y = f;
+    else if (field == 10u32) b.view.mass = f; else if (field == 11u32) b.view.inertia = f; else if (field == 12u32) b.view.isEnabled = word != 0u32; else b.view.bodyType = word as i32;
+}
+fun description19(a: ref u32[64]) -> game.ExplosionDescription = {
+    return game.ExplosionDescription(words64.Key64(a[2],a[3]),math2.Vec2(fromBits(a[4]),fromBits(a[5])),fromBits(a[6]),fromBits(a[7]),fromBits(a[8]));
+}
+fun definition19(e: game.ExplosionDescription) -> raw.ExplosionDef = { return raw.ExplosionDef(e.maskBits,e.position,e.radius,e.falloff,e.impulsePerLength); }
+fun outDescription19(e: raw.ExplosionDef) -> () = { outPair(e.maskBits); outFloat(e.position.x); outFloat(e.position.y); outFloat(e.radius); outFloat(e.falloff); outFloat(e.impulsePerLength); }
+fun checked19(owner: game.WorldNumber, selector: u32, e: game.ExplosionDescription, invoke: bool) -> game.ChainValidation = {
+    var selected: game.WorldNumber = owner; var temporary = game.WorldResult();
+    var w: ref raw.World = raw.worlds.at(owner.slot as i64); let savedId: u16 = w.worldId; let savedLock: bool = w.locked;
+    if (selector == 1u32) selected.slot = -1i32; else if (selector == 2u32) selected.slot = 128i32;
+    else if (selector == 3u32 or selector == 4u32) {
+        let old: game.WorldResult = game.createSleepWorld(math2.Vec2(),400.0f32,game.SolverWorldParameters());
+        selected = old.number; game.destroyWorld(old.number);
+        if (selector == 4u32) temporary = game.createSleepWorld(math2.Vec2(),400.0f32,game.SolverWorldParameters());
+    } else if (selector == 5u32) w.worldId = 127u16;
+    else if (selector == 6u32) selected.birthTicket.low = selected.birthTicket.low ^ 1u32;
+    else if (selector == 7u32) w.locked = true;
+    let result: game.ChainValidation = if invoke then game.explode(selected,e) else game.explosionPreflight(selected,e);
+    w.worldId = savedId; w.locked = savedLock;
+    if (temporary.status == game.OK and temporary.number.slot >= 0i32) game.destroyWorld(temporary.number);
+    return result;
+}
+fun geometry19(a: ref u32[64]) -> raw.ShapeRecord = {
+    var s = raw.ShapeRecord(); s.shapeType = a[0] as i32;
+    let r: f32 = fromBits(a[1]); let hx: f32 = fromBits(a[2]); let hy: f32 = fromBits(a[3]); let x: f32 = fromBits(a[4]); let y: f32 = fromBits(a[5]);
+    if (s.shapeType == 0i32) s.circle = math2.Circle(math2.Vec2(x,y),r);
+    else if (s.shapeType == 1i32) s.capsule = raw.Capsule(math2.Vec2(x-hx,y-hy),math2.Vec2(x+hx,y+hy),r);
+    else if (s.shapeType == 3i32) { s.polygon = mass2.b2MakeOffsetRoundedBox(hx,hy,math2.Vec2(x,y),math2.Rot(1.0f32,0.0f32),r); }
+    else if (s.shapeType == 2i32) s.segment = raw.Segment(math2.Vec2(x-hx,y-hy),math2.Vec2(x+hx,y+hy));
+    else s.chainSegment.segment = raw.Segment(math2.Vec2(x-hx,y-hy),math2.Vec2(x+hx,y+hy)); return s;
+}
+fun polygon19(a: ref u32[64]) -> raw.ShapeRecord = {
+    var s = raw.ShapeRecord(); s.shapeType = 3i32; s.polygon.count = a[0] as i32; s.polygon.radius = fromBits(a[1]);
+    var i: i32 = 0i32; while (i < s.polygon.count) { s.polygon.vertices[i] = math2.Vec2(fromBits(a[2i32+2i32*i]),fromBits(a[3i32+2i32*i])); i = i+1i32; }
+    raw.b2MakePolygon(&s.polygon); return s;
+}
+fun shapeInput19(s: ref raw.ShapeRecord, line: math2.Vec2) -> u32[39] = {
+    var p: u32[39]; p[0] = s.shapeType as u32; var proxy: distance.ShapeProxy = raw.b2MakeShapeDistanceProxy(s);
+    p[1] = proxy.count as u32; p[2] = toBits(proxy.radius); var i: i32 = 0i32;
+    while (i < proxy.count) { p[3i32+2i32*i] = toBits(proxy.points[i].x); p[4i32+2i32*i] = toBits(proxy.points[i].y); i = i+1i32; }
+    if (s.shapeType == 3i32) { i = 0i32; while (i < s.polygon.count) { p[19i32+2i32*i] = toBits(s.polygon.normals[i].x); p[20i32+2i32*i] = toBits(s.polygon.normals[i].y); i = i+1i32; } p[35] = toBits(s.polygon.centroid.x); p[36] = toBits(s.polygon.centroid.y); }
+    p[37] = toBits(line.x); p[38] = toBits(line.y); return p;
+}
+fun makeShape19(reg: ref Registers, slot: i32, parent: i32, s: raw.ShapeRecord) -> () = {
+    let result: game.ShapeResult = game.addPreparedShapeFlags12(reg.worlds[0].number,reg.bodies[parent].number,s,true,s.enablePreSolveEvents);
+    if (result.status != game.OK) fail19("DOMAIN"); reg.shapes[slot] = SavedShape(true,result.number,reg.worlds[0].number,result.id);
+}
+fun step19(reg: ref Registers, p: ref u32[26]) -> Execution = {
+    var e = Execution(); e.rawStep = game.rawSolverStep12(reg.worlds[0].number,fromBits(p[23]),p[22] as i32);
+    if (e.rawStep.status != game.OK) fail19("DOMAIN"); e.moves = raw.b2World_GetBodyEvents(reg.worlds[0].id);
+    var world: ref raw.World = raw.worlds.at(reg.worlds[0].number.slot as i64); var i: i64 = 0i64;
+    while (i < world.stepRequests.length()) { e.pairs.prepared.requests.push(world.stepRequests.at(i)); e.pairs.created.push(world.stepCreated.at(i)); i = i+1i64; }
+    reg.completedSteps = reg.completedSteps+1u32; completedPositiveSteps = completedPositiveSteps+1u32; return e;
+}
+fun reset19(reg: ref Registers) -> () = {
+    clearOperation14(); clearSolverObservations(); clearSleepObservations(); var op = Operation(); op.opcode = 600i32; clearHookObservations12(reg,op);
+    reg.regI8 = zeroI8();
+}
+fun createScene19(reg: ref Registers, p: ref u32[26]) -> () = {
+    let w: game.WorldResult = game.createSleepWorld(math2.Vec2(0.0f32,fromBits(p[25])),400.0f32,game.SolverWorldParameters());
+    if (w.status != game.OK) fail19("DOMAIN"); reg.worlds[0] = SavedWorld(true,w.number,w.id);
+    var bd = raw.BodyDef(); bd.bodyType = p[0] as i32; bd.isEnabled = (p[1]&1u32) != 0u32; bd.isAwake = (p[1]&2u32) != 0u32; bd.fixedRotation = (p[1]&4u32) != 0u32;
+    bd.position = math2.Vec2(fromBits(p[6]),fromBits(p[7])); bd.rotation = math2.Rot(fromBits(p[8]),fromBits(p[9])); bd.linearVelocity = math2.Vec2(fromBits(p[15]),fromBits(p[16])); bd.angularVelocity = fromBits(p[17]);
+    let b: game.BodyResult = game.createBody8(w.number,bd); if (b.status != game.OK) fail19("DOMAIN"); reg.bodies[0] = SavedBody(true,b.number,w.number,b.id);
+    var j: u32 = 0u32;
+    while (j < p[3]) {
+        var a: u32[64]; a[0] = p[2]; a[1] = p[10]; a[2] = p[11]; a[3] = p[12]; a[4] = toBits(fromBits(p[13])+2.0f32*(j as f32)*fromBits(p[11])); a[5] = p[14];
+        var s: raw.ShapeRecord = geometry19(&a); s.density = fromBits(p[18]); s.isSensor = (p[1]&8u32) != 0u32;
+        s.filter.categoryBits = ((p[5] as u64 << 32u64) | p[4] as u64) as i64; s.filter.maskBits = -1i64;
+        makeShape19(reg,j as i32,0i32,s); j = j+1u32;
+    }
+    if ((p[1]&16u32) != 0u32) {
+        bd.bodyType = 2i32; bd.position.x = bd.position.x+4.0f32; bd.isAwake = true; bd.isEnabled = true;
+        let other: game.BodyResult = game.createBody8(w.number,bd); reg.bodies[1] = SavedBody(true,other.number,w.number,other.id);
+        var jointShape = raw.ShapeRecord(); jointShape.circle.radius = 0.5f32; jointShape.density = fromBits(p[18]); jointShape.isSensor = (p[1]&8u32) != 0u32; jointShape.filter.categoryBits = ((p[5] as u64 << 32u64) | p[4] as u64) as i64; jointShape.filter.maskBits = -1i64;
+        makeShape19(reg,p[3] as i32,1i32,jointShape); var d = game.DistanceDescription(); d.length = 4.0f32;
+        let joint: game.JointResult = game.createDistanceJoint(w.number,b.number,other.number,d); if (joint.status != game.OK) fail19("DOMAIN");
+        joints14[0] = SavedJoint14(true,joint.number,w.number,raw.b2MakeJointId(raw.worlds.at(w.number.slot as i64),joint.number.slot),0i32);
+        if ((p[1]&2u32) == 0u32) game.setAwake(w.number,b.number,false);
+    }
+    j = 0u32; while (j < p[20]) { reset19(reg); var ignored: Execution = step19(reg,p); j = j+1u32; }
+}
+fun snapshot19(reg: ref Registers, id: u32, seq: u32, tick: u32, candidates: i32, p: ref u32[26], e: ref Execution) -> () = {
+    var i: i32 = 0i32; var nb: i32 = 0i32; var ns: i32 = 0i32; var nj: i32 = 0i32;
+    while (i < 256i32) {
+        if (liveBody(reg,i)) { prefix("S19",id,seq); outDec(tick as i32); outDec(0i32); outDec(i); outDec(14i32); outView19(raw.b2Body_GetView(reg.bodies[i].id)); newline(); } i = i+1i32;
+    }
+    var op = Operation(); op.opcode = if tick == 1u32 and p[21] == 0u32 and e.rawStep.didSolve then 31i32 else 600i32; op.dt = fromBits(p[23]); op.subStepCount = p[22] as i32; beginOutput14();
+    outState(reg,id,seq,op,e); flushOutput14();
+    i = 0i32; while (i < 16i32) { if (reg.worlds[i].saved and game.worldStatus(reg.worlds[i].number) == game.OK) { var w: ref raw.World = raw.worlds.at(reg.worlds[i].number.slot as i64); nb = nb+(w.bodyIdPool.nextIndex-w.bodyIdPool.freeCount); ns = ns+(w.shapeIdPool.nextIndex-w.shapeIdPool.freeCount); nj = nj+(w.jointIdPool.nextIndex-w.jointIdPool.freeCount); } i = i+1i32; }
+    prefix("Z19",id,seq); outDec(tick as i32); outDec(nb); outDec(ns); outDec(nj); outDec(candidates); newline();
+}
+fun trace19(reg: ref Registers, id: u32, seq: u32) -> i32 = {
+    var w: ref raw.World = raw.worlds.at(reg.worlds[0].number.slot as i64); var i: i64 = 0i64;
+    while (i < w.explosionTrace19.length()) {
+        let t: raw.ExplosionTrace19 = w.explosionTrace19.at(i); prefix("X19",id,seq); outDec(i as i32); outDec(t.shapeId); outDec(t.bodyId); outDec(t.phase); outDec(if t.phase == 2i32 then 10i32 else 1i32); outFloat(t.distance);
+        if (t.phase == 2i32) { outFloat(t.closestPoint.x); outFloat(t.closestPoint.y); outFloat(t.direction.x); outFloat(t.direction.y); outFloat(t.perimeter); outFloat(t.scale); outFloat(t.magnitude); outFloat(t.impulse.x); outFloat(t.impulse.y); } newline(); i = i+1i64;
+    }
+    return i as i32;
+}
+
+var lockOwner19: game.WorldNumber = game.WorldNumber(); var lockBody19: raw.BodyId = raw.BodyId();
+var lockCount19: u32 = 0u32; var locked19: u32 = 0u32; var beforeLock19: raw.BodyView = raw.BodyView(); var afterLock19: raw.BodyView = raw.BodyView();
+fun preSolve19(a: broad.ShapeId, b: broad.ShapeId, manifold: ref math2.Manifold, context: words64.Key64) -> bool = {
+    lockCount19 = lockCount19+1u32; locked19 = raw.worlds.at(lockOwner19.slot as i64).locked as u32;
+    beforeLock19 = raw.b2Body_GetView(lockBody19);
+    var d: game.ExplosionDescription = game.defaultExplosionDescription(); d.radius = 4.0f32; d.falloff = 2.0f32; d.impulsePerLength = 100.0f32;
+    var e: raw.ExplosionDef = definition19(d); raw.b2World_Explode(raw.WorldId((lockOwner19.slot+1i32) as u16,raw.worlds.at(lockOwner19.slot as i64).generation),&e);
+    let answer: game.ChainValidation = game.explode(lockOwner19,d); if (answer.status != game.LOCKED or answer.reason != 1i32) fail19("DOMAIN");
+    afterLock19 = raw.b2Body_GetView(lockBody19);
+    var before: u32[14] = viewWords19(beforeLock19); var after: u32[14] = viewWords19(afterLock19); var i: i32 = 0i32;
+    while (i < 14i32) { if (before[i] != after[i]) fail19("DOMAIN"); i = i+1i32; } return true;
+}
+fun native19(reg: ref Registers, selector: u32, banks: ref Bank19[2], nativeStep: ref Execution, id: u32, seq: u32) -> u32[30] = {
+    var result: u32[30]; var p: u32[26] = sceneWords19(0i32,1u32);
+    p[0] = 2u32; p[1] = 3u32; p[2] = 0u32; p[3] = 1u32; p[6] = 0u32; p[7] = 0u32; p[20] = 0u32; p[21] = 0u32; p[22] = 1u32; p[23] = toBits(1.0f32/60.0f32); p[25] = 0u32;
+    createScene19(reg,&p);
+    if (selector == 0u32) {
+        var bd = raw.BodyDef(); bd.bodyType = 2i32; bd.position.x = 0.5f32;
+        let b: game.BodyResult = game.createBody8(reg.worlds[0].number,bd); reg.bodies[1] = SavedBody(true,b.number,reg.worlds[0].number,b.id);
+        var s = raw.ShapeRecord(); s.circle.radius = 0.5f32; s.enablePreSolveEvents = true;
+        makeShape19(reg,1i32,1i32,s); raw.worlds.at(reg.worlds[0].number.slot as i64).shapes.at(0i64).enablePreSolveEvents = true;
+        lockCount19 = 0u32; lockOwner19 = reg.worlds[0].number; lockBody19 = reg.bodies[0].id;
+        var w: ref raw.World = raw.worlds.at(lockOwner19.slot as i64); w.callbacks12.preSolve = preSolve19; w.callbacks12.preInstalled = true;
+        nativeStep = step19(reg,&p); result[0] = lockCount19; result[1] = locked19;
+        var before: u32[14] = viewWords19(beforeLock19); var after: u32[14] = viewWords19(afterLock19); var i: i32 = 0i32;
+        while (i < 14i32) { result[2i32+i] = before[i]; result[16i32+i] = after[i]; i = i+1i32; }
+                                                                                     
+        return result;
+    }
+    banks[0] = save19(reg); banks[1] = banks[0]; var saved: u32[14] = viewWords19(banks[0].view); var j: i32 = 0i32;
+    while (j < 14i32) { result[j] = saved[j]; j = j+1i32; }
+    let old: SavedBody = reg.bodies[0]; let owner: SavedWorld = reg.worlds[0]; game.destroyBody(owner.number,old.number); result[14] = raw.b2Body_IsValid(old.id) as u32;
+    if (game.lookupBody(owner.number,old.number).status != game.STALE) fail19("DOMAIN");
+    var reuseDef = raw.BodyDef(); reuseDef.bodyType = 2i32; let newer: game.BodyResult = game.createBody8(owner.number,reuseDef);
+    reg.bodies[0] = SavedBody(true,newer.number,owner.number,newer.id); var reuseShape = raw.ShapeRecord(); reuseShape.circle.radius = 0.5f32; reuseShape.enablePreSolveEvents = true; makeShape19(reg,0i32,0i32,reuseShape);
+    result[15] = raw.b2Body_IsValid(old.id) as u32; if (game.lookupBody(owner.number,old.number).status != game.STALE) fail19("DOMAIN");
+    game.destroyWorld(owner.number); result[16] = raw.b2World_IsValid(owner.id) as u32; result[17] = raw.b2Body_IsValid(newer.id) as u32;
+    if (game.lookupBody(owner.number,newer.number).status != game.STALE) fail19("DOMAIN");
+    let next: game.WorldResult = game.createSleepWorld(math2.Vec2(),400.0f32,game.SolverWorldParameters()); reg.worlds[0] = SavedWorld(true,next.number,next.id);
+    result[18] = raw.b2World_IsValid(owner.id) as u32; if (game.lookupBody(owner.number,old.number).status != game.STALE) fail19("DOMAIN");
+    game.destroyWorld(next.number); return result;
+}
+fun validate19(code: u32, n: u32, a: ref u32[64], banks: ref Bank19[2]) -> () = {
+    var needed: u32 = 1u32;
+    if (code == 600u32) needed = 9u32; else if (code == 601u32 or code == 607u32) needed = 0u32; else if (code == 602u32) needed = 8u32; else if (code == 603u32) needed = 20u32; else if (code == 608u32) needed = 3u32;
+    if (n != needed) fail19("ARITY");
+    if (code == 600u32) { if (a[0] > 1u32) fail19("MODE"); if (a[1] > 7u32) fail19("SELECTOR"); }
+    if (code == 602u32) {
+        if (a[0] > 4u32) fail19("DOMAIN"); var i: i32 = 1i32;
+        while (i < 8i32) { let active: bool = not (i == 1i32 and (a[0] == 2u32 or a[0] == 4u32)) and not (a[0] == 0u32 and (i == 2i32 or i == 3i32)); if (active and not game.finite(fromBits(a[i]))) fail19("DOMAIN"); i = i+1i32; }
+        if (((a[0] == 0u32 or a[0] == 1u32 or a[0] == 3u32) and fromBits(a[1]) < 0.0f32) or (a[0] == 3u32 and (fromBits(a[2]) <= 0.0f32 or fromBits(a[3]) <= 0.0f32))) fail19("DOMAIN");
+    }
+    if (code == 603u32) {
+        if (a[0] < 3u32 or a[0] > 8u32 or not game.finite(fromBits(a[1])) or fromBits(a[1]) < 0.0f32) fail19("DOMAIN");
+        var hull = poly.Polygon(); hull.count = a[0] as i32; var hullIndex: i32 = 0i32;
+        while (hullIndex < 8i32) { if (hullIndex < hull.count) { hull.vertices[hullIndex] = math2.Vec2(fromBits(a[2i32+2i32*hullIndex]),fromBits(a[3i32+2i32*hullIndex])); if (not game.finiteVector(hull.vertices[hullIndex])) fail19("DOMAIN"); } else if (a[2i32+2i32*hullIndex] != 0u32 or a[3i32+2i32*hullIndex] != 0u32) fail19("DOMAIN"); hullIndex = hullIndex+1i32; }
+        if (not raw.b2ValidateHull(&hull) or not game.finite(fromBits(a[18])) or not game.finite(fromBits(a[19]))) fail19("DOMAIN");
+    }
+    if (code == 605u32 or code == 606u32 or code == 608u32) {
+        if (a[0] > 1u32) fail19("BANK");
+        if (code == 608u32) { if (a[1] > 13u32) fail19("FIELD"); if (((a[1] == 3u32 or a[1] == 12u32) and a[2] > 1u32) or (a[1] == 13u32 and a[2] > 2u32)) fail19("VALUE"); }
+        if (code != 605u32 and not banks[a[0] as i32].saved) fail19("BANK_EMPTY");
+    }
+    if (code == 609u32 and a[0] > 1u32) fail19("SELECTOR");
+}
+fun execute19(reg: ref Registers, banks: ref Bank19[2], p: ref u32[26], id: u32, seq: u32, code: u32, n: u32, a: ref u32[64]) -> () = {
+    if (code == 600u32 and a[0] == 0u32) { if (a[1] != 0u32 or game.explosionPreflight(reg.worlds[0].number,description19(a)).status != game.OK) fail19("DOMAIN"); }
+    reset19(reg); var result: u32[30]; var rn: i32 = 0i32; var kind: i32 = 0i32; var inCount: i32 = -1i32; var arguments: u32[39]; var status = game.ChainValidation(); var nativeStep = Execution(); var candidates: i32 = 0i32;
+    prefix("E19",id,seq); outDec(code as i32); outDec(n as i32); var i: i32 = 0i32; while (i < n as i32) { outHex(a[i]); i = i+1i32; } newline();
+    if (code == 600u32) {
+        var submitted: game.ExplosionDescription = description19(a); var e: raw.ExplosionDef = definition19(submitted);
+        if (a[0] == 1u32) status = checked19(reg.worlds[0].number,a[1],submitted,true); else raw.b2World_Explode(reg.worlds[0].id,&e);
+        if (status.status == game.OK) candidates = trace19(reg,id,seq);
+        if (a[0] == 1u32) e = definition19(submitted);
+        arguments[0] = e.maskBits.low; arguments[1] = e.maskBits.high; arguments[2] = toBits(e.position.x); arguments[3] = toBits(e.position.y); arguments[4] = toBits(e.radius); arguments[5] = toBits(e.falloff); arguments[6] = toBits(e.impulsePerLength); inCount = 7i32;
+    } else if (code == 601u32) {
+        let e: game.ExplosionDescription = game.defaultExplosionDescription(); result[0] = e.maskBits.low; result[1] = e.maskBits.high; result[2] = toBits(e.position.x); result[3] = toBits(e.position.y); result[4] = toBits(e.radius); result[5] = toBits(e.falloff); result[6] = toBits(e.impulsePerLength); kind = 1i32; rn = 7i32; inCount = 0i32;
+    } else if (code == 602u32 or code == 603u32) {
+        var s: raw.ShapeRecord = if code == 602u32 then geometry19(a) else polygon19(a); let line: math2.Vec2 = if code == 602u32 then math2.Vec2(fromBits(a[6]),fromBits(a[7])) else math2.Vec2(fromBits(a[18]),fromBits(a[19]));
+        let c: math2.Vec2 = raw.b2GetShapeCentroid(&s); result[0] = toBits(raw.b2GetShapePerimeter(&s)); result[1] = toBits(raw.b2GetShapeProjectedPerimeter(&s,line)); result[2] = toBits(c.x); result[3] = toBits(c.y); arguments = shapeInput19(&s,line); kind = 2i32; rn = 4i32; inCount = 39i32;
+    } else if (code == 605u32) banks[a[0] as i32] = save19(reg);
+    else if (code == 606u32) { kind = 3i32; rn = 19i32; }
+    else if (code == 608u32) edit19(&banks[a[0] as i32],a[1],a[2]);
+    else if (code == 609u32) { result = native19(reg,a[0],banks,&nativeStep,id,seq); kind = if a[0] == 0u32 then 4i32 else 5i32; rn = if a[0] == 0u32 then 30i32 else 19i32; }
+    prefix("A19",id,seq); outDec(code as i32); outDec(status.status); outDec(status.reason); newline();
+    prefix("R19",id,seq); outDec(code as i32); outDec(kind); outDec(rn);
+    if (code == 606u32) outBank19(banks[a[0] as i32]); else { i = 0i32; while (i < rn) { outHex(result[i]); i = i+1i32; } } newline();
+    if (inCount >= 0i32) { prefix("I19",id,seq); outDec(inCount); i = 0i32; while (i < inCount) { outHex(arguments[i]); i = i+1i32; } newline(); }
+    i = 0i32; while (i < 2i32) { if (banks[i].saved) { prefix("V19",id,seq); outDec(i); outDec(19i32); outBank19(banks[i]); newline(); } i = i+1i32; }
+    if (code == 609u32 and a[0] == 0u32) {
+                                                                                     
+                                                                            
+        var nativeWorld: ref raw.World = raw.worlds.at(reg.worlds[0].number.slot as i64);
+        nativeWorld.callbacks12.preSolve = raw.b2DefaultPreSolve12;
+        nativeWorld.callbacks12.preInstalled = false; nativeWorld.callbacks12.preContext = words64.Key64();
+                                                                            
+                                                                                 
+        nativeWorld.hookTrace12.clear();
+        snapshot19(reg,id,seq,1u32,0i32,p,&nativeStep);
+        reset19(reg); game.destroyWorld(reg.worlds[0].number);
+        var emptyStep = Execution(); snapshot19(reg,id,seq,0u32,0i32,p,&emptyStep); return;
+    }
+    if (code == 607u32 and p[21] != 0u32) {
+        var tick: u32 = 1u32; while (tick <= p[21]) { reset19(reg); var e: Execution = step19(reg,p); snapshot19(reg,id,seq,tick,0i32,p,&e); tick = tick+1u32; }
+    } else snapshot19(reg,id,seq,0u32,candidates,p,&nativeStep);
+}
+fun argumentEquals19(p: cptr char, text: str) -> bool = {
+    let t: cptr char = builtins.ptr_from_slice[char](text) as cptr char; var i: i64 = 0i64;
+    while (i < text.length()) { if (p[i] != t[i]) return false; i = i+1i64; } return p[i] == '\0';
+}
+fun main(argc: i32, argv: cptr cptr char) -> i64 = {
+    var diagnostic: bool = false; if (argc == 2i32 and argumentEquals19(argv[1],"--diagnostic")) diagnostic = true; else if (argc != 1i32) fail19("HEADER");
+    var header: Line19 = read19(); if (header.count != 4i32 or not tag19(&header,0i32,"PORT19")) fail19("HEADER"); if (not tag19(&header,1i32,"A")) fail19("PART");
+    var profile: i32 = -1i32; if (tag19(&header,2i32,"DIRECT")) profile = 0i32; else if (tag19(&header,2i32,"PUBLIC")) profile = 1i32; else if (tag19(&header,2i32,"GUARD")) profile = 2i32; if (profile < 0i32) fail19("PROFILE");
+    let count: u32 = number19(&header,3i32); let full: u32 = if profile == 1i32 then 32u32 else 48u32;
+    if (count == 0u32 or count > full or (not diagnostic and count != full)) fail19("N");
+    profile13C = 14i32; initialRow13 = false; initialTagged13 = true; var previous: u32 = 0u32; var ci: u32 = 0u32;
+    while (ci < count) {
+        var row: Line19 = read19(); if (row.count != 3i32 or not tag19(&row,0i32,"C")) fail19("CASE");
+        let id: u32 = number19(&row,1i32); let calls: u32 = number19(&row,2i32); if (id == 0u32 or id > full or id <= previous or (not diagnostic and id != ci+1u32)) fail19("ID"); previous = id;
+        let expected: u32 = if profile == 2i32 then 0u32 else (if profile == 0i32 or id == 23u32 or id == 24u32 then 1u32 else 9u32);
+        if ((profile == 2i32 and calls != 0u32) or (profile != 2i32 and (calls == 0u32 or calls > 32u32 or (not diagnostic and calls != expected)))) fail19("COUNT");
+        var reg = Registers(); var banks: Bank19[2] = zeroBanks19(); joints14 = zeroJoints14(); copies14 = zeroCopies14(); completedPositiveSteps = 0u32;
+        var p: u32[26] = sceneWords19(if profile == 1i32 then 1i32 else 0i32,if profile == 2i32 then 1u32 else id);
+        if (not (profile == 1i32 and (id == 23u32 or id == 24u32))) createScene19(&reg,&p);
+        outputString14("CASE"); outDec(id as i32); outDec(calls as i32); newline();
+        var s: u32 = 0u32; let total: u32 = if profile == 2i32 then 2u32 else calls;
+        while (s < total) {
+            var op: Line19 = read19(); let guard: bool = profile == 2i32;
+            if (op.count < 4i32 or not tag19(&op,0i32,if guard then "G" else "O")) fail19(if guard then "GUARD" else "SEQ");
+            let seq: u32 = number19(&op,1i32); let code: u32 = number19(&op,2i32); let n: u32 = number19(&op,3i32);
+            if (seq != (if guard then s else s+1u32)) fail19(if guard then "GUARD" else "SEQ");
+            if (code < 600u32 or code > 609u32 or code == 604u32) fail19("OPCODE"); if (n > 64u32 or op.count != 4i32+n as i32) fail19("ARITY");
+            var a: u32[64]; var i: i32 = 0i32; while (i < n as i32) { a[i] = number19(&op,4i32+i,true); i = i+1i32; }
+            if (guard) {
+                if (code != 600u32 or n != 9u32 or a[0] != 1u32) fail19("GUARD"); if (a[1] > 7u32) fail19("SELECTOR");
+                prefix("G19",id,s); outDec(600i32); outDec(9i32); i = 0i32; while (i < 9i32) { outHex(a[i]); i = i+1i32; } newline();
+                let answer: game.ChainValidation = checked19(reg.worlds[0].number,a[1],description19(&a),false); prefix("GA19",id,s); outDec((answer.status == game.OK) as i32); outDec(answer.status); outDec(answer.reason); newline();
+            } else { validate19(code,n,&a,&banks); execute19(&reg,&banks,&p,id,s+1u32,code,n,&a); }
+            s = s+1u32;
+        }
+        outputString14("ENDCASE"); outDec(id as i32); newline(); cleanup(&reg); ci = ci+1u32;
+    }
+    if (io.readCharCode() >= 0i32) fail19("TRAILING_DATA"); outputString14("END"); outDec(count as i32); newline(); return 0i64;
+}

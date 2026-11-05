@@ -1,0 +1,33 @@
+                                                 
+                                                                      
+                                                                      
+import fizyka.kola as math2;
+import fizyka.swiat as raw;
+import fizyka.gra as game;
+import core.primitive_io as io;
+
+fun outUnsigned(value: u64) -> () = {
+    if (value >= 10u64) outUnsigned(value / 10u64);
+    io.writeChar(('0' as u64 + value % 10u64) as char);
+}
+fun main() -> i64 = {
+    var parameters = game.SolverWorldParameters(); parameters.gravity = math2.Vec2();
+    let owner: game.WorldResult = game.createSleepWorld(parameters.gravity, parameters.maximumLinearSpeed, parameters, true);
+    var bodyDef = raw.BodyDef(); bodyDef.bodyType = 2i32;
+    let first: game.BodyResult = game.createBody8(owner.number, bodyDef);
+    let middle: game.BodyResult = game.createBody8(owner.number, bodyDef);
+    let moved: game.BodyResult = game.createBody8(owner.number, bodyDef);
+    if (owner.status != game.OK or first.status != game.OK or middle.status != game.OK or moved.status != game.OK) return 2i64;
+    let stepped: game.StepResult = game.step(owner.number, game.StepParameters(0.125f32, 1i32));
+    if (stepped.status != game.OK) return 2i64;
+    var world: ref raw.World = raw.worlds.at(owner.number.slot as i64);
+    let islandId: i32 = world.bodies.at(middle.number.slot as i64).islandId;
+    let movedIsland: i32 = world.bodies.at(moved.number.slot as i64).islandId;
+    raw.b2TrySleepIsland(world, islandId);
+    io.writeStr("LOCAL11 "); outUnsigned(raw.b2GetSolverSet(world, 2i32).bodyCount as u64);
+    io.writeChar(' '); outUnsigned(world.bodies.at(moved.number.slot as i64).localIndex as u64);
+    io.writeChar(' '); outUnsigned(world.islands.at(movedIsland as i64).localIndex as u64); io.writeChar('\n');
+                                                                         
+                                                                            
+    return 0i64;
+}

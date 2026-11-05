@@ -1,0 +1,1188 @@
+                                                            
+                                                                          
+                                         
+                              
+import fizyka.swiat as raw;
+import fizyka.gra as game;
+import fizyka.kola as math2;
+import fizyka.szeroka as broad;
+import fizyka.zbior as words64;
+import fizyka.ruch as mass2;
+import core.primitive_io as io;
+import core.builtins as builtins;
+import portbase as base;
+
+                                                                   
+fun toBits17(value: f32) -> u32 = { var word: f32 = value; return (&word as cptr u32)[0]; }
+fun fromBits17(value: u32) -> f32 = { var word: u32 = value; return (&word as cptr f32)[0]; }
+fun unsigned17(value: u64) -> () = {
+    if (value >= 10u64) unsigned17(value/10u64);
+    base.outputChar14(('0' as u64+value%10u64) as char);
+}
+fun decimal17(value: i32) -> () = { base.outputChar14(' '); unsigned17(value as u64); }
+fun hex17(value: u32) -> () = {
+    base.outputChar14(' '); var shift: i32 = 28i32;
+    while (shift >= 0i32) {
+        let digit: u32 = (value >> shift as u32) & 15u32;
+        base.outputChar14((if digit < 10u32 then 48u32+digit else 87u32+digit) as char); shift = shift-4i32;
+    }
+}
+fun pair17(value: words64.Key64) -> () = { hex17(value.low); hex17(value.high); }
+fun prefix17(tag: str, id: u32, seq: u32) -> () = {
+    base.currentOutputRank14 = if base.sameText13(tag,"E17") or base.sameText13(tag,"E16") or base.sameText13(tag,"G17") then 0i32 else (if base.sameText13(tag,"Q17") then 90i32 else (if base.sameText13(tag,"R17") or base.sameText13(tag,"R16") then 199i32 else (if base.sameText13(tag,"U17") then 1281i32 else (if base.sameText13(tag,"W17") then 1282i32 else 1280i32))));
+    base.outputString14(tag); decimal17(id as i32); decimal17(seq as i32); }
+fun newline17() -> () = { base.outputChar14('\n'); }
+fun rawId17(value: broad.ShapeId) -> () = { hex17(value.index1 as u32); hex17(value.world0 as u32); hex17(value.generation as u32); }
+fun number17(value: game.ShapeNumber) -> () = { hex17(value.slot as u32); pair17(value.birthTicket); pair17(value.ownerTicket); }
+fun echo17(id: u32, seq: u32, opcode: i32, count: i32, words: ref u32[64]) -> () = {
+    prefix17(if opcode >= 400i32 then "E17" else "E16",id,seq); decimal17(opcode); decimal17(count); var i: i32 = 0i32;
+    while (i < count) { hex17(words[i]); i = i+1i32; } newline17();
+}
+fun answer17(id: u32, seq: u32, opcode: i32, status: i32, reason: i32, count: i32, words: ref u32[64]) -> () = {
+    prefix17(if opcode >= 300i32 and opcode < 400i32 then "R16" else "R17",id,seq); decimal17(opcode); decimal17(status); decimal17(reason); decimal17(count);
+    var i: i32 = 0i32; while (i < count) { hex17(if status == game.OK then words[i] else 0u32); i = i+1i32; } newline17();
+}
+                                                                                                                 
+fun shapeDescription17(words: ref u32[64]) -> raw.ShapeRecord = {
+    var value = raw.ShapeRecord(); value.shapeType = words[3] as i32;
+    if (value.shapeType == 0i32) value.circle = math2.Circle(math2.Vec2(fromBits17(words[4]),fromBits17(words[5])),fromBits17(words[6]));
+    if (value.shapeType == 1i32) value.capsule = raw.Capsule(math2.Vec2(fromBits17(words[4]),fromBits17(words[5])),math2.Vec2(fromBits17(words[6]),fromBits17(words[7])),fromBits17(words[8]));
+    if (value.shapeType == 2i32) value.segment = raw.Segment(math2.Vec2(fromBits17(words[4]),fromBits17(words[5])),math2.Vec2(fromBits17(words[6]),fromBits17(words[7])));
+    if (value.shapeType == 3i32) {
+        value.polygon.count = words[4] as i32; value.polygon.radius = fromBits17(words[5]); var i: i32 = 0i32;
+        while (i < 8i32) { value.polygon.vertices[i] = math2.Vec2(fromBits17(words[6i32+2i32*i]),fromBits17(words[7i32+2i32*i])); i = i+1i32; }
+    }
+    value.density = fromBits17(words[44]); value.friction = fromBits17(words[45]); value.restitution = fromBits17(words[46]);
+    value.rollingResistance = fromBits17(words[47]); value.tangentSpeed = fromBits17(words[48]); value.userMaterialId = words[49] as i32;
+    value.filter.categoryBits = ((words[51] as u64 << 32u64) | words[50] as u64) as i64;
+    value.filter.maskBits = ((words[53] as u64 << 32u64) | words[52] as u64) as i64; value.filter.groupIndex = words[54] as i32;
+    value.enableContactEvents = words[56] != 0u32; value.enableHitEvents = words[57] != 0u32;
+    value.isSensor = words[59] != 0u32; value.enableSensorEvents = words[60] != 0u32; value.enablePreSolveEvents = words[62] != 0u32;
+    return value;
+}
+fun boxDescription17(words: ref u32[64]) -> game.BoxGeometry = {
+    return game.BoxGeometry(fromBits17(words[4]),fromBits17(words[5]),math2.Vec2(fromBits17(words[6]),fromBits17(words[7])),
+        math2.Rot(fromBits17(words[8]),fromBits17(words[9])),fromBits17(words[10]));
+}
+                                                                                
+fun create17(owner: game.WorldNumber, parent: game.BodyNumber, parentId: raw.BodyId, words: ref u32[64]) -> game.ShapeResult = {
+    var shape: raw.ShapeRecord = shapeDescription17(words);
+    let invoke: bool = words[55] != 0u32;
+    if (words[58] != 0u32) {
+        if (words[3] == 4u32) return game.addBoxFlags12(owner,parent,boxDescription17(words),shape,invoke,true);
+        return game.addShapeFlags12(owner,parent,shape,invoke,true);
+    }
+    if (words[3] == 4u32) {
+        let boxShape: game.BoxGeometry = boxDescription17(words); shape.shapeType = 3i32;
+        shape.polygon = mass2.b2MakeOffsetRoundedBox(boxShape.halfWidth,boxShape.halfHeight,boxShape.center,boxShape.rotation,boxShape.radius);
+    }
+    if (words[3] == 3u32) raw.b2MakePolygon(&shape.polygon);
+    var result = game.ShapeResult(); result.status = game.OK;
+    if (game.ticketLimit(game.lastIssued)) { result.status = game.LIMIT; return result; }
+    let ticket: words64.Key64 = game.nextTicket(game.lastIssued);
+    result.id = raw.b2CreateShape(parentId,shape,words[61] != 0u32,invoke);
+    if (result.id.index1 != 0i32) {
+        let slot: i32 = result.id.index1-1i32;
+        raw.worlds.at(parentId.world0 as i64).shapes.at(slot as i64).birthTicket = ticket;
+        game.lastIssued = ticket; result.number = game.ShapeNumber(slot,ticket,owner.birthTicket);
+    }
+    return result;
+}
+fun setEvents17(mode: i32, owner: game.WorldNumber, number: game.ShapeNumber, id: broad.ShapeId, flag: bool) -> game.SensorAction = {
+    if (mode == 0i32) { raw.b2Shape_EnableSensorEvents(id,flag); return game.SensorAction(); }
+    let status: i32 = game.enableSensorEvents(owner,number,flag);
+    return game.SensorAction(status,if status == game.LOCKED then 1i32 else 0i32);
+}
+fun readMeta17(mode: i32, owner: game.WorldNumber, number: game.ShapeNumber, id: broad.ShapeId, kind: i32) -> game.SensorMeta = {
+    if (mode == 1i32) {
+        if (kind == 0i32) return game.isSensor(owner,number);
+        if (kind == 1i32) return game.areSensorEventsEnabled(owner,number);
+        return game.sensorCapacity(owner,number);
+    }
+    if (kind == 0i32) return game.SensorMeta(game.OK,0i32,raw.b2Shape_IsSensor(id) as i32);
+    if (kind == 1i32) return game.SensorMeta(game.OK,0i32,raw.b2Shape_AreSensorEventsEnabled(id) as i32);
+    return game.SensorMeta(game.OK,0i32,raw.b2Shape_GetSensorCapacity(id));
+}
+fun touch17(value: raw.SensorEvent) -> game.SensorTouch = { return game.sensorTouch17(value); }
+                                                                                             
+fun overlaps17(mode: i32, owner: game.WorldNumber, number: game.ShapeNumber, id: broad.ShapeId, capacity: i32) -> game.SensorOverlaps = {
+    if (mode == 1i32) return game.sensorOverlaps(owner,number);
+    var result = game.SensorOverlaps(); result.status = game.OK;
+    var world: ref raw.World = raw.worlds.at(id.world0 as i64);
+    if (world.locked) return result;
+    let index: i32 = world.shapes.at((id.index1-1i32) as i64).sensorIndex;
+    if (index == -1i32) return result;
+    var i: i64 = 0i64;
+    while (i < capacity as i64 and i < world.sensors.at(index as i64).overlaps2.length()) {
+        let r: raw.ShapeRef = world.sensors.at(index as i64).overlaps2.at(i);
+        result.values.push(game.SensorOverlap(broad.ShapeId(r.shapeId+1i32,world.worldId,r.generation),game.ShapeNumber(r.shapeId,r.birthTicket,world.birthTicket)));
+        i = i+1i64;
+    }
+    return result;
+}
+fun zeroCopyWords17() -> u32[16] = { var values: u32[16]; return values; }
+class CopyWords17 { words: u32[16] = zeroCopyWords17(); }
+fun emptyCopyWords17() -> List[CopyWords17] = { var values: List[CopyWords17]; return values; }
+class EventBank17 { saved: bool = false; beginEvents: List[CopyWords17] = emptyCopyWords17(); endEvents: List[CopyWords17] = emptyCopyWords17(); }
+class OverlapBank17 { saved: bool = false; sensorSlot: i32 = 0i32; values: List[CopyWords17] = emptyCopyWords17(); }
+fun eventBanks17() -> EventBank17[4] = { var values: EventBank17[4]; return values; }
+fun overlapBanks17() -> OverlapBank17[4] = { var values: OverlapBank17[4]; return values; }
+class Banks17 { events: EventBank17[4] = eventBanks17(); overlaps: OverlapBank17[4] = overlapBanks17(); }
+                                                                                                 
+fun storeNumber17(words: ref u32[16], offset: i32, value: game.ShapeNumber) -> () = {
+    words[offset] = value.slot as u32; words[offset+1i32] = value.birthTicket.low; words[offset+2i32] = value.birthTicket.high;
+    words[offset+3i32] = value.ownerTicket.low; words[offset+4i32] = value.ownerTicket.high;
+}
+fun touchPacket17(value: game.SensorTouch) -> CopyWords17 = {
+    var result = CopyWords17(); result.words[0] = value.sensorId.index1 as u32; result.words[1] = value.sensorId.world0 as u32; result.words[2] = value.sensorId.generation as u32;
+    result.words[3] = value.visitorId.index1 as u32; result.words[4] = value.visitorId.world0 as u32; result.words[5] = value.visitorId.generation as u32;
+    storeNumber17(&result.words,6i32,value.sensor); storeNumber17(&result.words,11i32,value.visitor); return result;
+}
+fun overlapPacket17(value: game.SensorOverlap) -> CopyWords17 = {
+    var result = CopyWords17(); result.words[0] = value.id.index1 as u32; result.words[1] = value.id.world0 as u32; result.words[2] = value.id.generation as u32;
+    storeNumber17(&result.words,3i32,value.number); return result;
+}
+                                                                                              
+fun saveEvents17(banks: ref Banks17, slot: i32, mode: i32, owner: game.WorldNumber, id: raw.WorldId) -> game.SensorAction = {
+    var value = game.SensorEventCopy();
+    if (mode == 1i32) value = game.copySensorEvents(owner);
+    else {
+        value.status = game.OK; var events: raw.SensorEvents = raw.b2World_GetSensorEvents(id); var i: i64 = 0i64;
+        while (i < events.beginEvents.length()) { value.beginEvents.push(touch17(events.beginEvents.at(i))); i = i+1i64; }
+        var j: i64 = 0i64; while (j < events.endEvents.length()) { value.endEvents.push(touch17(events.endEvents.at(j))); j = j+1i64; }
+    }
+    let status: i32 = value.status; let reason: i32 = value.reason;
+    if (status == game.OK) {
+        var saved = EventBank17(); saved.saved = true; var bi: i64 = 0i64; var ei: i64 = 0i64;
+        while (bi < value.beginEvents.length()) { saved.beginEvents.push(touchPacket17(value.beginEvents.at(bi))); bi = bi+1i64; }
+        while (ei < value.endEvents.length()) { saved.endEvents.push(touchPacket17(value.endEvents.at(ei))); ei = ei+1i64; }
+        banks.events[slot] = move saved;
+    }
+    return game.SensorAction(status,reason);
+}
+fun saveOverlaps17(banks: ref Banks17, slot: i32, owner: game.WorldNumber, number: game.ShapeNumber) -> game.SensorAction = {
+    var value: game.SensorOverlaps = game.sensorOverlaps(owner,number); let status: i32 = value.status; let reason: i32 = value.reason;
+    if (status == game.OK) {
+        var saved = OverlapBank17(); saved.saved = true; saved.sensorSlot = number.slot; var i: i64 = 0i64;
+        while (i < value.values.length()) { saved.values.push(overlapPacket17(value.values.at(i))); i = i+1i64; }
+        banks.overlaps[slot] = move saved;
+    }
+    return game.SensorAction(status,reason);
+}
+                                                                                                       
+fun editCopy17(banks: ref Banks17, kind: i32, bank: i32, list: i32, index: i32, field: i32, word: u32) -> () = {
+    if (kind == 0i32) {
+        if (list == 0i32) banks.events[bank].beginEvents.at(index as i64).words[field] = word;
+        else banks.events[bank].endEvents.at(index as i64).words[field] = word;
+    } else banks.overlaps[bank].values.at(index as i64).words[field] = word;
+}
+fun list17(id: u32, seq: u32, source: i32, bank: i32, kind: i32, sensorSlot: i32, count: i32) -> () = {
+    prefix17("L17",id,seq); base.currentOutputRank14 = 1280i32; decimal17(source); decimal17(bank); decimal17(kind); decimal17(sensorSlot); decimal17(count); newline17();
+}
+fun touchWords17(value: game.SensorTouch) -> () = { rawId17(value.sensorId); rawId17(value.visitorId); number17(value.sensor); number17(value.visitor); }
+fun touches17(id: u32, seq: u32, source: i32, bank: i32, kind: i32, values: ref List[raw.SensorEvent]) -> i32 = {
+    list17(id,seq,source,bank,kind,0i32,values.length() as i32); var i: i64 = 0i64;
+    while (i < values.length()) {
+        prefix17("T17",id,seq); base.currentOutputRank14 = 1280i32; decimal17(source); decimal17(bank); decimal17(kind); decimal17(0i32); decimal17(i as i32); decimal17(16i32);
+        touchWords17(touch17(values.at(i))); newline17(); i = i+1i64;
+    }
+    return values.length() as i32;
+}
+fun overlapRows17(id: u32, seq: u32, source: i32, bank: i32, sensorSlot: i32, values: ref List[game.SensorOverlap]) -> i32 = {
+    list17(id,seq,source,bank,2i32,sensorSlot,values.length() as i32); var i: i64 = 0i64;
+    while (i < values.length()) {
+        prefix17("T17",id,seq); base.currentOutputRank14 = 1280i32; decimal17(source); decimal17(bank); decimal17(2i32); decimal17(sensorSlot); decimal17(i as i32); decimal17(8i32);
+        let value: game.SensorOverlap = values.at(i); rawId17(value.id); number17(value.number); newline17(); i = i+1i64;
+    }
+    return values.length() as i32;
+}
+fun savedRows17(id: u32, seq: u32, banks: ref Banks17) -> i32 = {
+    var rows: i32 = 0i32; var k: i32 = 0i32;
+    while (k < 4i32) {
+        if (banks.events[k].saved) {
+            rows = rows+packetRows17(id,seq,k,0i32,0i32,16i32,&banks.events[k].beginEvents);
+            rows = rows+packetRows17(id,seq,k,1i32,0i32,16i32,&banks.events[k].endEvents);
+        }
+        if (banks.overlaps[k].saved) rows = rows+packetRows17(id,seq,k,2i32,banks.overlaps[k].sensorSlot,8i32,&banks.overlaps[k].values);
+        k = k+1i32;
+    }
+    return rows;
+}
+fun packetRows17(id: u32, seq: u32, bank: i32, list: i32, sensorSlot: i32, count: i32, values: ref List[CopyWords17]) -> i32 = {
+    list17(id,seq,2i32,bank,list,sensorSlot,values.length() as i32); var i: i64 = 0i64;
+    while (i < values.length()) {
+        prefix17("T17",id,seq); base.currentOutputRank14 = 1280i32; decimal17(2i32); decimal17(bank); decimal17(list); decimal17(sensorSlot); decimal17(i as i32); decimal17(count);
+        var k: i32 = 0i32; while (k < count) { hex17(values.at(i).words[k]); k = k+1i32; } newline17(); i = i+1i64;
+    }
+    return values.length() as i32;
+}
+fun defaults17(kind: i32) -> u32[64] = {
+    var value = raw.ShapeRecord(); if (kind == 1i32) value = game.sensorDescription(value);
+    var words: u32[64]; words[0] = toBits17(value.density); words[1] = value.isSensor as u32; words[2] = value.enableSensorEvents as u32;
+    words[3] = value.enableContactEvents as u32; words[4] = value.enableHitEvents as u32; words[5] = value.enablePreSolveEvents as u32; return words;
+}
+fun compareRefs17(words: ref u32[64]) -> i32 = {
+    return raw.b2CompareShapeRefs(raw.ShapeRef(words[1] as i32,words[2] as u16,words64.Key64()),raw.ShapeRef(words[3] as i32,words[4] as u16,words64.Key64()));
+}
+fun guard17(id: u32, phase: u32, status: i32, reason: i32, accepted: bool) -> () = {
+    prefix17("G17",id,phase); decimal17(status); decimal17(reason); decimal17(accepted as i32); decimal17(0i32); newline17();
+}
+                                                                                          
+fun beginOperation17(world: ref raw.World) -> () = { world.sensorQueryTrace.clear(); }
+                                                                                                           
+fun queries17(id: u32, seq: u32, worldRegister: i32, world: ref raw.World) -> () = {
+    var i: i64 = 0i64;
+    let count: i64 = if guardObserving17 then guardQueries17.length() else world.sensorQueryTrace.length();
+    while (i < count) {
+        let q: raw.SensorQueryTrace = if guardObserving17 then guardQueries17.at(i) else world.sensorQueryTrace.at(i);
+        prefix17("Q17",id,seq); decimal17(worldRegister); decimal17(i as i32); decimal17(4i32);
+        hex17(q.sensorSlot as u32); hex17(q.visitorSlot as u32); hex17(q.treeType as u32); hex17(toBits17(q.distance)); newline17(); i = i+1i64;
+    }
+}
+                                                                                                
+                                                                               
+                                                                                          
+fun flagRow17(id: u32, seq: u32, wr: i32, slot: i32, shape: broad.ShapeId) -> () = {
+    prefix17("V17",id,seq); decimal17(wr); decimal17(slot); decimal17(2i32);
+    hex17(raw.b2Shape_IsSensor(shape) as u32); hex17(raw.b2Shape_AreSensorEventsEnabled(shape) as u32); newline17();
+}
+fun currentRows17(reg: ref base.Registers, id: u32, seq: u32, worldRegister: i32, world: ref raw.World) -> i32 = {
+    var seen: List[bool]; var i: i64 = 0i64; while (i < world.shapes.length()) { seen.push(false); i = i+1i64; }
+    var sr: i32 = 0i32;
+    while (sr < 512i32) {
+        if (base.liveShape(reg,sr) and reg.shapes[sr].id.world0 == world.worldId) {
+            let slot: i32 = reg.shapes[sr].id.index1-1i32;
+            if (not seen.at(slot as i64)) { flagRow17(id,seq,worldRegister,slot,reg.shapes[sr].id); seen.at(slot as i64) = true; }
+        } sr = sr+1i32;
+    }
+    var si0: i64 = 0i64; while (si0 < world.shapes.length()) {
+        if (world.shapes.at(si0).id != -1i32 and not seen.at(si0)) flagRow17(id,seq,worldRegister,si0 as i32,raw.b2MakeShapeId(world,si0 as i32));
+        si0 = si0+1i64;
+    }
+    var events: raw.SensorEvents = raw.b2World_GetSensorEvents(raw.WorldId((world.worldId+1u16),world.generation));
+    var rows: i32 = touches17(id,seq,0i32,worldRegister,0i32,&events.beginEvents);
+    rows = rows+touches17(id,seq,0i32,worldRegister,1i32,&events.endEvents);
+    var si: i64 = 0i64;
+    while (si < world.shapes.length()) {
+        if (world.shapes.at(si).id != -1i32 and world.shapes.at(si).sensorIndex != -1i32) {
+            let sensorId: broad.ShapeId = raw.b2MakeShapeId(world,si as i32);
+            var overlaps: game.SensorOverlaps = overlaps17(0i32,game.WorldNumber(),game.ShapeNumber(),sensorId,raw.b2Shape_GetSensorCapacity(sensorId));
+            rows = rows+overlapRows17(id,seq,0i32,worldRegister,si as i32,&overlaps.values);
+        }
+        si = si+1i64;
+    }
+    return rows;
+}
+fun privatePrefix17(id: u32, seq: u32, worldRegister: i32, sensorIndex: i32, group: i32, index: i32, count: i32) -> () = {
+    prefix17("U17",id,seq); decimal17(worldRegister); decimal17(sensorIndex); decimal17(group); decimal17(index); decimal17(count);
+}
+fun refs17(id: u32, seq: u32, worldRegister: i32, sensorIndex: i32, group: i32, values: ref List[raw.ShapeRef]) -> () = {
+    var i: i64 = 0i64;
+    while (i < values.length()) {
+        let value: raw.ShapeRef = values.at(i);
+        privatePrefix17(id,seq,worldRegister,sensorIndex,group,i as i32,4i32);
+        hex17(value.shapeId as u32); hex17(value.generation as u32); pair17(value.birthTicket); newline17(); i = i+1i64;
+    }
+}
+fun physicalEnd17(id: u32, seq: u32, worldRegister: i32, group: i32, values: ref List[raw.SensorEvent]) -> () = {
+    var i: i64 = 0i64;
+    while (i < values.length()) {
+        privatePrefix17(id,seq,worldRegister,0i32,group,i as i32,16i32); touchWords17(touch17(values.at(i))); newline17(); i = i+1i64;
+    }
+}
+fun privateRows17(id: u32, seq: u32, worldRegister: i32, world: ref raw.World) -> () = {
+    var i: i64 = 0i64;
+    while (i < world.sensors.length()) {
+        var sensor: ref raw.Sensor = world.sensors.at(i);
+        privatePrefix17(id,seq,worldRegister,i as i32,0i32,0i32,3i32);
+        hex17(sensor.shapeId as u32); hex17(sensor.overlaps1.length() as u32); hex17(sensor.overlaps2.length() as u32); newline17();
+        refs17(id,seq,worldRegister,i as i32,1i32,&sensor.overlaps1); refs17(id,seq,worldRegister,i as i32,2i32,&sensor.overlaps2); i = i+1i64;
+    }
+    var k: i32 = 0i32;
+    while (k < world.sensorEventBits.blockCount) {
+        privatePrefix17(id,seq,worldRegister,0i32,3i32,k,2i32); pair17(world.sensorEventBits.bits.at(k as i64)); newline17(); k = k+1i32;
+    }
+    physicalEnd17(id,seq,worldRegister,4i32,&world.sensorEndEvents0); physicalEnd17(id,seq,worldRegister,5i32,&world.sensorEndEvents1);
+}
+fun counters17(id: u32, seq: u32, worldRegister: i32, listRows: i32, world: ref raw.World) -> () = {
+    prefix17("W17",id,seq); decimal17(worldRegister); decimal17(8i32);
+    hex17(world.sensors.length() as u32); hex17(world.sensorBeginEvents.length() as u32);
+    hex17(world.sensorEndEvents0.length() as u32); hex17(world.sensorEndEvents1.length() as u32); hex17(world.endEventArrayIndex as u32);
+    hex17(world.sensorEventBits.blockCount as u32); hex17((if guardObserving17 then guardQueries17.length() else world.sensorQueryTrace.length()) as u32); hex17(listRows as u32); newline17();
+}
+                                                                                    
+fun fail17(kind: str) -> () = {
+    if (not base.inputOk) return;
+    base.inputOk = false;
+    let a: str = "PORT17: INPUT_"; let lf: str = "\n";
+    base.write(2i32,builtins.ptr_from_slice[char](a) as cptr char,a.length() as u64);
+    base.write(2i32,builtins.ptr_from_slice[char](kind) as cptr char,kind.length() as u64);
+    base.write(2i32,builtins.ptr_from_slice[char](lf) as cptr char,1u64);
+}
+
+fun tokens17() -> i32 = { var n: i32 = 1i32; var i: i32 = 0i32; while (i < base.rowLength) { if (base.rowBytes[i] == 32i32) n = n+1i32; i = i+1i32; } return n; }
+fun range17(value: u32, limit: u32) -> bool = { if (value >= limit) { fail17("REGISTER_RANGE"); return false; } return true; }
+fun world17(reg: ref base.Registers, value: u32) -> bool = { if (not range17(value,16u32)) return false; if (not reg.worlds[value as i32].saved) { fail17("REGISTER_UNINITIALIZED"); return false; } return true; }
+fun shape17(reg: ref base.Registers, value: u32) -> bool = { if (not range17(value,512u32)) return false; if (not reg.shapes[value as i32].saved) { fail17("REGISTER_UNINITIALIZED"); return false; } return true; }
+fun boolean17(value: u32) -> () = { if (value > 1u32) fail17("BOOL"); }
+fun mode17(value: u32) -> () = { if (value > 1u32) fail17("MODE"); }
+fun arity17(code: i32) -> i32 = {
+    if (code == 302i32) return 4i32; if (code == 303i32 or code == 304i32) return 3i32; if (code == 305i32) return 2i32;
+    if (code == 308i32) return 13i32; if (code == 309i32) return 57i32;
+    if (code == 400i32) return 63i32;
+    if (code >= 401i32 and code <= 403i32) return 4i32;
+    if (code == 404i32 or code == 405i32) return 3i32;
+    if (code == 406i32) return 2i32; if (code == 407i32) return 6i32;
+    if (code == 408i32) return 5i32; if (code == 409i32) return 1i32;
+    if (code == 312i32) return -2i32;
+    return -1i32;
+}
+fun rawShape17(reg: ref base.Registers, w: i32, s: i32) -> () = {
+    if (not raw.b2Shape_IsValid(reg.shapes[s].id) or not raw.b2World_IsValid(reg.worlds[w].id) or reg.shapes[s].id.world0+1u16 != reg.worlds[w].id.index1) fail17("DOMAIN");
+}
+fun validateDescription17(reg: ref base.Registers, a: ref u32[64]) -> () = {
+    if (not range17(a[0],512u32) or not world17(reg,a[1]) or not range17(a[2],256u32)) return;
+    if (not reg.bodies[a[2] as i32].saved) { fail17("REGISTER_UNINITIALIZED"); return; }
+    if (base.liveShape(reg,a[0] as i32)) { fail17("REGISTER_COLLISION"); return; }
+    if (a[3] > 4u32) { fail17("ENUM"); return; }
+    mode17(a[58]); boolean17(a[55]); boolean17(a[56]); boolean17(a[57]); boolean17(a[59]); boolean17(a[60]); boolean17(a[61]); boolean17(a[62]);
+    if (a[58] == 1u32 and a[61] != 1u32) fail17("PROFILE");
+    var used: i32 = if a[3] == 0u32 then 7i32 else (if a[3] == 1u32 then 9i32 else (if a[3] == 2u32 then 8i32 else (if a[3] == 3u32 then 22i32 else 11i32)));
+    var i: i32 = used; while (i < 44i32) { if (a[i] != 0u32) fail17("UNUSED"); i = i+1i32; }
+    if (a[3] == 3u32) {
+        if (a[4] > 8u32 and a[58] == 0u32) fail17("DOMAIN");
+        var vi: i32 = 0i32; while (vi < 8i32) { if (vi as u32 >= a[4] and (a[6i32+2i32*vi] != 0u32 or a[7i32+2i32*vi] != 0u32)) fail17("UNUSED"); vi = vi+1i32; }
+    }
+    if (a[58] == 0u32) {
+        let owner: base.SavedWorld = reg.worlds[a[1] as i32]; let parent: base.SavedBody = reg.bodies[a[2] as i32];
+        if (not raw.b2World_IsValid(owner.id) or not raw.b2Body_IsValid(parent.id) or parent.id.world0+1u16 != owner.id.index1) { fail17("DOMAIN"); return; }
+        var value: raw.ShapeRecord = shapeDescription17(a);
+        if (not game.validContactMaterial(&value)) fail17("DOMAIN");
+        if (a[3] == 4u32) { if (not game.validBox(boxDescription17(a))) fail17("DOMAIN"); }
+        else if (not base.validRawReplacement12(value) or not game.finite(value.density) or value.density < 0.0f32 or (value.shapeType == 0i32 and value.circle.radius < 0.0f32) or (value.shapeType == 1i32 and value.capsule.radius < 0.0f32)) fail17("DOMAIN");
+    }
+}
+fun validate17(reg: ref base.Registers, banks: ref Banks17, op: ref base.Operation, direct: bool) -> () = {
+    let a: u32[64] = op.words; let code: i32 = op.opcode;
+    if (code >= 302i32 and code <= 305i32) {
+        mode17(a[0]); if (not world17(reg,a[1])) return;
+        if (code == 302i32 or code == 303i32) { if (not range17(a[2],256u32)) return; if (not reg.bodies[a[2] as i32].saved) { fail17("REGISTER_UNINITIALIZED"); return; } }
+        if (code == 302i32) boolean17(a[3]); if (code == 304i32) boolean17(a[2]);
+        fail17("DOMAIN"); return;                                                        
+    }
+    if (code == 400i32) { validateDescription17(reg,&op.words); if (population17(2i32) >= 128i32) fail17("POPULATION"); return; }
+    if (code == 408i32) {
+        if (not direct) fail17("PROFILE"); if (a[0] != 0u32) fail17("FIXTURE");
+        if (a[1] > 2147483647u32 or a[3] > 2147483647u32 or a[2] > 65535u32 or a[4] > 65535u32) fail17("DOMAIN"); return;
+    }
+    if (code == 409i32) { if (a[0] > 1u32) fail17("ENUM"); return; }
+    if (code == 406i32 or code == 407i32) {
+        if (a[0] > 1u32) { fail17("ENUM"); return; } if (not range17(a[1],4u32)) return;
+        if ((a[0] == 0u32 and not banks.events[a[1] as i32].saved) or (a[0] == 1u32 and not banks.overlaps[a[1] as i32].saved)) { fail17("COPY"); return; }
+        if (code == 407i32) {
+            if ((a[0] == 0u32 and a[2] > 1u32) or (a[0] == 1u32 and a[2] != 2u32)) { fail17("ENUM"); return; }
+            if (a[4] >= (if a[0] == 0u32 then 16u32 else 8u32)) { fail17("COPY"); return; }
+            var n: i64 = 0i64;
+            if (a[0] == 1u32) n = banks.overlaps[a[1] as i32].values.length();
+            else if (a[2] == 0u32) n = banks.events[a[1] as i32].beginEvents.length();
+            else n = banks.events[a[1] as i32].endEvents.length();
+            if (a[3] as i64 >= n) { fail17("COPY"); return; }
+            var old: u32 = 0u32;
+            if (a[0] == 1u32) old = banks.overlaps[a[1] as i32].values.at(a[3] as i64).words[a[4] as i32];
+            else if (a[2] == 0u32) old = banks.events[a[1] as i32].beginEvents.at(a[3] as i64).words[a[4] as i32];
+            else old = banks.events[a[1] as i32].endEvents.at(a[3] as i64).words[a[4] as i32];
+            if (old == a[5]) fail17("DOMAIN");
+        } return;
+    }
+    if (code == 405i32) { if (not world17(reg,a[0]) or not shape17(reg,a[1]) or not range17(a[2],4u32)) return; return; }
+    if (code >= 401i32 and code <= 404i32) {
+        mode17(a[0]); if (not world17(reg,a[1])) return;
+        if (code == 404i32) { range17(a[2],4u32); if (a[0] == 0u32 and not raw.b2World_IsValid(reg.worlds[a[1] as i32].id)) fail17("DOMAIN"); return; }
+        if (not shape17(reg,a[2])) return;
+        if (code == 401i32) boolean17(a[3]);
+        if (code == 402i32 and a[3] > 2u32) fail17("ENUM");
+        if (code == 403i32 and (a[3] > 2147483647u32 or (a[0] == 1u32 and a[3] != 0u32))) fail17("DOMAIN");
+        if (a[0] == 0u32) rawShape17(reg,a[1] as i32,a[2] as i32); return;
+    }
+    if (code == 308i32) {
+        mode17(a[0]); if (not range17(a[1],16u32)) return;
+        if (reg.worlds[a[1] as i32].saved and game.worldStatus(reg.worlds[a[1] as i32].number) == game.OK) fail17("REGISTER_COLLISION");
+        if (population17(0i32) >= 2i32) fail17("POPULATION");
+        boolean17(a[10]); boolean17(a[11]); boolean17(a[12]);
+        if (a[12] != 0u32) { fail17("DOMAIN"); return; }                                                    
+        if (a[0] == 0u32 and not game.validSolverWorldParameters(worldDescription17(&op.words))) fail17("DOMAIN"); return;
+    }
+    if (code == 309i32) {
+        if (not world17(reg,a[0]) or not range17(a[1],256u32)) return;
+        if (reg.bodies[a[1] as i32].saved and game.bodyStatus(reg.bodies[a[1] as i32].owner,reg.bodies[a[1] as i32].number) == game.OK) fail17("REGISTER_COLLISION");
+        if (population17(1i32) >= 64i32) fail17("POPULATION");
+        boolean17(a[56]); if (a[56] != 0u32) fail17("DOMAIN");
+        var bodyWords: u32[64] = a; bodyWords[56] = 0u32; op.def = base.decodePayload12(90u32,bodyWords).def; return;
+    }
+    if (code == 312i32) {
+        if (a[1] > 7u32) { fail17("ENUM"); return; }
+        if (a[1] != 0u32) { fail17("DOMAIN"); return; }                                               
+        range17(a[0],16u32); boolean17(a[7]); boolean17(a[10]); boolean17(a[13]); boolean17(a[16]); boolean17(a[17]);
+    }
+}
+fun worldDescription17(a: ref u32[64]) -> game.SolverWorldParameters = {
+    var p = game.SolverWorldParameters(); p.gravity = math2.Vec2(fromBits17(a[2]),fromBits17(a[3])); p.maximumLinearSpeed = fromBits17(a[4]);
+    p.contactHertz = fromBits17(a[5]); p.contactDampingRatio = fromBits17(a[6]); p.maxContactPushSpeed = fromBits17(a[7]); p.restitutionThreshold = fromBits17(a[8]); p.hitEventThreshold = fromBits17(a[9]); p.enableWarmStarting = a[10] != 0u32; return p;
+}
+fun read17(reg: ref base.Registers, banks: ref Banks17, id: u32, seq: u32, direct: bool) -> base.Operation = {
+    base.readRow(); var op = base.Operation(); if (not base.inputOk) return op;
+    if (base.rowBytes[0] != 79i32) { fail17("TAG"); return op; }
+    base.consumeTag("O"); let got: u32 = base.readWord(); let code: u32 = base.readWord();
+    if (got != seq) fail17("SEQ");
+    if (code == 20u32) {
+        op.opcode = 20i32; base.checkArity(67i32); base.readPayload(&op.words);
+        if (not direct) { fail17("PROFILE"); return op; }
+        if (not world17(reg,op.words[0]) or not range17(op.words[1],256u32) or not range17(op.words[2],512u32) or not shape17(reg,op.words[4])) return op;
+        if (not reg.bodies[op.words[1] as i32].saved) fail17("REGISTER_UNINITIALIZED");
+        if (op.words[3] < 1u32 or op.words[3] > 65536u32) fail17("DOMAIN");
+        if (base.liveShape(reg,op.words[2] as i32)) fail17("REGISTER_COLLISION");
+        if (op.words[2] == op.words[4] or base.liveShape(reg,op.words[4] as i32) or game.bodyStatus(reg.worlds[op.words[0] as i32].number,reg.bodies[op.words[1] as i32].number) != game.OK or not game.equalKey(reg.shapes[op.words[4] as i32].number.ownerTicket,reg.worlds[op.words[0] as i32].number.birthTicket)) fail17("DOMAIN");
+        var ui: i32 = 5i32; while (ui < 64i32) { if (op.words[ui] != 0u32) fail17("UNUSED"); ui = ui+1i32; }
+        op.a = op.words[0] as i32; op.b = op.words[1] as i32; op.c = op.words[2] as i32; return op;
+    }
+    if (code < 300u32) { base.rowPosition = 0i32; return base.readOperationRow14(reg,id,seq); }
+    let n: u32 = base.readWord(); let expected: i32 = arity17(code as i32);
+    if (expected == -1i32) { fail17("OPCODE"); return op; }
+    if (n > 64u32 or tokens17() != 4i32+n as i32 or (expected >= 0i32 and n != expected as u32)) { fail17("ARITY"); return op; }
+    op.opcode = code as i32; base.readingPayload = true; var i: i32 = 0i32;
+    while (i < n as i32 and base.inputOk) { op.words[i] = base.readWord(); i = i+1i32; } base.readingPayload = false; base.endRow();
+    if (code == 312u32) {
+        if (n < 2u32) fail17("ARITY");
+        else if (op.words[1] > 7u32) fail17("ENUM");
+        else if (op.words[1] == 0u32 and n != 20u32) fail17("ARITY");
+    }
+    if (base.inputOk) validate17(reg,banks,&op,direct); return op;
+}
+class Result17 { status: i32 = 0i32; reason: i32 = 0i32; count: i32 = 0i32; words: u32[64] = base.zeroWords(); overlaps: game.SensorOverlaps = game.SensorOverlaps(); }
+fun execute17(reg: ref base.Registers, banks: ref Banks17, op: ref base.Operation) -> Result17 = {
+    var r = Result17(); let a: u32[64] = op.words; let code: i32 = op.opcode;
+    if (code == 409i32) { r.count = 6i32; r.words = defaults17(a[0] as i32); return r; }
+    if (code == 408i32) { r.count = 1i32; r.words[0] = compareRefs17(&op.words) as u32; return r; }
+    if (code == 406i32) return r;
+    if (code == 407i32) { editCopy17(banks,a[0] as i32,a[1] as i32,a[2] as i32,a[3] as i32,a[4] as i32,a[5]); return r; }
+    if (code == 312i32) {
+        var description = game.defaultDistanceDescription(); var i: i32 = 0i32; while (i < 18i32) { base.setDescriptionField14(&description,i,a[i+2i32]); i = i+1i32; }
+        base.descriptions14[a[0] as i32] = base.Description14(true,description); return r;
+    }
+    if (code == 308i32) {
+        let made: game.WorldResult = game.createSleepWorld(math2.Vec2(fromBits17(a[2]),fromBits17(a[3])),fromBits17(a[4]),worldDescription17(&op.words),a[11] != 0u32);
+        r.status = made.status; r.count = 3i32; if (r.status == game.OK) { reg.worlds[a[1] as i32] = base.SavedWorld(true,made.number,made.id); r.words[0] = made.number.slot as u32; r.words[1] = made.number.birthTicket.low; r.words[2] = made.number.birthTicket.high; } return r;
+    }
+    if (code == 309i32) {
+        var bodyOp: base.Operation = op; bodyOp.opcode = 90i32; bodyOp.a = a[0] as i32; bodyOp.b = a[1] as i32; bodyOp.mode = a[2] as i32;
+        bodyOp.source.hasObjectId = a[53] != 0u32; bodyOp.source.objectId = words64.Key64(a[54],a[55]);
+        var execution = base.Execution(); var saved = base.SavedBody(); var kind: i32 = 0i32;
+        r.status = base.runLiveOperation(reg,bodyOp,&execution,&saved,&kind); r.reason = if r.status == game.LOCKED then 1i32 else 0i32; r.count = 5i32;
+        if (r.status == game.OK) { r.words[0] = saved.number.slot as u32; r.words[1] = saved.number.birthTicket.low; r.words[2] = saved.number.birthTicket.high; r.words[3] = saved.number.ownerTicket.low; r.words[4] = saved.number.ownerTicket.high; } return r;
+    }
+    let wr: i32 = (if code == 405i32 then a[0] else a[1]) as i32; let owner: base.SavedWorld = reg.worlds[wr];
+    if (code == 400i32) {
+        let parent: base.SavedBody = reg.bodies[a[2] as i32]; let made: game.ShapeResult = create17(owner.number,parent.number,parent.id,&op.words);
+        r.status = made.status; r.reason = if r.status == game.LOCKED then 1i32 else made.sensorReason17; r.count = 8i32;
+        if (r.status == game.OK) {
+            reg.shapes[a[0] as i32] = base.SavedShape(true,made.number,owner.number,made.id);
+            r.words[0] = made.id.index1 as u32; r.words[1] = made.id.world0 as u32; r.words[2] = made.id.generation as u32;
+            r.words[3] = made.number.slot as u32; r.words[4] = made.number.birthTicket.low; r.words[5] = made.number.birthTicket.high; r.words[6] = made.number.ownerTicket.low; r.words[7] = made.number.ownerTicket.high;
+        } return r;
+    }
+    if (code == 404i32) { let saved: game.SensorAction = saveEvents17(banks,a[2] as i32,a[0] as i32,owner.number,owner.id); r.status = saved.status; r.reason = saved.reason; return r; }
+    let sr: i32 = (if code == 405i32 then a[1] else a[2]) as i32; let target: base.SavedShape = reg.shapes[sr];
+    if (code == 401i32) { let value: game.SensorAction = setEvents17(a[0] as i32,owner.number,target.number,target.id,a[3] != 0u32); r.status = value.status; r.reason = value.reason; }
+    if (code == 402i32) { let value: game.SensorMeta = readMeta17(a[0] as i32,owner.number,target.number,target.id,a[3] as i32); r.status = value.status; r.reason = value.reason; r.count = 1i32; r.words[0] = value.value as u32; }
+    if (code == 403i32) { r.overlaps = overlaps17(a[0] as i32,owner.number,target.number,target.id,a[3] as i32); r.status = r.overlaps.status; r.reason = r.overlaps.reason; r.count = 1i32; r.words[0] = r.overlaps.values.length() as u32; }
+    if (code == 405i32) { let saved: game.SensorAction = saveOverlaps17(banks,a[2] as i32,owner.number,target.number); r.status = saved.status; r.reason = saved.reason; }
+    return r;
+}
+fun observe17(reg: ref base.Registers, banks: ref Banks17, id: u32, seq: u32, op: ref base.Operation, result: ref Result17) -> () = {
+    var wi: i32 = 0i32; var rows: i32 = 0i32;
+    while (wi < 16i32) { if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) rows = rows+currentRows17(reg,id,seq,wi,raw.worlds.at(reg.worlds[wi].number.slot as i64)); wi = wi+1i32; }
+    if (op.opcode == 403i32 and result.status == game.OK) rows = rows+overlapRows17(id,seq,1i32,0i32,reg.shapes[op.words[2] as i32].number.slot,&result.overlaps.values);
+    rows = rows+savedRows17(id,seq,banks); wi = 0i32;
+    while (wi < 16i32) {
+        if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) {
+            var world: ref raw.World = raw.worlds.at(reg.worlds[wi].number.slot as i64);
+            queries17(id,seq,wi,world); privateRows17(id,seq,wi,world); counters17(id,seq,wi,rows,world);
+                                                                                            
+            prefix17("W16",id,seq); base.currentOutputRank14 = 323i32; decimal17(wi); decimal17(1i32); hex17(0u32); newline17();
+        } wi = wi+1i32;
+    }
+    prefix17("I16",id,seq); base.currentOutputRank14 = 1499i32; decimal17(8i32);
+    hex17((op.opcode >= 302i32 and op.opcode <= 305i32 or op.opcode == 308i32 or op.opcode == 309i32 or op.opcode == 312i32) as u32);
+    var live: u32 = 0u32; wi = 0i32;
+    while (wi < 16i32) { if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) live = live+1u32; wi = wi+1i32; }
+    hex17(live); var zero: i32 = 0i32; while (zero < 5i32) { hex17(0u32); zero = zero+1i32; } hex17(seq); newline17();
+}
+fun runOperation17(reg: ref base.Registers, banks: ref Banks17, id: u32, seq: u32, op: ref base.Operation) -> i32 = {
+    base.beginOutput14(); base.clearOperation14(); base.lastSensorReason17 = 0i32;
+    base.clearSolverObservations(); base.clearSleepObservations(); base.clearHookObservations12(reg,op);
+    var wi: i32 = 0i32; while (wi < 16i32) { if (reg.worlds[wi].saved and game.worldStatus(reg.worlds[wi].number) == game.OK) beginOperation17(raw.worlds.at(reg.worlds[wi].number.slot as i64)); wi = wi+1i32; }
+    var result = Result17();
+    if (op.opcode == 20i32) result.status = churn17(reg,id,seq,op);
+    else if (op.opcode < 300i32) {
+        result.status = base.runOperationBody14(reg,id,seq,op);
+        if ((op.opcode == 32i32) or (op.opcode == 86i32 and op.mode == 1i32 and op.kind == 0i32)) answer17(id,seq,op.opcode,result.status,base.lastSensorReason17,0i32,&result.words);
+    } else {
+        result = execute17(reg,banks,op);
+        let count: i32 = if op.opcode == 312i32 then 20i32 else arity17(op.opcode);
+        echo17(id,seq,op.opcode,count,&op.words); answer17(id,seq,op.opcode,result.status,result.reason,result.count,&result.words);
+        var execution = base.Execution(); execution.status = result.status;
+        base.observeGuardState14(reg,id,seq,op,&execution);
+    }
+    if (base.inputOk and result.status >= 0i32) { observe17(reg,banks,id,seq,op,&result); base.flushOutput14(); } else base.discardOutput14();
+    return result.status;
+}
+fun run17(diagnostic: bool) -> i64 = {
+    base.initialTagged13 = true; base.initialRow13 = false; base.profile13C = 14i32;
+    base.readRow(); if (not base.inputOk) return 2i64;
+    if (tokens17() != 3i32) { fail17("HEADER"); return 2i64; }
+    base.consumeTag("PORT17"); if (not base.inputOk) return 2i64;
+    base.rowPosition = base.rowPosition+1i32;
+    var profile: str = "PUBLIC"; var full: u32 = 96u32; var direct: bool = false; var guard: bool = false;
+    if (base.tokenEquals("DIRECT")) { profile = "DIRECT"; full = 64u32; direct = true; }
+    else if (base.tokenEquals("GUARD")) { profile = "GUARD"; full = 697u32; guard = true; }
+    else if (not base.tokenEquals("PUBLIC")) { fail17("PROFILE"); return 2i64; }
+    base.consumeTag(profile); let n: u32 = base.readWord(); base.endRow(); if (not base.inputOk) return 2i64;
+    if (n == 0u32 or n > full or (not diagnostic and n != full)) { fail17("N"); return 2i64; }
+    base.direct14 = direct; base.profile14 = profile;
+    base.outputString14("PORT17 "); base.outputString14(profile); decimal17(n as i32); newline17();
+    var ci: u32 = 0u32; var previous: u32 = 0u32;
+    while (ci < n and base.inputOk) {
+        base.requiredRow("C",3i32); let id: u32 = base.readWord(); let count: u32 = base.readWord(); base.endRow();
+        if (id <= previous or id > full or (not diagnostic and id != ci+1u32)) fail17("ID");
+        let maximum: u32 = if guard then 0u32 else (if direct then 160u32 else (if id <= 24u32 then 128u32 else 2048u32));
+        if ((guard and count != 0u32) or (not guard and (count < 1u32 or count > maximum))) fail17("OPCOUNT");
+        if (not diagnostic and not guard and count as i32 != operationCount17(direct,id)) fail17("OPCOUNT");
+        if (not base.inputOk) return 2i64;
+        previous = id; base.currentCase13 = id; var reg = base.Registers(); var banks = Banks17();
+        base.joints14 = base.zeroJoints14(); base.descriptions14 = base.zeroDescriptions14(); base.copies14 = base.zeroCopies14(); base.completedPositiveSteps = 0u32;
+        base.outputString14("CASE"); decimal17(id as i32); decimal17(count as i32); newline17();
+        var seq: u32 = 1u32;
+        while (seq <= count and base.inputOk) { var op: base.Operation = read17(&reg,&banks,id,seq,direct); if (base.inputOk) runOperation17(&reg,&banks,id,seq,&op); seq = seq+1u32; }
+        if (guard and base.inputOk) guardPair17(id);
+        base.cleanup(&reg); if (not base.inputOk) return 2i64;
+        base.outputString14("ENDCASE"); decimal17(id as i32); newline17(); ci = ci+1u32;
+    }
+    base.checkEnd(); if (not base.inputOk) return 2i64; base.outputString14("END"); decimal17(n as i32); newline17(); return 0i64;
+}
+fun main(argc: i32, argv: cptr cptr char) -> i64 = {
+    var diagnostic: bool = false;
+    if (argc == 2i32) { let arg: cptr char = argv[1]; let text: str = "--diagnostic"; let expected: cptr char = builtins.ptr_from_slice[char](text) as cptr char; var i: i32 = 0i32; diagnostic = true; while (i < 12i32 and diagnostic) { if (arg[i] != expected[i]) diagnostic = false; i = i+1i32; } if (diagnostic and arg[12] != 0 as char) diagnostic = false; }
+    return run17(diagnostic);
+}
+
+
+                                                                          
+fun guardRoute17(id: u32) -> i32 = {
+    if (id <= 14u32) return 0i32;
+    if (id <= 28u32) return 1i32;
+    if (id <= 42u32) return 2i32;
+    if (id <= 56u32) return 3i32;
+    if (id <= 70u32) return 4i32;
+    if (id <= 84u32) return 5i32;
+    if (id <= 90u32) return 6i32;
+    if (id <= 96u32) return 7i32;
+    if (id <= 102u32) return 8i32;
+    if (id <= 115u32) return 9i32;
+    if (id <= 127u32) return 10i32;
+    if (id <= 139u32) return 11i32;
+    if (id <= 152u32) return 12i32;
+    if (id <= 165u32) return 13i32;
+    if (id <= 178u32) return 14i32;
+    if (id <= 184u32) return 15i32;
+    if (id <= 190u32) return 16i32;
+    if (id <= 196u32) return 17i32;
+    if (id <= 202u32) return 18i32;
+    if (id <= 203u32) return 12i32;
+    if (id <= 204u32) return 13i32;
+    if (id <= 205u32) return 14i32;
+    if (id <= 208u32) return 0i32;
+    if (id <= 211u32) return 1i32;
+    if (id <= 214u32) return 2i32;
+    if (id <= 217u32) return 3i32;
+    if (id <= 220u32) return 4i32;
+    if (id <= 223u32) return 5i32;
+    if (id <= 226u32) return 6i32;
+    if (id <= 229u32) return 7i32;
+    if (id <= 232u32) return 8i32;
+    if (id <= 236u32) return 16i32;
+    if (id <= 239u32) return 12i32;
+    if (id <= 242u32) return 13i32;
+    if (id <= 245u32) return 14i32;
+    if (id <= 248u32) return 15i32;
+    if (id <= 251u32) return 17i32;
+    if (id <= 254u32) return 18i32;
+    if (id <= 255u32) return 17i32;
+    if (id <= 256u32) return 18i32;
+    if (id <= 257u32) return 16i32;
+    if (id <= 258u32) return 9i32;
+    if (id <= 259u32) return 10i32;
+    if (id <= 260u32) return 11i32;
+    if (id <= 261u32) return 0i32;
+    if (id <= 262u32) return 1i32;
+    if (id <= 263u32) return 2i32;
+    if (id <= 264u32) return 3i32;
+    if (id <= 265u32) return 4i32;
+    if (id <= 266u32) return 5i32;
+    if (id <= 267u32) return 6i32;
+    if (id <= 268u32) return 7i32;
+    if (id <= 269u32) return 8i32;
+    if (id <= 290u32) return 0i32;
+    if (id <= 311u32) return 1i32;
+    if (id <= 332u32) return 2i32;
+    if (id <= 353u32) return 3i32;
+    if (id <= 374u32) return 4i32;
+    if (id <= 395u32) return 5i32;
+    if (id <= 417u32) return 6i32;
+    if (id <= 439u32) return 7i32;
+    if (id <= 461u32) return 8i32;
+    if (id <= 519u32) return 0i32;
+    if (id <= 530u32) return 4i32;
+    if (id <= 541u32) return 5i32;
+    if (id <= 552u32) return 8i32;
+    if (id <= 570u32) return 6i32;
+    if (id <= 588u32) return 7i32;
+    if (id <= 606u32) return 8i32;
+    if (id <= 611u32) return 0i32;
+    if (id <= 629u32) return 2i32;
+    if (id <= 632u32) return 17i32;
+    if (id <= 635u32) return 18i32;
+    if (id <= 636u32) return 12i32;
+    if (id <= 637u32) return 13i32;
+    if (id <= 638u32) return 14i32;
+    if (id <= 639u32) return 0i32;
+    if (id <= 640u32) return 1i32;
+    if (id <= 641u32) return 2i32;
+    if (id <= 642u32) return 3i32;
+    if (id <= 643u32) return 4i32;
+    if (id <= 644u32) return 5i32;
+    if (id <= 645u32) return 6i32;
+    if (id <= 646u32) return 7i32;
+    if (id <= 647u32) return 8i32;
+    if (id <= 679u32) return 19i32;
+    if (id <= 687u32) return 20i32;
+    if (id <= 688u32) return 0i32;
+    if (id <= 689u32) return 1i32;
+    if (id <= 690u32) return 2i32;
+    if (id <= 691u32) return 3i32;
+    if (id <= 692u32) return 4i32;
+    if (id <= 693u32) return 5i32;
+    if (id <= 694u32) return 6i32;
+    if (id <= 695u32) return 7i32;
+    if (id <= 696u32) return 8i32;
+    if (id <= 697u32) return 21i32;
+    return -1i32;
+}
+fun guardSize17(id: u32) -> i32 = {
+    if (id <= 84u32) return 127i32;
+    if (id <= 102u32) return 184i32;
+    if (id <= 165u32) return 68i32;
+    if (id <= 184u32) return 67i32;
+    if (id <= 190u32) return 71i32;
+    if (id <= 204u32) return 68i32;
+    if (id <= 205u32) return 67i32;
+    if (id <= 223u32) return 127i32;
+    if (id <= 232u32) return 184i32;
+    if (id <= 236u32) return 71i32;
+    if (id <= 242u32) return 68i32;
+    if (id <= 248u32) return 67i32;
+    if (id <= 256u32) return 68i32;
+    if (id <= 257u32) return 71i32;
+    if (id <= 260u32) return 68i32;
+    if (id <= 266u32) return 127i32;
+    if (id <= 269u32) return 184i32;
+    if (id <= 395u32) return 127i32;
+    if (id <= 461u32) return 184i32;
+    if (id <= 541u32) return 127i32;
+    if (id <= 606u32) return 184i32;
+    if (id <= 611u32) return 127i32;
+    if (id <= 629u32) return 145i32;
+    if (id <= 637u32) return 68i32;
+    if (id <= 638u32) return 67i32;
+    if (id <= 644u32) return 127i32;
+    if (id <= 647u32) return 184i32;
+    if (id <= 687u32) return 67i32;
+    if (id <= 693u32) return 127i32;
+    if (id <= 696u32) return 184i32;
+    if (id <= 697u32) return 66i32;
+    return -1i32;
+}
+fun guardHelper17(id: u32) -> i32 = {
+    if (id <= 13u32) return 1i32;
+    if (id <= 14u32) return 0i32;
+    if (id <= 27u32) return 1i32;
+    if (id <= 28u32) return 0i32;
+    if (id <= 41u32) return 1i32;
+    if (id <= 42u32) return 0i32;
+    if (id <= 55u32) return 1i32;
+    if (id <= 56u32) return 0i32;
+    if (id <= 69u32) return 1i32;
+    if (id <= 70u32) return 0i32;
+    if (id <= 83u32) return 1i32;
+    if (id <= 84u32) return 0i32;
+    if (id <= 89u32) return 1i32;
+    if (id <= 90u32) return 0i32;
+    if (id <= 95u32) return 1i32;
+    if (id <= 96u32) return 0i32;
+    if (id <= 101u32) return 1i32;
+    if (id <= 102u32) return 0i32;
+    if (id <= 114u32) return 1i32;
+    if (id <= 115u32) return 0i32;
+    if (id <= 151u32) return 1i32;
+    if (id <= 152u32) return 0i32;
+    if (id <= 164u32) return 1i32;
+    if (id <= 165u32) return 0i32;
+    if (id <= 177u32) return 1i32;
+    if (id <= 178u32) return 0i32;
+    if (id <= 183u32) return 1i32;
+    if (id <= 184u32) return 0i32;
+    if (id <= 189u32) return 1i32;
+    if (id <= 190u32) return 0i32;
+    if (id <= 195u32) return 1i32;
+    if (id <= 196u32) return 0i32;
+    if (id <= 201u32) return 1i32;
+    if (id <= 202u32) return 0i32;
+    if (id <= 205u32) return 1i32;
+    if (id <= 269u32) return 0i32;
+    if (id <= 629u32) return 1i32;
+    if (id <= 697u32) return 0i32;
+    return -1i32;
+}
+fun guardLife17(id: u32) -> i32 = {
+    if (id <= 13u32) return 1i32;
+    if (id <= 14u32) return 0i32;
+    if (id <= 27u32) return 1i32;
+    if (id <= 28u32) return 0i32;
+    if (id <= 41u32) return 1i32;
+    if (id <= 42u32) return 0i32;
+    if (id <= 55u32) return 1i32;
+    if (id <= 56u32) return 0i32;
+    if (id <= 69u32) return 1i32;
+    if (id <= 70u32) return 0i32;
+    if (id <= 83u32) return 1i32;
+    if (id <= 84u32) return 0i32;
+    if (id <= 89u32) return 1i32;
+    if (id <= 90u32) return 0i32;
+    if (id <= 95u32) return 1i32;
+    if (id <= 96u32) return 0i32;
+    if (id <= 101u32) return 1i32;
+    if (id <= 102u32) return 0i32;
+    if (id <= 114u32) return 1i32;
+    if (id <= 115u32) return 0i32;
+    if (id <= 151u32) return 1i32;
+    if (id <= 152u32) return 0i32;
+    if (id <= 164u32) return 1i32;
+    if (id <= 165u32) return 0i32;
+    if (id <= 177u32) return 1i32;
+    if (id <= 178u32) return 0i32;
+    if (id <= 183u32) return 1i32;
+    if (id <= 184u32) return 0i32;
+    if (id <= 189u32) return 1i32;
+    if (id <= 190u32) return 0i32;
+    if (id <= 195u32) return 1i32;
+    if (id <= 196u32) return 0i32;
+    if (id <= 201u32) return 1i32;
+    if (id <= 697u32) return 0i32;
+    return -1i32;
+}
+fun guardWords17() -> u32[144] = { var a: u32[144]; return a; }
+class GuardInput17 { context: u32[64] = base.zeroWords(); words: u32[144] = guardWords17(); route: i32 = 0i32; count: i32 = 0i32; }
+fun guardLifeResult17(g: ref GuardInput17) -> game.SensorAction = {
+    let c: u32[64] = g.context; let owner: game.WorldNumber = game.WorldNumber(c[0] as i32,words64.Key64(c[1],c[2]));
+    if (not game.worldSlotValid17(owner.slot) or not game.worldMetadataValid17(owner,c[4] != 0u32,words64.Key64(c[5],c[6]))) return game.SensorAction(game.STALE,0i32);
+    let body: bool = g.route <= 5i32; let target: bool = body or (g.route >= 9i32 and g.route <= 14i32);
+    if (target) {
+        if (not game.targetOwnerValid17(owner.birthTicket,words64.Key64(c[10],c[11]))) return game.SensorAction(game.FOREIGN,0i32);
+        if (not game.targetSlotValid17(c[7] as i32,c[12] as i64)) return game.SensorAction(game.STALE,0i32);
+        let actual: words64.Key64 = words64.Key64(c[15],c[16]); let expected: words64.Key64 = words64.Key64(c[8],c[9]);
+        if (body) { if (not game.bodyMetadataValid17(c[13] as i32,c[14] as i32,actual,expected)) return game.SensorAction(game.STALE,0i32); }
+        else if (not game.shapeMetadataValid17(c[13] as i32,actual,expected)) return game.SensorAction(game.STALE,0i32);
+    }
+    return game.SensorAction();
+}
+fun guardBodyDescription17(g: ref GuardInput17) -> raw.BodyDef = {
+    var d = raw.BodyDef(); d.bodyType = g.words[3] as i32;
+    d.position = math2.Vec2(fromBits17(g.words[4]),fromBits17(g.words[5])); d.rotation = math2.Rot(fromBits17(g.words[6]),fromBits17(g.words[7]));
+    d.linearVelocity = math2.Vec2(fromBits17(g.words[8]),fromBits17(g.words[9])); d.angularVelocity = fromBits17(g.words[10]);
+    d.linearDamping = fromBits17(g.words[11]); d.angularDamping = fromBits17(g.words[12]); d.gravityScale = fromBits17(g.words[13]);
+    d.fixedRotation = g.words[14] != 0u32; d.allowFastRotation = g.words[15] != 0u32; d.enableSleep = g.words[16] != 0u32; d.isAwake = g.words[17] != 0u32;
+    d.sleepThreshold = fromBits17(g.words[18]); d.isEnabled = g.words[19] != 0u32; d.name.length = g.words[20] as i32;
+    var i: i32 = 0i32; while (i < 32i32) { d.name.bytes[i] = g.words[21i32+i] as u8; i = i+1i32; } return d;
+}
+fun guardDescription17(g: ref GuardInput17) -> raw.ShapeRecord = {
+    var words: u32[64]; let start: i32 = if g.route >= 6i32 and g.route <= 8i32 then 57i32 else 0i32;
+    var i: i32 = 0i32; while (i < 63i32) { words[i] = g.words[start+i]; i = i+1i32; }
+    var shape: raw.ShapeRecord = shapeDescription17(&words);
+    if (g.count == 81i32) {
+        shape.polygon.centroid = math2.Vec2(fromBits17(g.words[63]),fromBits17(g.words[64])); var j: i32 = 0i32;
+        while (j < 8i32) { shape.polygon.normals[j] = math2.Vec2(fromBits17(g.words[65i32+2i32*j]),fromBits17(g.words[66i32+2i32*j])); j = j+1i32; }
+    }
+    return shape;
+}
+fun guardBox17(g: ref GuardInput17) -> game.BoxGeometry = {
+    let start: i32 = if g.route >= 6i32 then 57i32 else 0i32;
+    return game.BoxGeometry(fromBits17(g.words[start+4i32]),fromBits17(g.words[start+5i32]),math2.Vec2(fromBits17(g.words[start+6i32]),fromBits17(g.words[start+7i32])),math2.Rot(fromBits17(g.words[start+8i32]),fromBits17(g.words[start+9i32])),fromBits17(g.words[start+10i32]));
+}
+                                                                              
+fun makeGuardWorld17(reg: ref base.Registers, g: ref GuardInput17, helper: bool) -> () = {
+    let c: u32[64] = g.context; var parameters = game.SolverWorldParameters(); parameters.gravity = math2.Vec2();
+    let made: game.WorldResult = game.createSleepWorld(math2.Vec2(),400.0f32,parameters,true); reg.worlds[0] = base.SavedWorld(true,made.number,made.id);
+    var d = raw.BodyDef(); d.bodyType = if helper then 2i32 else 0i32; d.isEnabled = c[32] != 0u32;
+    let a: game.BodyResult = game.createBody8(made.number,d); reg.bodies[0] = base.SavedBody(true,a.number,made.number,a.id);
+    d.bodyType = 2i32; d.isEnabled = true; let b: game.BodyResult = game.createBody8(made.number,d); reg.bodies[1] = base.SavedBody(true,b.number,made.number,b.id);
+    var shape: raw.ShapeRecord = game.circleShape(if c[19] != 0u32 then 1.0f32 else 0.2f32,1.0f32); shape.isSensor = c[19] != 0u32; shape.enableSensorEvents = c[30] != 0u32;
+    let first: game.ShapeResult = game.createShapeRaw(made.number,a.number,shape,true,false); reg.shapes[0] = base.SavedShape(true,first.number,made.number,first.id);
+    shape.circle.radius = 0.2f32; shape.isSensor = false; shape.enableSensorEvents = true;
+    let second: game.ShapeResult = game.createShapeRaw(made.number,b.number,shape,true,false); reg.shapes[1] = base.SavedShape(true,second.number,made.number,second.id);
+    if (c[20] != 0u32) raw.b2World_SetCustomFilterCallback(made.id,raw.b2DefaultFilter12,words64.Key64(),true);
+    if (not helper) return;
+                                                                           
+    var world: ref raw.World = raw.worlds.at(made.number.slot as i64);
+    world.birthTicket = words64.Key64(c[5],c[6]); world.bodies.at(0i64).birthTicket = words64.Key64(c[15],c[16]); world.shapes.at(0i64).birthTicket = words64.Key64(c[15],c[16]);
+    let owner: game.WorldNumber = game.WorldNumber(c[0] as i32,words64.Key64(c[1],c[2]));
+    reg.worlds[0].number = owner;
+    reg.bodies[0].number = game.BodyNumber(c[7] as i32,words64.Key64(c[8],c[9]),words64.Key64(c[10],c[11])); reg.bodies[0].owner = owner;
+    reg.shapes[0].number = game.ShapeNumber(c[7] as i32,words64.Key64(c[8],c[9]),words64.Key64(c[10],c[11])); reg.shapes[0].owner = owner;
+    reg.bodies[1].owner = owner; reg.bodies[1].number.ownerTicket = owner.birthTicket; reg.shapes[1].owner = owner; reg.shapes[1].number.ownerTicket = owner.birthTicket;
+    game.lastIssued = words64.Key64(c[22],c[23]);
+    if (c[20] != 0u32) raw.b2World_SetCustomFilterCallback(made.id,raw.b2DefaultFilter12,words64.Key64(),true);
+}
+fun guardCall17(reg: ref base.Registers, banks: ref Banks17, g: ref GuardInput17, helperOnly: bool) -> game.SensorAction = {
+    let route: i32 = g.route; let owner: game.WorldNumber = reg.worlds[0].number; let parent: game.BodyNumber = reg.bodies[0].number; let target: game.ShapeNumber = reg.shapes[if g.context[18] as i32 < 0i32 then 1i32 else 0i32].number;
+    if (route <= 8i32) {
+        let shape: raw.ShapeRecord = guardDescription17(g); let d: raw.BodyDef = guardBodyDescription17(g); let geometry: game.BoxGeometry = guardBox17(g);
+        let kind: i32 = if route == 4i32 or route == 5i32 or route == 8i32 then 2i32 else (if route == 2i32 or route == 3i32 or route == 7i32 then 1i32 else 0i32);
+        if (helperOnly) { let check: game.CreationCheck17 = game.creationPreflight17(owner,parent,d,shape,geometry,kind,route >= 6i32,route == 1i32 or route == 3i32 or route == 5i32); return game.SensorAction(check.status,check.reason); }
+        var made = game.ShapeResult(); var pair = game.PairResult();
+        if (route == 0i32) made = game.addShape(owner,parent,shape,false);
+        if (route == 1i32) made = game.addShapeFlags12(owner,parent,shape,false,true);
+        if (route == 2i32) made = game.addPreparedShape(owner,parent,shape,false);
+        if (route == 3i32) made = game.addPreparedShapeFlags12(owner,parent,shape,false,true);
+        if (route == 4i32) made = game.addBox(owner,parent,geometry,shape,false);
+        if (route == 5i32) made = game.addBoxFlags12(owner,parent,geometry,shape,false,true);
+        if (route == 6i32) pair = game.createBodyWithShape(owner,d,shape,false,false,words64.Key64());
+        if (route == 7i32) pair = game.createBodyWithPreparedShape(owner,d,shape,false,false,words64.Key64());
+        if (route == 8i32) pair = game.createBodyWithBox(owner,d,geometry,shape,false,false,words64.Key64());
+        if (route >= 6i32) { if (pair.status == game.OK) { reg.bodies[4] = base.SavedBody(true,pair.body.number,owner,pair.body.id); reg.shapes[4] = base.SavedShape(true,pair.shape.number,owner,pair.shape.id); } return game.SensorAction(pair.status,if pair.status == game.LOCKED then 1i32 else pair.sensorReason17); }
+        if (made.status == game.OK) reg.shapes[4] = base.SavedShape(true,made.number,owner,made.id);
+        return game.SensorAction(made.status,if made.status == game.LOCKED then 1i32 else made.sensorReason17);
+    }
+    if (route == 9i32) { let status: i32 = game.enableSensorEvents(owner,target,g.context[31] != 0u32); return game.SensorAction(status,if status == game.LOCKED then 1i32 else 0i32); }
+    if (route == 10i32) { let value: game.SensorMeta = game.isSensor(owner,target); return game.SensorAction(value.status,value.reason); }
+    if (route == 11i32) { let value: game.SensorMeta = game.areSensorEventsEnabled(owner,target); return game.SensorAction(value.status,value.reason); }
+    if (route == 12i32) { let value: game.SensorMeta = game.sensorCapacity(owner,target); return game.SensorAction(value.status,value.reason); }
+    if (route == 13i32) { var value: game.SensorOverlaps = game.sensorOverlaps(owner,target); return game.SensorAction(value.status,value.reason); }
+    if (route == 14i32) return saveOverlaps17(banks,g.words[2] as i32,owner,target);
+    if (route == 15i32) return saveEvents17(banks,g.words[2] as i32,1i32,owner,reg.worlds[0].id);
+    if (route == 16i32) { if (helperOnly) return game.pairRulesPreflight17(owner,g.context[31] != 0u32); let status: i32 = game.enablePairRules(owner,g.context[31] != 0u32); return game.SensorAction(status,if status == game.LOCKED then 1i32 else (if status == game.PARAM then game.SENSOR_FILTER17 else 0i32)); }
+    if (route == 17i32 or route == 18i32) return guardStep17(reg,true,fromBits17(g.words[1]),g.words[2] as i32,g.words[3] as i32,route == 18i32);
+    return game.SensorAction(game.PARAM,0i32);
+}
+fun emptyGuardQueries17() -> List[raw.SensorQueryTrace] = { var values: List[raw.SensorQueryTrace]; return values; }
+var guardQueries17: List[raw.SensorQueryTrace] = emptyGuardQueries17(); var guardObserving17: bool = false; var guardPhaseNumber17: u32 = 0u32;
+var guardTraceCounts17: i32[6] = base.zeroN10();
+fun guardRowRank17(index: i32) -> i32 = { return if index < 5i32 then 966i32+index else (if index == 5i32 then 971i32 else 976i32); }
+fun emptyGuardRows17() -> base.OutputBucket14[7] = { var rows: base.OutputBucket14[7]; return rows; }
+                                                                           
+                                                                              
+fun captureGuardStep17(world: ref raw.World, execution: ref base.Execution) -> () = {
+    let id: u32 = base.currentCase13; let phase: u32 = guardPhaseNumber17; var i: i64 = 0i64;
+    while (i < world.sensorQueryTrace.length()) { guardQueries17.push(world.sensorQueryTrace.at(i)); i = i+1i64; }
+    if (world.solverTrace.hasTask) {
+        var group: i32 = 1i32;
+        while (group < 6i32) { base.outSolverTrace(&world.solverTrace,world,0i32,id,phase,0i32,7i32,group,execution); group = group+1i32; }
+    }
+    var count: i32 = 1i32; while (count < 6i32) { guardTraceCounts17[count] = guardTraceCounts17[count]+execution.n10[count]; count = count+1i32; }
+    base.outputBuckets14[971].rows.clear(); base.outputBuckets14[976].rows.clear();
+    if (world.hasFinalizeSnapshot) {
+        base.outSleepWorldPhase(world,0i32,id,phase,0i32,false); base.outSleepWorldPhase(world,0i32,id,phase,0i32,true);
+    }
+}
+fun renderGuardState17(reg: ref base.Registers, id: u32, phase: u32, op: base.Operation) -> () = {
+    var retained: base.OutputBucket14[7] = emptyGuardRows17(); var i: i32 = 0i32;
+    while (i < 7i32) {
+        let rank: i32 = guardRowRank17(i);
+        retained[i].rows = builtins.move_out[List[base.OutputRow14]](ptrof base.outputBuckets14[rank].rows);
+        var empty: List[base.OutputRow14] = base.emptyOutputRows14(); builtins.move_in[List[base.OutputRow14]](ptrof base.outputBuckets14[rank].rows,move empty); i = i+1i32;
+    }
+    guardExecution17.n10 = base.zeroN10(); base.observeGuardState14(reg,id,phase,op,&guardExecution17);
+    i = 0i32; while (i < 5i32) { let rank: i32 = guardRowRank17(i); var owned: List[base.OutputRow14] = builtins.move_out[List[base.OutputRow14]](ptrof retained[i].rows);
+            var empty: List[base.OutputRow14] = base.emptyOutputRows14(); builtins.move_in[List[base.OutputRow14]](ptrof retained[i].rows,move empty);
+            base.outputBuckets14[rank].rows = move owned; i = i+1i32; }
+    i = 1i32; while (i < 6i32) { guardExecution17.n10[i] = guardTraceCounts17[i]; i = i+1i32; }
+    base.outputBuckets14[1391].rows.clear(); base.prefix("I10",id,phase); i = 0i32;
+    while (i < 6i32) { hex17(guardExecution17.n10[i] as u32); i = i+1i32; } newline17();
+    if (not raw.worlds.at(reg.worlds[0].number.slot as i64).hasFinalizeSnapshot) {
+        i = 5i32;
+        while (i < 7i32) {
+            let rank: i32 = guardRowRank17(i); let n: i32 = retained[i].rows.length() as i32; var j: i64 = 0i64;
+            while (j < base.outputBuckets14[rank].rows.length()) {
+                var row = base.OutputRow14(); row.data = copy base.outputBuckets14[rank].rows.at(j).data; retained[i].rows.push(move row); j = j+1i64;
+            }
+            var owned: List[base.OutputRow14] = builtins.move_out[List[base.OutputRow14]](ptrof retained[i].rows);
+            var empty: List[base.OutputRow14] = base.emptyOutputRows14(); builtins.move_in[List[base.OutputRow14]](ptrof retained[i].rows,move empty);
+            base.outputBuckets14[rank].rows = move owned; let counter: i32 = if i == 5i32 then 0i32 else 5i32; base.sleepCounts[counter] = base.sleepCounts[counter]+n; i = i+1i32;
+        }
+        base.outputBuckets14[1392].rows.clear(); base.prefix("I11",id,phase); i = 0i32;
+        while (i < 11i32) { hex17(base.sleepCounts[i] as u32); i = i+1i32; } newline17();
+    }
+}
+var guardExecution17: base.Execution = base.Execution(); var guardObservation17: base.Operation = base.Operation(); var guardStepped17: bool = false;
+fun guardStep17(reg: ref base.Registers, checked: bool, dt: f32, substeps: i32, copySlot: i32 = 0i32, solverOnly: bool = false) -> game.SensorAction = {
+    var op = base.Operation(); op.opcode = if checked then 32i32 else 31i32; op.a = 0i32; op.dt = dt; op.subStepCount = substeps; op.copySlot = copySlot;
+    let owner: game.WorldNumber = reg.worlds[0].number;
+    if (checked and raw.worlds.at(owner.slot as i64).locked) {
+        if (solverOnly) { let solverRefusal: raw.StepResult = game.solverStep(owner,dt,substeps,true); return game.SensorAction(solverRefusal.status,if solverRefusal.status == game.LOCKED then 1i32 else solverRefusal.sensorReason17); }
+        let refused: game.StepResult = game.step(owner,game.StepParameters(dt,substeps));
+        return game.SensorAction(refused.status,if refused.status == game.LOCKED then 1i32 else refused.sensorReason17);
+    }
+    base.clearSolverObservations(); base.clearSleepObservations(); base.clearHookObservations12(reg,op);
+    var execution = base.Execution(); var reason: i32 = 0i32;
+    if (checked and solverOnly) {
+        execution.rawStep = game.solverStep(owner,dt,substeps,true); execution.status = execution.rawStep.status; reason = execution.rawStep.sensorReason17;
+        if (execution.status == game.OK) {
+            reg.copies[copySlot].saved = true; reg.copies[copySlot].values.clear(); var solverMoveIndex: i64 = 0i64; var solverWorld: ref raw.World = raw.worlds.at(owner.slot as i64);
+            while (solverMoveIndex < solverWorld.bodyMoveEvents.length()) {
+                let event: raw.BodyMoveEvent = solverWorld.bodyMoveEvents.at(solverMoveIndex); let slot: i32 = event.bodyId.index1-1i32; var value = game.BodyMove();
+                value.number = game.BodyNumber(slot,solverWorld.bodies.at(slot as i64).birthTicket,owner.birthTicket); value.transform = event.transform;
+                value.hasObjectId = event.hasObjectId; value.objectId = event.objectId; value.fellAsleep = event.fellAsleep; reg.copies[copySlot].values.push(value); solverMoveIndex = solverMoveIndex+1i64;
+            }
+        }
+    } else if (checked) {
+        execution.gameStep = game.step(owner,game.StepParameters(dt,substeps)); execution.status = execution.gameStep.status; reason = execution.gameStep.sensorReason17;
+        execution.rawStep.status = execution.status; execution.rawStep.effectiveSubSteps = execution.gameStep.effectiveSubSteps; execution.rawStep.didSolve = execution.gameStep.didSolve;
+        if (execution.status == game.OK) { reg.copies[copySlot].saved = true; reg.copies[copySlot].values = copy execution.gameStep.values; }
+    } else { execution.rawStep = game.rawSolverStep12(owner,dt,substeps); execution.status = execution.rawStep.status; }
+    if (execution.status == game.OK) {
+        execution.moves = raw.b2World_GetBodyEvents(reg.worlds[0].id); reg.completedSteps = reg.completedSteps+1u32;
+                                                                                              
+    }
+    var world: ref raw.World = raw.worlds.at(owner.slot as i64); var i: i64 = 0i64;
+    while (i < world.stepRequests.length()) { execution.pairs.prepared.requests.push(world.stepRequests.at(i)); execution.pairs.created.push(world.stepCreated.at(i)); i = i+1i64; }
+    captureGuardStep17(world,&execution);
+    let status: i32 = execution.status; guardExecution17 = move execution; guardObservation17 = op; guardStepped17 = true;
+    return game.SensorAction(status,if status == game.LOCKED then 1i32 else reason);
+}
+var callbackInput17: GuardInput17 = GuardInput17(); var callbackReg17: base.Registers = base.Registers(); var callbackBanks17: Banks17 = Banks17();
+var callbackResult17: game.SensorAction = game.SensorAction(); var callbackCalls17: i32 = 0i32; var callbackAct17: bool = false;
+fun preSolve9_17(a: broad.ShapeId, b: broad.ShapeId, manifold: ref math2.Manifold, context: words64.Key64) -> bool = {
+    if (callbackCalls17 == 0i32 and callbackAct17) callbackResult17 = guardCall17(&callbackReg17,&callbackBanks17,&callbackInput17,false);
+    callbackCalls17 = callbackCalls17+1i32; return true;
+}
+fun lockFixture17(reg: ref base.Registers, banks: ref Banks17, g: ref GuardInput17, phase: u32) -> game.SensorAction = {
+    let owner: game.WorldNumber = reg.worlds[0].number;
+    var d = raw.BodyDef(); d.position = math2.Vec2(10.0f32,0.0f32);
+    var shape: raw.ShapeRecord = game.circleShape(1.0f32,1.0f32); shape.enablePreSolveEvents = true;
+    var i: i32 = 2i32; while (i < 4i32) {
+        d.bodyType = if i == 2i32 then 0i32 else 2i32;
+        d.position.x = if i == 2i32 then 10.0f32 else 10.1f32;
+        let body: game.BodyResult = game.createBody8(owner,d); reg.bodies[i] = base.SavedBody(true,body.number,owner,body.id); i = i+1i32;
+    }
+    i = 2i32; while (i < 4i32) {
+        shape.enableSensorEvents = true;
+        let made: game.ShapeResult = game.createShapeRaw(owner,reg.bodies[i].number,shape,true,false); reg.shapes[i] = base.SavedShape(true,made.number,owner,made.id); i = i+1i32;
+    }
+    callbackInput17 = g; callbackCalls17 = 0i32; callbackAct17 = true;
+    raw.b2World_SetPreSolveCallback(callbackReg17.worlds[0].id,preSolve9_17,words64.Key64());
+    reg.worlds[0].functionIds12[1] = 9u32;
+    guardStep17(reg,false,1.0f32/60.0f32,4i32);
+    if (callbackCalls17 != 1i32) { fail17("DOMAIN"); return game.SensorAction(game.PARAM,0i32); }
+    return callbackResult17;
+}
+fun guardOwnership17(reg: ref base.Registers, banks: ref Banks17, g: ref GuardInput17) -> game.SensorAction = {
+    let owner: game.WorldNumber = reg.worlds[0].number;
+    guardStep17(reg,false,1.0f32/60.0f32,4i32);
+    let list: i32 = g.words[2] as i32;
+    if (list == 1i32) { raw.b2Body_SetTransform(reg.bodies[1].id,math2.Vec2(4.0f32,0.0f32),math2.Rot(1.0f32,0.0f32)); guardStep17(reg,false,1.0f32/60.0f32,4i32); }
+    if (g.route == 19i32) { saveEvents17(banks,0i32,1i32,owner,reg.worlds[0].id); saveEvents17(banks,1i32,1i32,owner,reg.worlds[0].id); }
+    else { saveOverlaps17(banks,0i32,owner,reg.shapes[0].number); saveOverlaps17(banks,1i32,owner,reg.shapes[0].number); }
+    if (g.words[1] != 0u32) {
+        let field: i32 = g.words[0] as i32; var word: u32 = 0u32;
+        if (g.route == 20i32) word = banks.overlaps[0].values.at(0i64).words[field];
+        else if (list == 0i32) word = banks.events[0].beginEvents.at(0i64).words[field];
+        else word = banks.events[0].endEvents.at(0i64).words[field];
+        editCopy17(banks,if g.route == 19i32 then 0i32 else 1i32,0i32,list,0i32,field,word ^ 1u32);
+    }
+    game.destroyWorld(owner); var parameters = game.SolverWorldParameters(); parameters.gravity = math2.Vec2(); let made: game.WorldResult = game.createSleepWorld(math2.Vec2(),400.0f32,parameters,true); reg.worlds[0] = base.SavedWorld(true,made.number,made.id);
+    return game.SensorAction();
+}
+fun guardWrap17(reg: ref base.Registers, banks: ref Banks17, g: ref GuardInput17, phase: u32) -> game.SensorAction = {
+    let owner: game.WorldNumber = reg.worlds[0].number; let old: game.ShapeNumber = reg.shapes[1].number;
+    guardStep17(reg,false,1.0f32/60.0f32,4i32); saveEvents17(banks,0i32,1i32,owner,reg.worlds[0].id);
+    game.destroyShapeRaw(owner,old,true); var shape = raw.ShapeRecord(); shape.circle.radius = 0.5f32;
+    var i: u32 = 0u32; var churn = base.Operation(); churn.a = 0i32; churn.b = 1i32; churn.c = 2i32; churn.words[4] = 1u32;
+    while (i < g.words[0]) {
+        if (i > 0u32) { game.destroyShapeRaw(owner,reg.shapes[2].number,true); churnRow17(reg,base.currentCase13,phase,i as i32+1i32,0i32,&churn); }
+        let made: game.ShapeResult = game.createShapeRaw(owner,reg.bodies[1].number,shape,true,true);
+        reg.shapes[2] = base.SavedShape(true,made.number,owner,made.id); churnRow17(reg,base.currentCase13,phase,i as i32+1i32,1i32,&churn); i = i+1u32;
+    }
+    raw.b2Shape_EnableSensorEvents(reg.shapes[2].id,true); guardStep17(reg,false,1.0f32/60.0f32,4i32);
+    return game.SensorAction(game.shapeStatus(owner,if g.words[1] == 0u32 then old else reg.shapes[2].number),0i32);
+}
+fun guardPhase17(id: u32, phase: u32, g: ref GuardInput17) -> () = {
+    if (guardLife17(id) != 0i32) { let lifeResult: game.SensorAction = guardLifeResult17(g); guard17(id,phase,lifeResult.status,lifeResult.reason,lifeResult.status == game.OK); return; }
+    let helper: bool = guardHelper17(id) != 0i32;
+    var savedWorlds: List[raw.World]; let previous: words64.Key64 = game.lastIssued;
+    if (helper) {
+        savedWorlds = builtins.move_out[List[raw.World]](ptrof raw.worlds);
+        var temporary: List[raw.World] = raw.initialWorlds(); builtins.move_in[List[raw.World]](ptrof raw.worlds,move temporary);
+    }
+    callbackReg17 = base.Registers(); callbackBanks17 = Banks17();
+    var reg: ref base.Registers = &callbackReg17; var banks: ref Banks17 = &callbackBanks17;
+    guardExecution17 = base.Execution(); guardObservation17 = base.Operation(); guardStepped17 = false;
+    guardQueries17.clear(); guardTraceCounts17 = base.zeroN10(); guardPhaseNumber17 = phase;
+    base.clearOperation14(); base.clearSolverObservations(); base.clearSleepObservations();
+    base.joints14 = base.zeroJoints14(); base.descriptions14 = base.zeroDescriptions14(); base.copies14 = base.zeroCopies14(); base.completedPositiveSteps = 0u32;
+    base.beginOutput14(); makeGuardWorld17(reg,g,helper); var result = game.SensorAction();
+    if (g.route == 19i32 or g.route == 20i32) result = guardOwnership17(reg,banks,g);
+    else if (g.route == 21i32) result = guardWrap17(reg,banks,g,phase);
+    else if (g.context[17] != 0u32) result = lockFixture17(reg,banks,g,phase);
+    else result = guardCall17(reg,banks,g,helper);
+    if (base.inputOk) {
+        guard17(id,phase,result.status,result.reason,result.status == game.OK);
+        if (not helper) {
+            var op = base.Operation(); op.opcode = 400i32;
+            var observation: base.Operation = if guardStepped17 then guardObservation17 else op; guardExecution17.status = result.status;
+            renderGuardState17(reg,id,phase,observation);
+                                                                                 
+            base.outputBuckets14[200].rows.clear(); base.prefix("A14",id,phase); decimal17(result.status); decimal17(0i32); newline17();
+            var r = Result17(); guardObserving17 = true; observe17(reg,banks,id,phase,&op,&r); guardObserving17 = false;
+        }
+        base.flushOutput14();
+    }
+    base.cleanup(reg);
+    if (helper) {
+        var temporary: List[raw.World] = builtins.move_out[List[raw.World]](ptrof raw.worlds);
+        builtins.move_in[List[raw.World]](ptrof raw.worlds,move savedWorlds); game.lastIssued = previous;
+    }
+}
+fun guardPair17(id: u32) -> () = {
+    var phase: u32 = 0u32;
+    while (phase < 2u32 and base.inputOk) {
+        base.readRow(); if (not base.inputOk) return;
+        if (base.rowBytes[0] != 71i32) { fail17("TAG"); return; }
+        base.consumeTag("G"); let actual: u32 = base.readWord(); let guard: u32 = base.readWord(); let gotPhase: u32 = base.readWord(); let route: u32 = base.readWord(); let n: u32 = base.readWord();
+        if (actual != id or guard != id) { fail17("GUARD"); return; }
+        if (gotPhase != phase) { fail17("PHASE"); return; }
+        if (route > 21u32 or route as i32 != guardRoute17(id)) { fail17("FIXTURE"); return; }
+        if (n as i32 != guardSize17(id) or tokens17() != 6i32+n as i32) { fail17("ARITY"); return; }
+        var g = GuardInput17(); g.route = route as i32; g.count = n as i32-64i32; var i: i32 = 0i32; base.readingPayload = true;
+        while (i < 64i32 and base.inputOk) { g.context[i] = base.readWord(); i = i+1i32; }
+        var j: i32 = 0i32; while (j < g.count and base.inputOk) { g.words[j] = base.readWord(); j = j+1i32; } base.readingPayload = false; base.endRow();
+        var k: i32 = 38i32; while (k < 64i32) { if (g.context[k] != 0u32) fail17("UNUSED"); k = k+1i32; }
+        if (g.context[25] != 0u32) { fail17("DOMAIN"); return; }                                              
+        if (base.inputOk) guardPhase17(id,phase,&g); phase = phase+1u32;
+    }
+}
+
+                                                                        
+fun churnRow17(reg: ref base.Registers, id: u32, seq: u32, j: i32, phase: i32, op: ref base.Operation) -> () = {
+    base.prefix("J",id,seq); base.currentOutputRank14 = 1i32; decimal17(j); decimal17(phase); base.outShapeHandle(reg.shapes[op.c]);
+    let old: base.SavedShape = reg.shapes[op.words[4] as i32]; hex17(raw.b2Shape_IsValid(old.id) as u32); hex17((game.shapeStatus(old.owner,old.number) == game.OK) as u32);
+    let owner: game.WorldNumber = reg.worlds[op.a].number; let world: game.WorldLookup = game.lookupWorld(owner); let body: game.BodyLookup = game.lookupBody(owner,reg.bodies[op.b].number);
+    hex17(world.value.shapeCount as u32); hex17(body.value.shapeCount as u32); base.outMass(mass2.MassData(body.value.mass,body.value.localCenter,body.value.inertia)); newline17();
+}
+fun churn17(reg: ref base.Registers, id: u32, seq: u32, op: ref base.Operation) -> i32 = {
+    base.outEcho(id,seq,op); var shape = raw.ShapeRecord(); shape.circle.radius = 0.5f32;
+    var status: i32 = game.OK; var j: i32 = 1i32;
+    while (j <= op.words[3] as i32 and status == game.OK) {
+        if (j > 1i32) { status = game.destroyShapeRaw(reg.worlds[op.a].number,reg.shapes[op.c].number,true); if (status != game.OK) return status; churnRow17(reg,id,seq,j,0i32,op); }
+        let made: game.ShapeResult = game.createShapeRaw(reg.worlds[op.a].number,reg.bodies[op.b].number,shape,true,true); status = made.status;
+        if (status == game.OK) { reg.shapes[op.c] = base.SavedShape(true,made.number,reg.worlds[op.a].number,made.id); churnRow17(reg,id,seq,j,1i32,op); }
+        j = j+1i32;
+    }
+    base.outChainAnswer13(id,seq,status,0i32);
+    base.prefix("R",id,seq); decimal17(0i32); decimal17(status); decimal17(3i32); base.outShapeHandle(reg.shapes[op.c]); newline17();
+    var execution = base.Execution(); execution.status = status; base.observeGuardState14(reg,id,seq,op,&execution); return status;
+}
+
+fun population17(kind: i32) -> i32 = {
+    var count: i32 = 0i32; var i: i64 = 0i64;
+    while (i < raw.worlds.length()) {
+        var world: ref raw.World = raw.worlds.at(i);
+        if (world.inUse) {
+            if (kind == 0i32) count = count+1i32;
+            else if (kind == 1i32) count = count+world.bodyIdPool.nextIndex-world.bodyIdPool.freeCount;
+            else count = count+world.shapeIdPool.nextIndex-world.shapeIdPool.freeCount;
+        } i = i+1i64;
+    } return count;
+}
+
+                                                                 
+fun operationCount17(direct: bool, id: u32) -> i32 = {
+    if (direct) {
+        if (id <= 8u32) return 1i32;
+        if (id <= 10u32) return 8i32;
+        if (id <= 11u32) return 9i32;
+        if (id <= 12u32) return 10i32;
+        if (id <= 13u32) return 12i32;
+        if (id <= 14u32) return 11i32;
+        if (id <= 15u32) return 8i32;
+        if (id <= 16u32) return 12i32;
+        if (id <= 19u32) return 7i32;
+        if (id <= 21u32) return 8i32;
+        if (id <= 22u32) return 7i32;
+        if (id <= 26u32) return 10i32;
+        if (id <= 27u32) return 15i32;
+        if (id <= 28u32) return 8i32;
+        if (id <= 32u32) return 7i32;
+        if (id <= 35u32) return 9i32;
+        if (id <= 37u32) return 8i32;
+        if (id <= 39u32) return 7i32;
+        if (id <= 40u32) return 8i32;
+        if (id <= 41u32) return 12i32;
+        if (id <= 42u32) return 13i32;
+        if (id <= 43u32) return 10i32;
+        if (id <= 48u32) return 11i32;
+        if (id <= 49u32) return 8i32;
+        if (id <= 50u32) return 9i32;
+        if (id <= 52u32) return 8i32;
+        if (id <= 53u32) return 71i32;
+        if (id <= 54u32) return 135i32;
+        if (id <= 55u32) return 8i32;
+        if (id <= 56u32) return 9i32;
+        if (id <= 57u32) return 11i32;
+        if (id <= 58u32) return 8i32;
+        if (id <= 59u32) return 13i32;
+        if (id <= 60u32) return 11i32;
+        if (id <= 61u32) return 9i32;
+        if (id <= 62u32) return 78i32;
+        if (id <= 63u32) return 13i32;
+        if (id <= 64u32) return 2i32;
+    }
+        if (id <= 5u32) return 6i32;
+        if (id <= 6u32) return 7i32;
+        if (id <= 8u32) return 8i32;
+        if (id <= 9u32) return 7i32;
+        if (id <= 10u32) return 8i32;
+        if (id <= 11u32) return 10i32;
+        if (id <= 12u32) return 9i32;
+        if (id <= 13u32) return 10i32;
+        if (id <= 14u32) return 9i32;
+        if (id <= 15u32) return 8i32;
+        if (id <= 16u32) return 9i32;
+        if (id <= 18u32) return 8i32;
+        if (id <= 19u32) return 9i32;
+        if (id <= 22u32) return 8i32;
+        if (id <= 23u32) return 9i32;
+        if (id <= 24u32) return 7i32;
+        if (id <= 30u32) return 618i32;
+        if (id <= 42u32) return 627i32;
+        if (id <= 48u32) return 617i32;
+        if (id <= 49u32) return 624i32;
+        if (id <= 52u32) return 615i32;
+        if (id <= 53u32) return 624i32;
+        if (id <= 54u32) return 615i32;
+        if (id <= 60u32) return 627i32;
+        if (id <= 66u32) return 620i32;
+        if (id <= 72u32) return 1260i32;
+        if (id <= 78u32) return 704i32;
+        if (id <= 84u32) return 1807i32;
+        if (id <= 90u32) return 1357i32;
+        if (id <= 96u32) return 871i32;
+    return -1i32;
+}

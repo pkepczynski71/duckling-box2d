@@ -1,0 +1,414 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+import fizyka.kola.*;
+import std.math;
+
+                                                                            
+                                                                                   
+                                                              
+fun zeroPolygonVectors() -> Vec2[8] = {
+    var values: Vec2[8];
+    return values;
+}
+
+# Box2D 8c661469, include/box2d/collision.h:133.
+                                                                               
+                                                                       
+class Polygon {
+    vertices: Vec2[8] = zeroPolygonVectors();
+    normals: Vec2[8] = zeroPolygonVectors();
+    centroid: Vec2 = Vec2();
+    radius: f32 = 0.0f32;
+    count: i32 = 0i32;
+}
+
+# Box2D 8c661469, include/box2d/collision.     
+class SegmentDistanceResult {
+    closest1: Vec2 = Vec2();
+    closest2: Vec2 = Vec2();
+    fraction1: f32 = 0.0f32;
+    fraction2: f32 = 0.0f32;
+    distanceSquared: f32 = 0.0f32;
+}
+
+# Box2D 8c661469, src/manifold.                  
+const FLT_MAX: f32 = 3.4028234663852886e38f32;
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2MinFloat(a: f32, b: f32) -> f32 = {
+    if (a < b) return a;
+    return b;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2ClampFloat(a: f32, lower: f32, upper: f32) -> f32 = {
+    if (a < lower) return lower;
+    if (a > upper) return upper;
+    return a;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2Dot(a: Vec2, b: Vec2) -> f32 = {
+    return a.x * b.x + a.y * b.y;
+}
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2CrossSV(s: f32, v: Vec2) -> Vec2 = {
+    return Vec2(-s * v.y, s * v.x);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2Neg(a: Vec2) -> Vec2 = {
+    return Vec2(-a.x, -a.y);
+}
+
+# Box2D 8c661469, include/box2d/math_functions.     
+fun b2DistanceSquared(a: Vec2, b: Vec2) -> f32 = {
+    let c: Vec2 = Vec2(b.x - a.x, b.y - a.y);
+    return c.x * c.x + c.y * c.y;
+}
+
+# Box2D 8c661469, src/manifold.            
+fun B2_MAKE_ID(a: i32, b: i32) -> u16 = {
+    return ((((a as u8) as u32) << 8u32) | ((b as u8) as u32)) as u16;
+}
+
+# Box2D 8c661469, src/distance.    
+fun b2SegmentDistance(p1: Vec2, q1: Vec2, p2: Vec2, q2: Vec2) -> SegmentDistanceResult = {
+    var result = SegmentDistanceResult();
+    let d1: Vec2 = b2Sub(q1, p1);
+    let d2: Vec2 = b2Sub(q2, p2);
+    let r: Vec2 = b2Sub(p1, p2);
+    let dd1: f32 = b2Dot(d1, d1);
+    let dd2: f32 = b2Dot(d2, d2);
+    let rd1: f32 = b2Dot(r, d1);
+    let rd2: f32 = b2Dot(r, d2);
+    let epsSqr: f32 = FLT_EPSILON * FLT_EPSILON;
+
+    if (dd1 < epsSqr or dd2 < epsSqr) {
+        if (dd1 >= epsSqr) {
+            result.fraction1 = b2ClampFloat(-rd1 / dd1, 0.0f32, 1.0f32);
+            result.fraction2 = 0.0f32;
+        } else if (dd2 >= epsSqr) {
+            result.fraction1 = 0.0f32;
+            result.fraction2 = b2ClampFloat(rd2 / dd2, 0.0f32, 1.0f32);
+        } else {
+            result.fraction1 = 0.0f32;
+            result.fraction2 = 0.0f32;
+        }
+    } else {
+        let d12: f32 = b2Dot(d1, d2);
+        let denominator: f32 = dd1 * dd2 - d12 * d12;
+        var f1: f32 = 0.0f32;
+        if (denominator != 0.0f32) {
+            f1 = b2ClampFloat((d12 * rd2 - rd1 * dd2) / denominator, 0.0f32, 1.0f32);
+        }
+        var f2: f32 = (d12 * f1 + rd2) / dd2;
+        if (f2 < 0.0f32) {
+            f2 = 0.0f32;
+            f1 = b2ClampFloat(-rd1 / dd1, 0.0f32, 1.0f32);
+        } else if (f2 > 1.0f32) {
+            f2 = 1.0f32;
+            f1 = b2ClampFloat((d12 - rd1) / dd1, 0.0f32, 1.0f32);
+        }
+        result.fraction1 = f1;
+        result.fraction2 = f2;
+    }
+    result.closest1 = b2MulAdd(p1, result.fraction1, d1);
+    result.closest2 = b2MulAdd(p2, result.fraction2, d2);
+    result.distanceSquared = b2DistanceSquared(result.closest1, result.closest2);
+    return result;
+}
+
+# Box2D 8c661469, src/manifold.     
+fun b2ClipPolygons(polyA: ref Polygon, polyB: ref Polygon, edgeA: i32, edgeB: i32, flip: bool) -> Manifold = {
+    var manifold = Manifold();
+                                                                                    
+    var poly1 = Polygon();
+    var poly2 = Polygon();
+    var i11: i32 = 0i32;
+    var i12: i32 = 0i32;
+    var i21: i32 = 0i32;
+    var i22: i32 = 0i32;
+    if (flip) {
+        poly1 = polyB;
+        poly2 = polyA;
+        i11 = edgeB;
+        i12 = if edgeB + 1i32 < polyB.count then edgeB + 1i32 else 0i32;
+        i21 = edgeA;
+        i22 = if edgeA + 1i32 < polyA.count then edgeA + 1i32 else 0i32;
+    } else {
+        poly1 = polyA;
+        poly2 = polyB;
+        i11 = edgeA;
+        i12 = if edgeA + 1i32 < polyA.count then edgeA + 1i32 else 0i32;
+        i21 = edgeB;
+        i22 = if edgeB + 1i32 < polyB.count then edgeB + 1i32 else 0i32;
+    }
+    let normal: Vec2 = poly1.normals[i11];
+    let v11: Vec2 = poly1.vertices[i11];
+    let v12: Vec2 = poly1.vertices[i12];
+    let v21: Vec2 = poly2.vertices[i21];
+    let v22: Vec2 = poly2.vertices[i22];
+    let tangent: Vec2 = b2CrossSV(1.0f32, normal);
+    let lower1: f32 = 0.0f32;
+    let upper1: f32 = b2Dot(b2Sub(v12, v11), tangent);
+    let upper2: f32 = b2Dot(b2Sub(v21, v11), tangent);
+    let lower2: f32 = b2Dot(b2Sub(v22, v11), tangent);
+    if (upper2 < lower1 or upper1 < lower2) return manifold;
+
+    var vLower = Vec2();
+    if (lower2 < lower1 and upper2 - lower2 > FLT_EPSILON) {
+        vLower = b2Lerp(v22, v21, (lower1 - lower2) / (upper2 - lower2));
+    } else {
+        vLower = v22;
+    }
+    var vUpper = Vec2();
+    if (upper2 > upper1 and upper2 - lower2 > FLT_EPSILON) {
+        vUpper = b2Lerp(v22, v21, (upper1 - lower2) / (upper2 - lower2));
+    } else {
+        vUpper = v21;
+    }
+    let separationLower: f32 = b2Dot(b2Sub(vLower, v11), normal);
+    let separationUpper: f32 = b2Dot(b2Sub(vUpper, v11), normal);
+    let r1: f32 = poly1.radius;
+    let r2: f32 = poly2.radius;
+    vLower = b2MulAdd(vLower, 0.5f32 * (r1 - r2 - separationLower), normal);
+    vUpper = b2MulAdd(vUpper, 0.5f32 * (r1 - r2 - separationUpper), normal);
+    let radius: f32 = r1 + r2;
+    if (flip == false) {
+        manifold.normal = normal;
+        manifold.point0.anchorA = vLower;
+        manifold.point0.separation = separationLower - radius;
+        manifold.point0.id = B2_MAKE_ID(i11, i22);
+        manifold.pointCount = manifold.pointCount + 1i32;
+        manifold.point1.anchorA = vUpper;
+        manifold.point1.separation = separationUpper - radius;
+        manifold.point1.id = B2_MAKE_ID(i12, i21);
+        manifold.pointCount = manifold.pointCount + 1i32;
+    } else {
+        manifold.normal = b2Neg(normal);
+        manifold.point0.anchorA = vUpper;
+        manifold.point0.separation = separationUpper - radius;
+        manifold.point0.id = B2_MAKE_ID(i21, i12);
+        manifold.pointCount = manifold.pointCount + 1i32;
+        manifold.point1.anchorA = vLower;
+        manifold.point1.separation = separationLower - radius;
+        manifold.point1.id = B2_MAKE_ID(i22, i11);
+        manifold.pointCount = manifold.pointCount + 1i32;
+    }
+    return manifold;
+}
+
+# Box2D 8c661469, src/manifold.     
+fun b2FindMaxSeparation(edgeIndex: ref i32, poly1: ref Polygon, poly2: ref Polygon) -> f32 = {
+    let count1: i32 = poly1.count;
+    let count2: i32 = poly2.count;
+    var bestIndex: i32 = 0i32;
+    var maxSeparation: f32 = -FLT_MAX;
+    var i: i32 = 0i32;
+    while (i < count1) {
+        let n: Vec2 = poly1.normals[i];
+        let v1: Vec2 = poly1.vertices[i];
+        var si: f32 = FLT_MAX;
+        var j: i32 = 0i32;
+        while (j < count2) {
+            let sij: f32 = b2Dot(n, b2Sub(poly2.vertices[j], v1));
+            if (sij < si) si = sij;
+            j = j + 1i32;
+        }
+        if (si > maxSeparation) {
+            maxSeparation = si;
+            bestIndex = i;
+        }
+        i = i + 1i32;
+    }
+    edgeIndex = bestIndex;
+    return maxSeparation;
+}
+
+# Box2D 8c661469, src/manifold.                                      
+fun b2CollidePolygons(polygonA: ref Polygon, xfA: Transform, polygonB: ref Polygon, xfB: Transform) -> Manifold = {
+    let origin: Vec2 = polygonA.vertices[0];
+    let linearSlop: f32 = B2_LINEAR_SLOP;
+    let speculativeDistance: f32 = B2_SPECULATIVE_DISTANCE;
+    let sfA: Transform = Transform(b2Add(xfA.p, b2RotateVector(xfA.q, origin)), xfA.q);
+    let xf: Transform = b2InvMulTransforms(sfA, xfB);
+    var localPolyA = Polygon();
+    localPolyA.count = polygonA.count;
+    localPolyA.radius = polygonA.radius;
+    localPolyA.vertices[0] = Vec2();
+    localPolyA.normals[0] = polygonA.normals[0];
+    var indexA: i32 = 1i32;
+    while (indexA < localPolyA.count) {
+        localPolyA.vertices[indexA] = b2Sub(polygonA.vertices[indexA], origin);
+        localPolyA.normals[indexA] = polygonA.normals[indexA];
+        indexA = indexA + 1i32;
+    }
+    var localPolyB = Polygon();
+    localPolyB.count = polygonB.count;
+    localPolyB.radius = polygonB.radius;
+    var indexB: i32 = 0i32;
+    while (indexB < localPolyB.count) {
+        localPolyB.vertices[indexB] = b2TransformPoint(xf, polygonB.vertices[indexB]);
+        localPolyB.normals[indexB] = b2RotateVector(xf.q, polygonB.normals[indexB]);
+        indexB = indexB + 1i32;
+    }
+    var edgeA: i32 = 0i32;
+    let separationA: f32 = b2FindMaxSeparation(&edgeA, &localPolyA, &localPolyB);
+    var edgeB: i32 = 0i32;
+    let separationB: f32 = b2FindMaxSeparation(&edgeB, &localPolyB, &localPolyA);
+    let radius: f32 = localPolyA.radius + localPolyB.radius;
+    if (separationA > speculativeDistance + radius or separationB > speculativeDistance + radius) {
+        return Manifold();
+    }
+
+    var flip: bool = false;
+    if (separationA >= separationB) {
+        flip = false;
+        let searchDirectionA: Vec2 = localPolyA.normals[edgeA];
+        let countB: i32 = localPolyB.count;
+        edgeB = 0i32;
+        var minDotB: f32 = FLT_MAX;
+        var incidentB: i32 = 0i32;
+        while (incidentB < countB) {
+            let dotB: f32 = b2Dot(searchDirectionA, localPolyB.normals[incidentB]);
+            if (dotB < minDotB) {
+                minDotB = dotB;
+                edgeB = incidentB;
+            }
+            incidentB = incidentB + 1i32;
+        }
+    } else {
+        flip = true;
+        let searchDirectionB: Vec2 = localPolyB.normals[edgeB];
+        let countA: i32 = localPolyA.count;
+        edgeA = 0i32;
+        var minDotA: f32 = FLT_MAX;
+        var incidentA: i32 = 0i32;
+        while (incidentA < countA) {
+            let dotA: f32 = b2Dot(searchDirectionB, localPolyA.normals[incidentA]);
+            if (dotA < minDotA) {
+                minDotA = dotA;
+                edgeA = incidentA;
+            }
+            incidentA = incidentA + 1i32;
+        }
+    }
+
+    var manifold = Manifold();
+    if (separationA > 0.1f32 * linearSlop or separationB > 0.1f32 * linearSlop) {
+        let i11: i32 = edgeA;
+        let i12: i32 = if edgeA + 1i32 < localPolyA.count then edgeA + 1i32 else 0i32;
+        let i21: i32 = edgeB;
+        let i22: i32 = if edgeB + 1i32 < localPolyB.count then edgeB + 1i32 else 0i32;
+        let v11: Vec2 = localPolyA.vertices[i11];
+        let v12: Vec2 = localPolyA.vertices[i12];
+        let v21: Vec2 = localPolyB.vertices[i21];
+        let v22: Vec2 = localPolyB.vertices[i22];
+        let result: SegmentDistanceResult = b2SegmentDistance(v11, v12, v21, v22);
+                                                                  
+        let distance: f32 = math.sqrt(result.distanceSquared);
+        let separation: f32 = distance - radius;
+        if (distance - radius > speculativeDistance) return manifold;
+        manifold = b2ClipPolygons(&localPolyA, &localPolyB, edgeA, edgeB, flip);
+        var minSeparation: f32 = FLT_MAX;
+        var minIndex: i32 = 0i32;
+        while (minIndex < manifold.pointCount) {
+            let pointSeparation: f32 = if minIndex == 0i32 then manifold.point0.separation else manifold.point1.separation;
+            minSeparation = b2MinFloat(minSeparation, pointSeparation);
+            minIndex = minIndex + 1i32;
+        }
+        if (separation + 0.1f32 * linearSlop < minSeparation) {
+            if (result.fraction1 == 0.0f32 and result.fraction2 == 0.0f32) {
+                var normal00: Vec2 = b2Sub(v21, v11);
+                let invDistance00: f32 = 1.0f32 / distance;
+                normal00.x = normal00.x * invDistance00;
+                normal00.y = normal00.y * invDistance00;
+                let c100: Vec2 = b2MulAdd(v11, localPolyA.radius, normal00);
+                let c200: Vec2 = b2MulAdd(v21, -localPolyB.radius, normal00);
+                manifold.normal = normal00;
+                manifold.point0.anchorA = b2Lerp(c100, c200, 0.5f32);
+                manifold.point0.separation = distance - radius;
+                manifold.point0.id = B2_MAKE_ID(i11, i21);
+                manifold.pointCount = 1i32;
+            } else if (result.fraction1 == 0.0f32 and result.fraction2 == 1.0f32) {
+                var normal01: Vec2 = b2Sub(v22, v11);
+                let invDistance01: f32 = 1.0f32 / distance;
+                normal01.x = normal01.x * invDistance01;
+                normal01.y = normal01.y * invDistance01;
+                let c101: Vec2 = b2MulAdd(v11, localPolyA.radius, normal01);
+                let c201: Vec2 = b2MulAdd(v22, -localPolyB.radius, normal01);
+                manifold.normal = normal01;
+                manifold.point0.anchorA = b2Lerp(c101, c201, 0.5f32);
+                manifold.point0.separation = distance - radius;
+                manifold.point0.id = B2_MAKE_ID(i11, i22);
+                manifold.pointCount = 1i32;
+            } else if (result.fraction1 == 1.0f32 and result.fraction2 == 0.0f32) {
+                var normal10: Vec2 = b2Sub(v21, v12);
+                let invDistance10: f32 = 1.0f32 / distance;
+                normal10.x = normal10.x * invDistance10;
+                normal10.y = normal10.y * invDistance10;
+                let c110: Vec2 = b2MulAdd(v12, localPolyA.radius, normal10);
+                let c210: Vec2 = b2MulAdd(v21, -localPolyB.radius, normal10);
+                manifold.normal = normal10;
+                manifold.point0.anchorA = b2Lerp(c110, c210, 0.5f32);
+                manifold.point0.separation = distance - radius;
+                manifold.point0.id = B2_MAKE_ID(i12, i21);
+                manifold.pointCount = 1i32;
+            } else if (result.fraction1 == 1.0f32 and result.fraction2 == 1.0f32) {
+                var normal11: Vec2 = b2Sub(v22, v12);
+                let invDistance11: f32 = 1.0f32 / distance;
+                normal11.x = normal11.x * invDistance11;
+                normal11.y = normal11.y * invDistance11;
+                let c111: Vec2 = b2MulAdd(v12, localPolyA.radius, normal11);
+                let c211: Vec2 = b2MulAdd(v22, -localPolyB.radius, normal11);
+                manifold.normal = normal11;
+                manifold.point0.anchorA = b2Lerp(c111, c211, 0.5f32);
+                manifold.point0.separation = distance - radius;
+                manifold.point0.id = B2_MAKE_ID(i12, i22);
+                manifold.pointCount = 1i32;
+            }
+        }
+    } else {
+        manifold = b2ClipPolygons(&localPolyA, &localPolyB, edgeA, edgeB, flip);
+    }
+    if (manifold.pointCount > 0i32) {
+        manifold.normal = b2RotateVector(xfA.q, manifold.normal);
+                                                                                  
+        manifold.point0.anchorA = b2RotateVector(xfA.q, b2Add(manifold.point0.anchorA, origin));
+        manifold.point0.anchorB = b2Add(manifold.point0.anchorA, b2Sub(xfA.p, xfB.p));
+        manifold.point0.point = b2Add(xfA.p, manifold.point0.anchorA);
+        if (manifold.pointCount > 1i32) {
+            manifold.point1.anchorA = b2RotateVector(xfA.q, b2Add(manifold.point1.anchorA, origin));
+            manifold.point1.anchorB = b2Add(manifold.point1.anchorA, b2Sub(xfA.p, xfB.p));
+            manifold.point1.point = b2Add(xfA.p, manifold.point1.anchorA);
+        }
+    }
+    return manifold;
+}

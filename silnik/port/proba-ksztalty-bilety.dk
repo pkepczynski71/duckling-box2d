@@ -1,0 +1,76 @@
+  
+SPDX-FileCopyrightText: 2023 Erin Catto
+SPDX-License-Identifier: MIT
+
+MIT License
+
+Copyright (c) 2022 Erin Catto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+  
+
+
+                                                                        
+                                                                       
+import fizyka.gra as game;
+import fizyka.swiat as raw;
+import fizyka.kola as math2;
+import fizyka.zbior as bits;
+import core.primitive_io as io;
+
+                                                                                
+fun main() -> i64 = {
+    let createdWorld: game.WorldResult = game.createWorld(math2.Vec2(), 400.0f32);
+    if (createdWorld.status != game.OK) return 1i64;
+    var def = raw.BodyDef(); def.bodyType = 2i32;
+    let createdBody: game.BodyResult = game.createBody(createdWorld.number, def);
+    if (createdBody.status != game.OK) return 2i64;
+    let source: raw.ShapeRecord = game.circleShape(0.5f32, 1.0f32);
+    let worldSlot: i64 = createdWorld.number.slot as i64;
+    game.lastIssued = bits.Key64(4294967295u32, 17u32);
+    let carried: game.ShapeResult = game.addPreparedShape(createdWorld.number, createdBody.number, source, true);
+    if (carried.status != game.OK or not bits.equalKey(carried.number.birthTicket, bits.Key64(0u32, 18u32))
+        or not bits.equalKey(game.lastIssued, bits.Key64(0u32, 18u32))) return 3i64;
+    if (game.destroyShape(createdWorld.number, carried.number) != game.OK) return 4i64;
+    let maximum: bits.Key64 = bits.Key64(4294967295u32, 4294967295u32);
+    game.lastIssued = bits.Key64(4294967294u32, 4294967295u32);
+    let finalShape: game.ShapeResult = game.addPreparedShape(createdWorld.number, createdBody.number, source, true);
+    if (finalShape.status != game.OK or not bits.equalKey(finalShape.number.birthTicket, maximum)
+        or not bits.equalKey(game.lastIssued, maximum)) return 5i64;
+    let nextIndex: i32 = raw.worlds.at(worldSlot).shapeIdPool.nextIndex;
+    let freeCount: i32 = raw.worlds.at(worldSlot).shapeIdPool.freeCount;
+    let moveCount: i64 = raw.worlds.at(worldSlot).broadPhase.moveArray.length();
+    let rejected: game.ShapeResult = game.addPreparedShape(createdWorld.number, createdBody.number, source, true);
+    if (rejected.status != game.LIMIT or rejected.id.index1 != 0i32
+        or not bits.equalKey(game.lastIssued, maximum)) return 6i64;
+    if (raw.worlds.at(worldSlot).shapeIdPool.nextIndex != nextIndex or raw.worlds.at(worldSlot).shapeIdPool.freeCount != freeCount
+        or raw.worlds.at(worldSlot).broadPhase.moveArray.length() != moveCount
+        or raw.worlds.at(worldSlot).broadPhase.trees[2].proxyCount != 1i32
+        or raw.worlds.at(worldSlot).bodies.at(createdBody.number.slot as i64).shapeCount != 1i32) return 7i64;
+    if (game.shapeStatus(createdWorld.number, finalShape.number) != game.OK) return 8i64;
+    if (game.destroyShape(createdWorld.number, finalShape.number) != game.OK) return 9i64;
+    let afterDestroy: game.ShapeResult = game.createShapeRaw(createdWorld.number, createdBody.number, source, true, true);
+    if (afterDestroy.status != game.LIMIT or not bits.equalKey(game.lastIssued, maximum)
+        or game.shapeStatus(createdWorld.number, finalShape.number) != game.STALE
+        or raw.worlds.at(worldSlot).broadPhase.trees[2].proxyCount != 0i32
+        or raw.worlds.at(worldSlot).broadPhase.moveArray.length() != 0i64) return 10i64;
+    if (game.destroyWorld(createdWorld.number) != game.OK) return 11i64;
+    io.writeStr("KSZTALTY BILETY OK\n");
+    return 0i64;
+}

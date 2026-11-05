@@ -1,0 +1,335 @@
+{
+  "version": "N2-13c-2026-11-01-0800",
+  "dtBits": "3c888889",
+  "maximumLinearSpeedBits": "42c80000",
+  "subSteps": [
+    1,
+    4,
+    8,
+    1,
+    4,
+    8
+  ],
+  "warmStarting": [
+    0,
+    0,
+    0,
+    1,
+    1,
+    1
+  ],
+  "W7": {
+    "ids": [
+      421,
+      426
+    ],
+    "steps": 1200,
+    "opMax": 1320,
+    "boxFrictionBits": "3f19999a",
+    "terrainFrictionBits": "3f19999a",
+    "boxCenters": [
+      [
+        0,
+        0.5
+      ],
+      [
+        0,
+        1.5
+      ],
+      [
+        0,
+        2.5
+      ]
+    ],
+    "halfExtents": [
+      0.5,
+      0.5
+    ],
+    "schedule": [
+      {
+        "after": 720,
+        "actions": [
+          "save copies",
+          "DestroyChain"
+        ]
+      },
+      {
+        "after": 721,
+        "actions": [
+          "read saved/public end data"
+        ]
+      },
+      {
+        "before": 901,
+        "actions": [
+          "recreate terrain"
+        ]
+      },
+      {
+        "after": 960,
+        "actions": [
+          "read CURRENT B2 position as f32",
+          "DestroyBody B2",
+          "recreate middle box at that recorded CURRENT position with friction0.6"
+        ]
+      }
+    ],
+    "invariant": "No change to physics before the replacement; both end buffers and history/ownership remain obligations.",
+    "replacementPositionBitsByVariant": [
+      [
+        "3f859c05",
+        "c29fadf5"
+      ],
+      [
+        "3c188bcc",
+        "c29d39e5"
+      ],
+      [
+        "3a753476",
+        "c29d1a4d"
+      ],
+      [
+        "3d2905c2",
+        "c29de9b3"
+      ],
+      [
+        "3c3707ba",
+        "c29d39ad"
+      ],
+      [
+        "3ba09571",
+        "c29d1d8d"
+      ]
+    ],
+    "replacementPositionSource": "Actual B2 position read immediately before destroy after960 in W2 C-only; materialized as identical literal input for C and D, each side must independently match its own pre-destroy B2 position"
+  },
+  "W8": {
+    "ids": [
+      427,
+      432
+    ],
+    "steps": 600,
+    "opMax": 720,
+    "proposedOperationCount": 708,
+    "spareOperations": 12,
+    "categoryBits": "8000000000000000",
+    "initial": {
+      "boxes": 8,
+      "halfExtents": [
+        0.25,
+        0.25
+      ],
+      "positions": "(i-4,0.25) for i0..7",
+      "frictionBits": "00000000",
+      "group": -1,
+      "maskBits": "ffffffffffffffff",
+      "preSolveFlags": true,
+      "groundFrictionBits": "3f19999a"
+    },
+    "orderedRules": {
+      "target": "box0 and child[5] of current chain generation, complete ShapeNumber; recreate resets targets",
+      "filter": [
+        {
+          "a": "box0",
+          "b": "child5",
+          "allow": false
+        },
+        {
+          "a": "box0",
+          "b": "child5",
+          "allow": true
+        },
+        {
+          "a": "child5",
+          "b": "box0",
+          "allow": true
+        }
+      ],
+      "preSolve": [
+        {
+          "a": "child5",
+          "b": "box0",
+          "allow": false,
+          "direction": [
+            0,
+            1
+          ],
+          "threshold": 2,
+          "replace": false,
+          "normal": [
+            0,
+            0
+          ]
+        },
+        {
+          "a": "child5",
+          "b": "box0",
+          "allow": true,
+          "direction": [
+            0,
+            1
+          ],
+          "threshold": 0,
+          "replace": false,
+          "normal": [
+            0,
+            0
+          ]
+        },
+        {
+          "a": "child5",
+          "b": "box0",
+          "allow": false,
+          "direction": [
+            0,
+            1
+          ],
+          "threshold": 0,
+          "replace": false,
+          "normal": [
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "schedule": [
+      {
+        "after": 1,
+        "actions": [
+          "DestroyChain/CreateChain group+1",
+          "all8 boxes filter(group+1,mask0), category bit63",
+          "clear+append filter/pre rules using current child5"
+        ]
+      },
+      {
+        "after": 2,
+        "actions": [
+          "DestroyChain/CreateChain group0",
+          "all8 boxes filter(group0,maskall), category bit63",
+          "clear+append filter/pre rules using current child5"
+        ]
+      },
+      {
+        "after": 20,
+        "actions": [
+          "box0 mask1 group0"
+        ]
+      },
+      {
+        "after": 21,
+        "actions": [
+          "box0 maskbit63 group0"
+        ]
+      },
+      {
+        "after": 30,
+        "actions": [
+          "clear+append filter:rule0 allowtrue",
+          "box0 mask0 then maskall"
+        ]
+      },
+      {
+        "after": 35,
+        "actions": [
+          "clear+append pre:rule1 allowfalse"
+        ]
+      },
+      {
+        "after": 36,
+        "actions": [
+          "clear+append pre:rule1 allowtrue replaceNormal(0,1)"
+        ]
+      },
+      {
+        "after": 120,
+        "actions": [
+          "disable terrain"
+        ]
+      },
+      {
+        "after": 180,
+        "actions": [
+          "enable terrain"
+        ]
+      },
+      {
+        "after": 240,
+        "actions": [
+          "terrain transform(+0.25,0)"
+        ]
+      },
+      {
+        "after": 300,
+        "actions": [
+          "destroy B3"
+        ]
+      },
+      {
+        "after": 360,
+        "actions": [
+          "recreate B3",
+          "preSolve flag true",
+          "filter category bit63 maskall group0"
+        ]
+      },
+      {
+        "after": 420,
+        "actions": [
+          "checked SetType1",
+          "checked SetType2",
+          "checked child DestroyShape18",
+          "checked child Density19",
+          "checked child mutator81 kind0..8"
+        ]
+      }
+    ],
+    "restrictions": "No chain SetFilter API; only legal recreate and ordinary box filter(kind4). No extra positive/zero Step. No omitted refusal, no opMax increase. Final recount including any extra reads/copies required."
+  },
+  "geometryOpenW1": [
+    [
+      12,
+      0
+    ],
+    [
+      10,
+      0
+    ],
+    [
+      6,
+      0
+    ],
+    [
+      4,
+      0
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      0,
+      0
+    ],
+    [
+      -2,
+      0
+    ],
+    [
+      -4,
+      0
+    ],
+    [
+      -6,
+      0
+    ],
+    [
+      -10,
+      0
+    ],
+    [
+      -12,
+      0
+    ]
+  ]
+}

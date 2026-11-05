@@ -1,0 +1,7 @@
+                                                
+                                                                      
+                                                                                    
+                                                                                         
+import lancuchy_adapter as adapter;
+
+fun main() -> i64 = { return adapter.main13C(); }

@@ -1,0 +1,502 @@
+{
+  "runtimeDenominator": "Declarations and fields have no gcov instructions; executed methods are in14b-pokrycie.json",
+  "types": [
+    {
+      "source": "src/joint.h:130-190",
+      "port": [
+        "silnik/fizyka/swiat.dk:1163",
+        "silnik/fizyka/swiat.dk:1189"
+      ],
+      "kind": "R/P active payload types"
+    },
+    {
+      "source": "include/box2d/types.h:701-764",
+      "port": [
+        "silnik/fizyka/swiat.dk:1217",
+        "silnik/fizyka/gra.dk:2446"
+      ],
+      "kind": "revolute definitions/descriptions"
+    },
+    {
+      "source": "include/box2d/types.h:778-842",
+      "port": [
+        "silnik/fizyka/swiat.dk:1232",
+        "silnik/fizyka/gra.dk:2602"
+      ],
+      "kind": "prismatic definitions/descriptions"
+    },
+    {
+      "source": "include/box2d/math_functions.h:50-55",
+      "port": [
+        "silnik/fizyka/swiat.dk:5401"
+      ],
+      "kind": "Mat22, column order"
+    },
+    {
+      "source": "include/box2d/math_functions.h:481-485",
+      "port": [
+        "silnik/fizyka/swiat.dk:5209"
+      ],
+      "kind": "remainderf unwind"
+    },
+    {
+      "source": "include/box2d/math_functions.h:569-579",
+      "port": [
+        "silnik/fizyka/swiat.dk:5402"
+      ],
+      "kind": "Solve22"
+    }
+  ],
+  "API": [
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 998,
+      "function": "b2CreatePrismaticJoint",
+      "declaration": "B2_API b2JointId b2CreatePrismaticJoint( b2WorldId worldId, const b2PrismaticJointDef* def );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5710"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1001,
+      "function": "b2PrismaticJoint_EnableSpring",
+      "declaration": "B2_API void b2PrismaticJoint_EnableSpring( b2JointId jointId, bool enableSpring );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5745"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1004,
+      "function": "b2PrismaticJoint_IsSpringEnabled",
+      "declaration": "B2_API bool b2PrismaticJoint_IsSpringEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5749"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1009,
+      "function": "b2PrismaticJoint_SetSpringHertz",
+      "declaration": "B2_API void b2PrismaticJoint_SetSpringHertz( b2JointId jointId, float hertz );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5735"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1012,
+      "function": "b2PrismaticJoint_GetSpringHertz",
+      "declaration": "B2_API float b2PrismaticJoint_GetSpringHertz( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5736"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1015,
+      "function": "b2PrismaticJoint_SetSpringDampingRatio",
+      "declaration": "B2_API void b2PrismaticJoint_SetSpringDampingRatio( b2JointId jointId, float dampingRatio );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5737"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1018,
+      "function": "b2PrismaticJoint_GetSpringDampingRatio",
+      "declaration": "B2_API float b2PrismaticJoint_GetSpringDampingRatio( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5738"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1021,
+      "function": "b2PrismaticJoint_SetTargetTranslation",
+      "declaration": "B2_API void b2PrismaticJoint_SetTargetTranslation( b2JointId jointId, float translation );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5739"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1024,
+      "function": "b2PrismaticJoint_GetTargetTranslation",
+      "declaration": "B2_API float b2PrismaticJoint_GetTargetTranslation( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5740"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1027,
+      "function": "b2PrismaticJoint_EnableLimit",
+      "declaration": "B2_API void b2PrismaticJoint_EnableLimit( b2JointId jointId, bool enableLimit );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5750"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1030,
+      "function": "b2PrismaticJoint_IsLimitEnabled",
+      "declaration": "B2_API bool b2PrismaticJoint_IsLimitEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5754"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1033,
+      "function": "b2PrismaticJoint_GetLowerLimit",
+      "declaration": "B2_API float b2PrismaticJoint_GetLowerLimit( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5767"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1036,
+      "function": "b2PrismaticJoint_GetUpperLimit",
+      "declaration": "B2_API float b2PrismaticJoint_GetUpperLimit( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5768"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1039,
+      "function": "b2PrismaticJoint_SetLimits",
+      "declaration": "B2_API void b2PrismaticJoint_SetLimits( b2JointId jointId, float lower, float upper );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5760"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1042,
+      "function": "b2PrismaticJoint_EnableMotor",
+      "declaration": "B2_API void b2PrismaticJoint_EnableMotor( b2JointId jointId, bool enableMotor );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5755"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1045,
+      "function": "b2PrismaticJoint_IsMotorEnabled",
+      "declaration": "B2_API bool b2PrismaticJoint_IsMotorEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5759"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1048,
+      "function": "b2PrismaticJoint_SetMotorSpeed",
+      "declaration": "B2_API void b2PrismaticJoint_SetMotorSpeed( b2JointId jointId, float motorSpeed );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5741"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1051,
+      "function": "b2PrismaticJoint_GetMotorSpeed",
+      "declaration": "B2_API float b2PrismaticJoint_GetMotorSpeed( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5742"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1054,
+      "function": "b2PrismaticJoint_SetMaxMotorForce",
+      "declaration": "B2_API void b2PrismaticJoint_SetMaxMotorForce( b2JointId jointId, float force );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5743"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1057,
+      "function": "b2PrismaticJoint_GetMaxMotorForce",
+      "declaration": "B2_API float b2PrismaticJoint_GetMaxMotorForce( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5744"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1060,
+      "function": "b2PrismaticJoint_GetMotorForce",
+      "declaration": "B2_API float b2PrismaticJoint_GetMotorForce( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5769"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1063,
+      "function": "b2PrismaticJoint_GetTranslation",
+      "declaration": "B2_API float b2PrismaticJoint_GetTranslation( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:6083"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1066,
+      "function": "b2PrismaticJoint_GetSpeed",
+      "declaration": "B2_API float b2PrismaticJoint_GetSpeed( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:6089"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1081,
+      "function": "b2CreateRevoluteJoint",
+      "declaration": "B2_API b2JointId b2CreateRevoluteJoint( b2WorldId worldId, const b2RevoluteJointDef* def );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5412"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1084,
+      "function": "b2RevoluteJoint_EnableSpring",
+      "declaration": "B2_API void b2RevoluteJoint_EnableSpring( b2JointId jointId, bool enableSpring );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5446"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1087,
+      "function": "b2RevoluteJoint_IsSpringEnabled",
+      "declaration": "B2_API bool b2RevoluteJoint_IsSpringEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5450"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1090,
+      "function": "b2RevoluteJoint_SetSpringHertz",
+      "declaration": "B2_API void b2RevoluteJoint_SetSpringHertz( b2JointId jointId, float hertz );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5436"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1093,
+      "function": "b2RevoluteJoint_GetSpringHertz",
+      "declaration": "B2_API float b2RevoluteJoint_GetSpringHertz( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5437"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1096,
+      "function": "b2RevoluteJoint_SetSpringDampingRatio",
+      "declaration": "B2_API void b2RevoluteJoint_SetSpringDampingRatio( b2JointId jointId, float dampingRatio );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5438"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1099,
+      "function": "b2RevoluteJoint_GetSpringDampingRatio",
+      "declaration": "B2_API float b2RevoluteJoint_GetSpringDampingRatio( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5439"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1102,
+      "function": "b2RevoluteJoint_SetTargetAngle",
+      "declaration": "B2_API void b2RevoluteJoint_SetTargetAngle( b2JointId jointId, float angle );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5440"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1105,
+      "function": "b2RevoluteJoint_GetTargetAngle",
+      "declaration": "B2_API float b2RevoluteJoint_GetTargetAngle( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5441"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1109,
+      "function": "b2RevoluteJoint_GetAngle",
+      "declaration": "B2_API float b2RevoluteJoint_GetAngle( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:6077"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1112,
+      "function": "b2RevoluteJoint_EnableLimit",
+      "declaration": "B2_API void b2RevoluteJoint_EnableLimit( b2JointId jointId, bool enableLimit );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5451"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1115,
+      "function": "b2RevoluteJoint_IsLimitEnabled",
+      "declaration": "B2_API bool b2RevoluteJoint_IsLimitEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5455"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1118,
+      "function": "b2RevoluteJoint_GetLowerLimit",
+      "declaration": "B2_API float b2RevoluteJoint_GetLowerLimit( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5468"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1121,
+      "function": "b2RevoluteJoint_GetUpperLimit",
+      "declaration": "B2_API float b2RevoluteJoint_GetUpperLimit( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5469"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1125,
+      "function": "b2RevoluteJoint_SetLimits",
+      "declaration": "B2_API void b2RevoluteJoint_SetLimits( b2JointId jointId, float lower, float upper );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5461"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1128,
+      "function": "b2RevoluteJoint_EnableMotor",
+      "declaration": "B2_API void b2RevoluteJoint_EnableMotor( b2JointId jointId, bool enableMotor );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5456"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1131,
+      "function": "b2RevoluteJoint_IsMotorEnabled",
+      "declaration": "B2_API bool b2RevoluteJoint_IsMotorEnabled( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5460"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1134,
+      "function": "b2RevoluteJoint_SetMotorSpeed",
+      "declaration": "B2_API void b2RevoluteJoint_SetMotorSpeed( b2JointId jointId, float motorSpeed );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5442"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1137,
+      "function": "b2RevoluteJoint_GetMotorSpeed",
+      "declaration": "B2_API float b2RevoluteJoint_GetMotorSpeed( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5443"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1140,
+      "function": "b2RevoluteJoint_GetMotorTorque",
+      "declaration": "B2_API float b2RevoluteJoint_GetMotorTorque( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5470"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1143,
+      "function": "b2RevoluteJoint_SetMaxMotorTorque",
+      "declaration": "B2_API void b2RevoluteJoint_SetMaxMotorTorque( b2JointId jointId, float torque );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5444"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    },
+    {
+      "source": "include/box2d/box2d.h",
+      "line": 1146,
+      "function": "b2RevoluteJoint_GetMaxMotorTorque",
+      "declaration": "B2_API float b2RevoluteJoint_GetMaxMotorTorque( b2JointId jointId );",
+      "port": [
+        "silnik/fizyka/swiat.dk:5445"
+      ],
+      "sourceSHA": "f84e07c7a7dd049acd734c9cb355f9d91e5eccca39aebfd4510b13dc7b48eb6f"
+    }
+  ]
+}
