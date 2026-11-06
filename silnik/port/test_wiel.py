@@ -484,7 +484,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
         self.assertEqual(manifest['tasks'][1]['linking_options']['additional_link_options'][-1], '-lm')
-        self.assertNotIn('box2d', json.dumps(manifest))
+        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
 
     def test_both_comparisons_run_when_polygon_driver_is_missing(self):
         (self.ci.OUT/'duckling-kod.csv').write_text('0\n')

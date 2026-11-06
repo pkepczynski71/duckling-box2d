@@ -492,7 +492,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
         self.assertEqual(manifest['tasks'][1]['linking_options']['additional_link_options'][-1], '-lm')
-        self.assertNotIn('box2d', json.dumps(manifest))
+        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
         self.assertIn('Eab3f151cdcce E428c9140f6d7 E2f2457405c54 E35e99f929e01 E54ccc6038f6e',
                       (self.ci.OUT/'blad-portu-ruch.csv').read_text(encoding='utf-8'))
 

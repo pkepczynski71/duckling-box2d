@@ -437,7 +437,7 @@ class CITests(unittest.TestCase):
         manifest = json.loads((self.ci.OUT/'duckling-szeroka-manifest.json').read_text())
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
-        self.assertNotIn('box2d', json.dumps(manifest))
+        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
 
     def test_summary_cli_cannot_ignore_missing_or_red_step_five(self):
         for stage in ('c', 'duckling', 'check', 'check-ruch', 'check-drzewo'):

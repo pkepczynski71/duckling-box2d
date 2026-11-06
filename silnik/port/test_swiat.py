@@ -442,7 +442,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(old.read_text(), 'old measured result')
         manifest = json.loads((self.ci.OUT/'duckling-swiat-manifest.json').read_text())
         self.assertEqual(manifest['packages'][0]['path'], str(physics))
-        self.assertNotIn('box2d', json.dumps(manifest).lower())
+        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], '').lower())
 
     def test_checks_run_even_after_comparison_failure(self):
         with patch.object(self.ci.base, 'run', side_effect=[1, 0]) as run:
@@ -577,7 +577,7 @@ class FollowupCI(unittest.TestCase):
         self.assertEqual(list(call.call_args.args[1])[-2:], ['-O', '0'])
         manifest = json.loads((self.ci.OUT/'fixture-manifest.json').read_bytes())
         self.assertEqual(manifest['packages'][0]['path'], str(ROOT/'silnik/fizyka'))
-        self.assertNotIn('box2d', json.dumps(manifest).lower())
+        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], '').lower())
 
     def test_ticket_stages_reject_wrong_output_and_exit(self):
         for result, wanted in (((0, b'BILETY OK\n'), 0), ((3, b'BILETY OK\n'), 1),
