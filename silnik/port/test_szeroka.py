@@ -9,7 +9,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import sys
 import tempfile
 import unittest
@@ -18,12 +17,17 @@ from unittest.mock import patch
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 
-def manifest_without_repo_root(manifest):
-    root = json.dumps(os.path.normcase(str(ROOT.resolve())))[1:-1]
-    flags = re.IGNORECASE if os.path.normcase('A') == 'a' else 0
-    separator = re.escape(json.dumps(os.sep)[1:-1])
-    return re.sub(r'(?<!\\)"' + re.escape(root) + r'(?="|' + separator + ')', '"',
-                  json.dumps(manifest), flags=flags)
+def manifest_without_repo_root(value):
+    if isinstance(value, dict):
+        return {key: manifest_without_repo_root(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [manifest_without_repo_root(item) for item in value]
+    if isinstance(value, str) and Path(value).is_absolute():
+        path = Path(value).resolve(strict=False)
+        root = ROOT.resolve()
+        if Path(os.path.normcase(str(path))).is_relative_to(Path(os.path.normcase(str(root)))):
+            return str(path.relative_to(root))
+    return value
 
 
 def module(name, file):
@@ -445,7 +449,7 @@ class CITests(unittest.TestCase):
         manifest = json.loads((self.ci.OUT/'duckling-szeroka-manifest.json').read_text())
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
-        self.assertNotIn('box2d', manifest_without_repo_root(manifest))
+        self.assertNotIn('box2d', json.dumps(manifest_without_repo_root(manifest)))
 
     def test_summary_cli_cannot_ignore_missing_or_red_step_five(self):
         for stage in ('c', 'duckling', 'check', 'check-ruch', 'check-drzewo'):
