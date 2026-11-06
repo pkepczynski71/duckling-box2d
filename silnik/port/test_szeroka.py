@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -16,6 +17,13 @@ from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
+
+def manifest_without_repo_root(manifest):
+    root = json.dumps(os.path.normcase(str(ROOT.resolve())))[1:-1]
+    flags = re.IGNORECASE if os.path.normcase('A') == 'a' else 0
+    separator = re.escape(json.dumps(os.sep)[1:-1])
+    return re.sub(r'(?<!\\)"' + re.escape(root) + r'(?="|' + separator + ')', '"',
+                  json.dumps(manifest), flags=flags)
 
 
 def module(name, file):
@@ -437,7 +445,7 @@ class CITests(unittest.TestCase):
         manifest = json.loads((self.ci.OUT/'duckling-szeroka-manifest.json').read_text())
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
-        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
+        self.assertNotIn('box2d', manifest_without_repo_root(manifest))
 
     def test_summary_cli_cannot_ignore_missing_or_red_step_five(self):
         for stage in ('c', 'duckling', 'check', 'check-ruch', 'check-drzewo'):

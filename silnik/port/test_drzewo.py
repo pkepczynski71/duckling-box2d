@@ -7,6 +7,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -18,6 +19,13 @@ spec = importlib.util.spec_from_file_location('porownaj_drzewo_test', HERE/'poro
 p = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(p)
 g = p.g
+
+def manifest_without_repo_root(manifest):
+    root = json.dumps(os.path.normcase(str(ROOT.resolve())))[1:-1]
+    flags = re.IGNORECASE if os.path.normcase('A') == 'a' else 0
+    separator = re.escape(json.dumps(os.sep)[1:-1])
+    return re.sub(r'(?<!\\)"' + re.escape(root) + r'(?="|' + separator + ')', '"',
+                  json.dumps(manifest), flags=flags)
 
 
 def fixture():
@@ -460,7 +468,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
         self.assertEqual(manifest['tasks'][1]['linking_options']['additional_link_options'][-1], '-lm')
-        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
+        self.assertNotIn('box2d', manifest_without_repo_root(manifest))
         self.assertEqual((self.ci.OUT/'duckling-drzewo-kod.csv').read_text(), '125\n')
         self.assertIn('Ebcd8b38e500d Ef642974cfcb1, Ec3f183a85574 Ede7d1b721a1e motion E631f494748f8',
                       (self.ci.OUT/'blad-portu-drzewo.csv').read_text(encoding='utf-8'))

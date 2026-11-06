@@ -11,6 +11,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -23,6 +24,13 @@ p = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = p
 spec.loader.exec_module(p)
 g = p.g
+
+def manifest_without_repo_root(manifest):
+    root = json.dumps(os.path.normcase(str(ROOT.resolve())))[1:-1]
+    flags = re.IGNORECASE if os.path.normcase('A') == 'a' else 0
+    separator = re.escape(json.dumps(os.sep)[1:-1])
+    return re.sub(r'(?<!\\)"' + re.escape(root) + r'(?="|' + separator + ')', '"',
+                  json.dumps(manifest), flags=flags)
 
 
 def analytic_case(id=1, steps=3, gravity=(0, 0), velocity=(0, 0), commands=(), position=(0, 0), maximum=400):
@@ -492,7 +500,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
         self.assertEqual(manifest['tasks'][1]['linking_options']['additional_link_options'][-1], '-lm')
-        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
+        self.assertNotIn('box2d', manifest_without_repo_root(manifest))
         self.assertIn('Eab3f151cdcce E428c9140f6d7 E2f2457405c54 E35e99f929e01 E54ccc6038f6e',
                       (self.ci.OUT/'blad-portu-ruch.csv').read_text(encoding='utf-8'))
 

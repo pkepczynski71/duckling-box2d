@@ -11,6 +11,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -23,6 +24,13 @@ sys.modules[spec.name] = p
 spec.loader.exec_module(p)
 g = p.g
 ROOT = HERE.parents[1]
+
+def manifest_without_repo_root(manifest):
+    root = json.dumps(os.path.normcase(str(ROOT.resolve())))[1:-1]
+    flags = re.IGNORECASE if os.path.normcase('A') == 'a' else 0
+    separator = re.escape(json.dumps(os.sep)[1:-1])
+    return re.sub(r'(?<!\\)"' + re.escape(root) + r'(?="|' + separator + ')', '"',
+                  json.dumps(manifest), flags=flags)
 
 
 def square_words(position):
@@ -484,7 +492,7 @@ class CITests(unittest.TestCase):
         self.assertEqual(Path(manifest['packages'][0]['path']), physics)
         self.assertEqual(manifest['packages'][1]['dependencies'], [{'id': 'fizyka'}])
         self.assertEqual(manifest['tasks'][1]['linking_options']['additional_link_options'][-1], '-lm')
-        self.assertNotIn('box2d', json.dumps(manifest).replace(json.dumps(str(ROOT.resolve()))[1:-1], ''))
+        self.assertNotIn('box2d', manifest_without_repo_root(manifest))
 
     def test_both_comparisons_run_when_polygon_driver_is_missing(self):
         (self.ci.OUT/'duckling-kod.csv').write_text('0\n')
